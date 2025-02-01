@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/others-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>UDP Scanner</h1>
+<h2>Requirements</h2>
+<p>Following Modules and their dependencies of python :</p>
+<pre><code>import socket
+import os
+import argparse
+import struct
+import requests
+import ctypes
+import ipaddress
+import threading
+import shutil
+import time
+</code></pre>
+<h2>Usuage Info</h2>
+<pre><code>./udp-scanner.py -h
+usage: udp-scanner.py [-h] -lh LISTEN_HOST -tsn TARGET_SUBNET [-p PORT] [-v] [-raw] [--view-ip-header] [--view-icmp-header]
+
+options:
+  -h, --help            show this help message and exit
+  -lh LISTEN_HOST, --listen-host LISTEN_HOST
+                        IP or hostname of listening host
+  -tsn TARGET_SUBNET, --target-subnet TARGET_SUBNET
+                        Target Subnet for UDP Scan
+  -p PORT, --port PORT  Dest Port for UDP probe
+  -v, --verbose         Increase Output Verbosity, Show Address Info, Also view other packets than of icmp dest+port unreachable, This
+                        will not view raw/ip/icmp packet, use other options for that
+  -raw, --view-raw-buffer
+                        View Raw Buffer along with Decoded packet
+  --view-ip-header      View IP Header
+  --view-icmp-header    View ICMP Header
+</code></pre>
+<h2>Coding Algorithm</h2>
+<ul>
+<li>Bind your pubic interface to receive raw packets depending on your OS</li>
+<li>Run Seperate Threads for<ul>
+<li>Sending UDP probe</li>
+<li>Keeping Track of Received Packets</li>
+<li>Sending SIGINT when sent finish (UDP packets)</li>
+</ul>
+</li>
+<li>Make sure you give enough time for the receiver to be ready before sending UDP probes, and even after completing sending</li>
+<li>If interrupted of sent finish, print Active Hosts and exit the program</li>
+</ul>
+<h2>Extracting IP Header</h2>
+<ul>
+<li>From Raw Bytes, first 20 bytes are IP Header</li>
+<li>Pass it to IP class, it will use <code>struct</code> module for unpacking/extracting</li>
+<li>Extract accordingly (depending on fields)</li>
+<li>See 
+<img src="/home/maharaja/doing/nov14onwards/b1-hb-bhp/sniffer/pics/ipv4-header.png" alt="ipv4-header.png"></li>
+</ul>
+<h2>Extracting ICMP Header</h2>
+<ul>
+<li>We are particularly interested on Type:3, Code:3; this is the type and code we should receive coz host will send this type of message when it hit to close UDP port </li>
+<li>Type and Code will live within 8 bytes after the IP Header</li>
+<li>Hence, raw_buffer[20:20+8] is enough to extract ICMP Header, pass it to ICMP class, it will also use <code>struct</code> module like IP class</li>
+<li>Extract accordingly (depending on fields)</li>
+<li>See 
+<img src="/home/maharaja/doing/nov14onwards/b1-hb-bhp/sniffer/pics/ipv4-header.png" alt="ipv4-header.png"></li>
+</ul>
+<h2>Update To Expect</h2>
+<ul>
+<li>Use of database folder for getting messages according to the type and code of icmp message</li>
+<li>Grow database and Sniffer/Scanner to get other packets as well (like TCP in *ix systems)</li>
+<li>Add more command line options</li>
+</ul>
+</div>

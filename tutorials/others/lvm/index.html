@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LVM Management Guide</title>
+    <link rel="stylesheet" href="/css/main-style.css">
+    <link rel="stylesheet" href="/css/tut-styl.css">
+    <script src="/javascript/load.js"></script>
+    <script>
+        includeHTML('/includes/navbar.html', 'navbar');
+        includeHTML('/includes/others-sidebar.html', 'sidebar');
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #bebca1;
+        }
+        
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #444;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        pre {
+            background: #eee;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        code {
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .warning {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+            /* font-size: 1.2em; */
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        p{
+            font-size: 1.1em;
+        }
+        .additional-tasks {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="navbar" id="navbar"></div>
+    <div class="sidebar" id="sidebar"></div>
+
+    <div class="content">
+        <h1>LVM Management Guide</h1>
+        <p>Performing operations on LVM requires <code>sudo</code> privileges.</p>
+
+        <h2>1. Create/Initialize Physical Volume (PV)</h2>
+        <div class="warning">
+            <p>Creating a physical volume is quite risky as this will wipe out your partition. <strong>PLEASE BACKUP</strong>.</p>
+        </div>
+        <p>Initialize PV on your machine to be recognized by LVM and usable in LVM Volume Group (VG):</p>
+        <pre><code># pvcreate /dev/sda1
+# pvcreate /dev/sda2 /dev/sdaN
+</code></pre>
+        <p>For our purpose, we will initialize with 2 PVs:</p>
+        <pre><code># pvcreate /dev/sda1 /dev/sda2
+</code></pre>
+        <p>View information about PVs:</p>
+        <pre><code># pvs
+# pvdisplay
+</code></pre>
+
+        <h2>2. Create Volume Group (VG)</h2>
+        <p>Create a VG with the PVs. You can specify one or multiple PVs in VG:</p>
+        <pre><code># vgcreate gfs /dev/sda1
+</code></pre>
+        <p>View information about VGs:</p>
+        <pre><code># vgs
+# vgdisplay
+</code></pre>
+
+        <h2>[Optional Step-3] Extend VG with Additional PVs</h2>
+        <p>Extend VG with additional PVs if needed. Here we will include the other partition <code>/dev/sda2</code> into our VG named <code>'gfs'</code>:</p>
+        <pre><code># vgextend gfs /dev/sda2
+</code></pre>
+
+        <h2>4. Create a Logical Volume (LV)</h2>
+        <p>Create an LV from the VG (<code>gfs</code>) with a size <= VFree (free space available in VG):</p>
+        <pre><code># lvcreate --name deeya --size 5g gfs
+</code></pre>
+        <p>Created LVs and VGs resides at:</p>
+        <pre><code>/dev/gfs
+/dev/gfs/deeya
+/dev/mapper/gfs-deeya
+</code></pre>
+        <p>Actually they are pointing to some device at /dev. To view that details:</p>
+        <pre><code># ls -l /dev/gfs/deeya
+</code></pre>
+        <p>View information about LVs:</p>
+        <pre><code># lvs
+# lvdisplay
+</code></pre>
+
+        <h2>Mounting the Logical Volume</h2>
+        <p>Create a mount point and format the LV with an ext4 filesystem:</p>
+        <pre><code>$ mkdir -p /home/$USER/mount/h-disk/hdd1
+# mkfs.ext4 /dev/gfs/deeya
+</code></pre>
+        <p>Mount the LV (use one of the following, verify device name if necessary):</p>
+        <pre><code>$ sudo mount /dev/gfs/deeya /home/$USER/mount/h-disk/hdd1
+$ sudo mount /dev/mapper/gfs-deeya /home/$USER/mount/h-disk/hdd1
+$ sudo mount /dev/dm-0 /home/$USER/mount/h-disk/hdd1
+</code></pre>
+
+        <div class="additional-tasks">
+            <h2>Additional Tasks</h2>
+            <h3>How to Extend the Size of LV to Use 100% of Free Space in VG</h3>
+            <p>Extend an LV to use all remaining free space in the VG and resize its filesystem:</p>
+            <pre><code># lvextend -l+100%FREE --resizefs gfs/deeya
+</code></pre>
+            <p>If you don't use <code>--resizefs</code>, manually resize the filesystem:</p>
+            <pre><code># resize2fs /dev/gfs/deeya
+</code></pre>
+
+            <h3>How to Extend by 'x' Gigs</h3>
+            <p>Initialize additional PVs and add them to VG:</p>
+            <pre><code># pvcreate /dev/sda{3,4,5}
+# vgextend gfs /dev/sda{3,4,5}
+</code></pre>
+            <p>Extend the size of LV by 4g, using a specific PV:</p>
+            <pre><code># lvextend --resizefs -L +4g gfs/deeya /dev/sda4
+</code></pre>
+            <p>Extend by the amount of free space on a specific PV:</p>
+            <pre><code># lvextend --resizefs gfs/deeya /dev/sda4
+</code></pre>
+
+            <h3>How to Partition /dev/sda Safely</h3>
+            <p>Ensure the logical volume is deactivated and unmounted:</p>
+            <pre><code># umount /dev/gfs/deeya
+# lvchange -a n
+# vgchange -a n
+# fdisk /dev/sda
+# vgchange -a y
+# lvchange -a y
+# mount /dev/gfs/deeya /home/$USER/mount/h-disk/hdd1
+</code></pre>
+            <p>First command will unmount <i>/dev/gfs/deeya</i></p>
+            <p>Second and Third will deactivate all LVs and VGs</p>
+            <p>Fourth will partition disk<p>
+            <p>Fifth and Sixth will reactivate all LVs and VGs</p>
+            <p>Seventh will mount <i>/dev/gfs/deeya</i> at <i>/home/$USER/mount/h-disk/hdd1</i></p>
+            <h3>How to Rename LV and VG</h3>
+            <p>Rename an LV:</p>
+            <pre><code># lvrename /dev/gfs/deeya gfs/smarika
+# lvrename gfs deeya smarika
+</code></pre>
+            <p>Rename a VG:</p>
+            <pre><code># vgrename gfs grlfrns
+# vgrename Zvlifi-Ep3t-e0Ng-U42h-o0ye-KHu1-nl7Ns4 grlfrns
+</code></pre>
+
+            <h3>Activate/Deactivate LV/VG</h3>
+            <p>Deactivate all LV:</p>
+            <pre><code># lvchange -a n
+</code></pre>
+            <p>Reactivate all LV:</p>
+            <pre><code># lvchange -a y
+</code></pre>
+            <p>Deactivate all VG:</p>
+            <pre><code># vgchange -a n
+</code></pre>
+            <p>Reactivate all VG:</p>
+            <pre><code># vgchange -a y
+</code></pre>
+            <p>Deactivate/reactivate specific LV:</p>
+            <pre><code># lvchange -an myvol1
+# lvchange -ay myvol1
+</code></pre>
+            <p>Deactivate/reactivate specific VG:</p>
+            <pre><code># vgchange -an mygrp1
+# vgchange -ay mygrp1
+</code></pre>
+
+            <p>Making it simple:</p>
+            <pre><code># lvchange {-a n|y} | {-an &lt;vol&gt;}
+# vgchange {-a n|y} | {-an &lt;grp&gt;}
+</code></pre>
+
+            <h3>Filesystem Checks</h3>
+            <p>Check a Linux ext2/ext3/ext4 filesystem:</p>
+            <pre><code># e2fsck -f /dev/gfs/smarika
+</code></pre>
+            <p>Edit <code>fstab</code> to mount <code>/dev/gfs/smarika</code> at boot:</p>
+            <pre><code># echo '/dev/gfs/smarika /home/maharaja/mount/h-disk/hdd1 ext4 defaults 0 2' >> /etc/fstab
+</code></pre>
+
+            <h3>More Info</h3>
+            <p>Check which PVs are in a group:</p>
+            <pre><code>$ sudo pvs --units g --noheadings -o pv_name,vg_name | grep 'myvol'
+$ sudo pvs | grep 'myvol' | awk '{print $1}'
+</code></pre>
+            <p>Scan disks for checking LVM compatibility:</p>
+            <pre><code>$ sudo lvmdiskscan
+</code></pre>
+            <p>Check the file system of volumes:</p>
+            <pre><code>$ lsblk -l
+</code></pre>
+            <p>When you are root, you can also use the <code>file</code> command to check fs of volumes:</p>
+            <pre><code>$ sudo file -sL /dev/vgrp1/lvol1
+</code></pre>
+        </div>
+    </div>
+</body>
+</html>
+

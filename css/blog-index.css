@@ -1,0 +1,114 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.blog-container {
+    margin: 20px auto;
+    padding: 0 15px;
+    max-width: 1200px;
+    display: block;
+}
+
+.blog-post {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+    margin: 16px;
+    width: 30%;
+    display: inline-block;
+    vertical-align: top; /* Aligns the blocks horizontally */
+    min-height: 1px; /* Ensures the div doesn't collapse */
+}
+
+.blog-post:hover {
+    transform: translateY(-5px); /* Hover effect */
+}
+
+.blog-post-header {
+    margin-bottom: 15px;
+}
+
+.blog-post-title {
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.blog-post-meta {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.blog-post-image {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.post-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.image-caption {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.blog-post-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+}
+
+.blog-post-footer {
+    margin-top: 20px;
+}
+
+.tags {
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .blog-post {
+        width: 48%; /* Two posts per row */
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-post {
+        width: 100%; /* One post per row */
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-post-title {
+        font-size: 1.5rem;
+    }
+
+    .blog-post-meta {
+        font-size: 0.8rem;
+    }
+
+    .blog-post-content {
+        font-size: 0.95rem;
+    }
+
+    .image-caption {
+        font-size: 0.85rem;
+    }
+
+    .post-image {
+        max-height: 300px;
+    }
+}
