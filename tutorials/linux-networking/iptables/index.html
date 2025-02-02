@@ -1,0 +1,400 @@
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    // includeHTML('/includes/others-sidebar.html', 'sidebar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Intro</h1>
+<ul>
+<li><code>iptables</code> is a command line application for linux to interact with kernel level <strong>netfilter</strong>.</li>
+<li>It works on those linux system having that <em>netfilter framework</em>.</li>
+<li><code>iptables</code> adds, deletes or modifies entries in the kernel filtering table.</li>
+<li>As, it directly interacts with kernel, each time you reboot or shutdown your machine, all the rules you added will be flushed.</li>
+<li>You can use <code>iptables-persistence</code> aka <code>netfilter-persistence</code> to maintain the rules reloaded in every session of your login.</li>
+<li>Default ACCEPT or DROP of packet is generally decided by the default policy of the chain. </li>
+<li>In short, it is a way to decide the <em>fate of every packet</em> that comes in or goes out of the machine.</li>
+<li>Man Page : <a href="https://linux.die.net/man/8/iptables">man iptables</a></li>
+</ul>
+<h2>Tables</h2>
+<p><strong>RAW, MANGLE, NAT, FILTER</strong> are the main tables for <code>iptables</code>. Every tables are specified for some special task.  It is better (must for beginners) to use tables as per their characteristic or only for the purpose they are designed.</p>
+<h3>RAW</h3>
+<ul>
+<li>Default chains in this table are : <em>PREROUTING, OUTPUT</em></li>
+<li>Mainly use to est a mark on packets that they should not be handled by the <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#STATEMACHINE">connection-tracking-system</a>. This is because <strong>RAW</strong> table is hit before any connectio is tracked.</li>
+<li>This is done by using <code>NOTRACK</code> target on the packet.</li>
+</ul>
+<h3>MANGLE</h3>
+<ul>
+<li>Default chains in this table are : <em>PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING</em></li>
+<li>Mainly used for mangling packets or to mangle targets.</li>
+<li>Actually the use case is mostly to change :<ol>
+<li>TOS</li>
+<li>TTL</li>
+<li>MARK</li>
+<li>SECMARK</li>
+<li>CONNSECMARK</li>
+</ol>
+</li>
+<li>More on these : <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#MANGLETABLE">Mangle-Targets</a></li>
+</ul>
+<h3>NAT</h3>
+<ul>
+<li>Default chains in this table are : <em>PREROUTING, INPUT, OUTPUT, POSTROUTING</em></li>
+<li>This should only be use when you will need to perform <a href="https://en.wikipedia.org/wiki/Network_address_translation">Network Address Translation</a></li>
+<li>Following are the main targets used in this table :<ol>
+<li>DNAT</li>
+<li>SNAT</li>
+<li>MASQUERADE</li>
+<li>REDIRECT</li>
+</ol>
+</li>
+<li>More on these : <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#NATTABLE">Nat-Targets</a></li>
+</ul>
+<h3>FILTER</h3>
+<ul>
+<li>Default chains in this table are : <em>INPUT, FORWARD, OUTPUT</em></li>
+<li>This is where all the filtering related packets are perfomed.</li>
+<li>Mainly packets are either <em>accepted</em>(ACCEPT) or <em>dropped</em>(DROP)</li>
+</ul>
+<h2>User Defined Chains</h2>
+<ul>
+<li>Users themselves can define their chain for custom ruleset.</li>
+<li>This chain is nothing but the collection of rules.</li>
+<li>When a packet matches a rule whose target is a user-defined chain, the packet begins traversing the rules in that user-defined chain. If that chain doesn't decide the fate of the packet, then once traversal on that chain has finished, traversal resumes on the next rule in the current chain.</li>
+<li>This figure illustrate the traversal :</li>
+</ul>
+<p><img src="/temp/pics/table_subtraverse-chain.jpg" alt="table_subtraverse-chain.jpg"></p>
+<h2>Packet Traversal</h2>
+<p>When a packet first enters the firewall, it hits the hardware and then gets passed on to the proper device driver in the kernel. Then the packet starts to go through a series of steps in the kernel, before it is either sent to the correct application (locally), or forwarded to another host - or whatever happens to it.</p>
+<p><strong>Table 6-1. Destination local host (our own machine)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Table</th>
+<th>Chain</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td>On the wire (e.g., Internet)</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td>Comes in on the interface (e.g., eth0)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>raw</td>
+<td>PREROUTING</td>
+<td>This chain is used to handle packets before the connection tracking takes place. It can be used to set a specific connection not to be handled by the connection tracking code for example.</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+<td>This is when the connection tracking code takes place as discussed in the <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#STATEMACHINE"><em>The state machine</em></a> chapter.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>mangle</td>
+<td>PREROUTING</td>
+<td>This chain is normally used for mangling packets, i.e., changing TOS and so on.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>nat</td>
+<td>PREROUTING</td>
+<td>This chain is used for DNAT mainly. Avoid filtering in this chain since it will be bypassed in certain cases.</td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td></td>
+<td>Routing decision, i.e., is the packet destined for our local host or to be forwarded and where.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>mangle</td>
+<td>INPUT</td>
+<td>At this point, the mangle INPUT chain is hit. We use this chain to mangle packets, after they have been routed, but before they are actually sent to the process on the machine.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>filter</td>
+<td>INPUT</td>
+<td>This is where we do filtering for all incoming traffic destined for our local host. Note that all incoming packets destined for this host pass through this chain, no matter what interface or in which direction they came from.</td>
+</tr>
+<tr>
+<td>10</td>
+<td></td>
+<td></td>
+<td>Local process or application (i.e., server or client program).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Table 6-2. Source local host (our own machine)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Table</th>
+<th>Chain</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td>Local process/application (i.e., server/client program)</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td>Routing decision. What source address to use, what outgoing interface to use, and other necessary information that needs to be gathered.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>raw</td>
+<td>OUTPUT</td>
+<td>This is where you do work before the connection tracking has taken place for locally generated packets. You can mark connections so that they will not be tracked for example.</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+<td>This is where the connection tracking takes place for locally generated packets, for example state changes et cetera. This is discussed in more detail in the <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#STATEMACHINE"><em>The state machine</em></a> chapter.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>mangle</td>
+<td>OUTPUT</td>
+<td>This is where we mangle packets, it is suggested that you do not filter in this chain since it can have side effects.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>nat</td>
+<td>OUTPUT</td>
+<td>This chain can be used to NAT outgoing packets from the firewall itself.</td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td></td>
+<td>Routing decision, since the previous mangle and nat changes may have changed how the packet should be routed.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>filter</td>
+<td>OUTPUT</td>
+<td>This is where we filter packets going out from the local host.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>mangle</td>
+<td>POSTROUTING</td>
+<td>The POSTROUTING chain in the mangle table is mainly used when we want to do mangling on packets before they leave our host, but after the actual routing decisions. This chain will be hit by both packets just traversing the firewall, as well as packets created by the firewall itself.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>nat</td>
+<td>POSTROUTING</td>
+<td>This is where we do SNAT as described earlier. It is suggested that you don't do filtering here since it can have side effects, and certain packets might slip through even though you set a default policy of DROP.</td>
+</tr>
+<tr>
+<td>11</td>
+<td></td>
+<td></td>
+<td>Goes out on some interface (e.g., eth0)</td>
+</tr>
+<tr>
+<td>12</td>
+<td></td>
+<td></td>
+<td>On the wire (e.g., Internet)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Table 6-3. Forwarded packets</strong></p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Table</th>
+<th>Chain</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td>On the wire (i.e., Internet)</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td>Comes in on the interface (i.e., eth0)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>raw</td>
+<td>PREROUTING</td>
+<td>Here you can set a connection to not be handled by the connection tracking system.</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+<td>This is where the non-locally generated connection tracking takes place, and is also discussed more in detail in the <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#STATEMACHINE"><em>The state machine</em></a> chapter.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>mangle</td>
+<td>PREROUTING</td>
+<td>This chain is normally used for mangling packets, i.e., changing TOS and so on.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>nat</td>
+<td>PREROUTING</td>
+<td>This chain is used for DNAT mainly. SNAT is done further on. Avoid filtering in this chain since it will be bypassed in certain cases.</td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td></td>
+<td>Routing decision, i.e., is the packet destined for our local host or to be forwarded and where.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>mangle</td>
+<td>FORWARD</td>
+<td>The packet is then sent on to the FORWARD chain of the mangle table. This can be used for very specific needs, where we want to mangle the packets after the initial routing decision, but before the last routing decision made just before the packet is sent out.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>filter</td>
+<td>FORWARD</td>
+<td>The packet gets routed onto the FORWARD chain. Only forwarded packets go through here, and here we do all the filtering. Note that all traffic that's forwarded goes through here (not only in one direction), so you need to think about it when writing your rule-set.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>mangle</td>
+<td>POSTROUTING</td>
+<td>This chain is used for specific types of packet mangling that we wish to take place after all kinds of routing decisions have been done, but still on this machine.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>nat</td>
+<td>POSTROUTING</td>
+<td>This chain should first and foremost be used for SNAT. Avoid doing filtering here, since certain packets might pass this chain without ever hitting it. This is also where Masquerading is done.</td>
+</tr>
+<tr>
+<td>12</td>
+<td></td>
+<td></td>
+<td>Goes out on the outgoing interface (i.e., eth1).</td>
+</tr>
+<tr>
+<td>13</td>
+<td></td>
+<td></td>
+<td>Out on the wire again (i.e., LAN).</td>
+</tr>
+</tbody>
+</table>
+<p>The Figure below can summerize these all tables :</p>
+<p><img src="/temp/pics/iptables_traverse.jpg" alt="iptables_traverse.jpg"></p>
+<h2>Playing with <code>iptables</code></h2>
+<h3>Basic Operations on Chain</h3>
+<ul>
+<li>Create Chain ( <code>-N</code> )</li>
+<li>Delete Empty Chain ( <code>-X</code> )</li>
+<li>Change Policy ( <code>-P</code> ) </li>
+<li>List Rules ( <code>-L</code> ) </li>
+<li>List Rules for particular table ( <code>-L -t &lt;table&gt;</code> )</li>
+<li>List Rules in different Format ( <code>-n -L</code> )</li>
+<li>List Rules with line numbers ( <code>-n -L --line-number</code> )</li>
+<li>Flush the Rules out of chain ( <code>-F</code> )</li>
+<li>Zero the packet and byte counters on all rules in the chain ( <code>-Z</code> )</li>
+</ul>
+<h3>Manipulation on Table</h3>
+<ul>
+<li>Append new rule in chain ( <code>-A</code> )</li>
+<li>Insert new rule at some position ( <code>-I &lt;chain&gt; &lt;rule-num&gt;</code> )</li>
+<li>Replace new rule at some position ( <code>-R &lt;chain&gt; &lt;rule-num&gt;</code> )</li>
+<li>Delete new rule at some position or Delete the first that matches ( <code>-D &lt;chain&gt; &lt;rule-num&gt;</code> ) </li>
+</ul>
+<h3>Filtering</h3>
+<ul>
+<li>Source or Destination IP Address ( <code>--src</code>, <code>--dst</code> )</li>
+<li>Protocol ( `--protocol <num|name> )</li>
+<li>Interface ( <code>--in-interface</code>, <code>--out-interface</code> )</li>
+<li>You can specify interface that does not exist or that is <em>DOWN</em>, but rule will only match when the interface is availabe and <em>UP</em></li>
+</ul>
+<h3>Extentions</h3>
+<ul>
+<li>When you specify protocol with  <code>-p</code> or <code>--protocol</code>, the modules related protocol are loaded from the kernel. The load depends on the protocol you specify.</li>
+<li>If you wanna load external module which should be installed in you system, you can load it with the help of <code>-m</code> or <code>--match</code>.</li>
+<li><strong>mac</strong> extention provides <code>--mac-source &lt;mac&gt;</code> option which you can use in <em>INPUT, FORWARD, PREROUTING</em> chains. </li>
+<li><strong>limit</strong> extention provides <code>--limit {N[/s|m|h|d]</code> with <code>--limit-burst &lt;N&gt;</code> whcih you can use to set limit and burst limit in the specific match of packets.</li>
+<li><strong>state</strong> extention is very useful on designing filtering rules. This extention provides <code>--state {NEW | ESTABLISHED | RELATED | INVALID}</code> for packet filtering based on <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#STATEMACHINE">state</a>.</li>
+</ul>
+<h2>Basic Rule</h2>
+<p>Each packet in the table is actually defined as :</p>
+<blockquote>
+<p>If packet looks like this, Perform this action for this packet.</p>
+</blockquote>
+<p>The following can be the basic ruleset or filewall :</p>
+<pre><code class="language-bash"># Allow all outgoing traffic
+iptables -P OUTPUT ACCEPT
+
+# Block all incoming traffic by default
+iptables -P INPUT DROP
+
+# Allow incoming traffic on loopback interface
+iptables -A INPUT -i lo -j ACCEPT
+
+# Allow incoming traffic on established and related connections
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow SSH incoming traffic
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Allow HTTP and HTTPS incoming traffic
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Allow DNS incoming traffic
+iptables -A INPUT -p udp --dport 53 -j ACCEPT
+iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+
+# Drop all other incoming traffic
+iptables -A INPUT -j DROP
+
+# Save the rules
+iptables-save &gt; /etc/iptables/rules.v4
+</code></pre>
+<h1>Outro</h1>
+<p>This was just comprehensive guide for using <code>iptables</code>. Please also refer to :</p>
+<p><a href="/blogs/posts/iptablesFwDesign_ndMakingPersistence">How I designed simple home firewall and make it persistence with <code>iptables</code></a></p>
+<!-- <p><a href="facebook.com">How do I made my pc to work as Router using <code>iptables</code> NATing</a></p> -->
+</div>

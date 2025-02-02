@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Exposing server behind the firewall in the internal network</h1>
+<p>If you don't understand what port forwarding is you must condier reading <a href="https://en.wikipedia.org/wiki/Port_forwarding">its basics</a> first. Here I will discuss my struggle to expose the internal server ( which is behind the firewall or security zones ) for other security zone. Actually, even client and this server were on same network, only host or pc form home_zone could access that server. The needed was to expose the <code>ssh</code> server at port <strong>22</strong>. For this, I will have to expose a port of one machine which can be accessed by those security zones. I decided to expose <strong>2222</strong> port, which is good for readability. For the host who is exposing its port <strong>2222</strong>, it is his responsibility to filter packets which could be another whole topic. For simplicity, I will exclude the use of security zones and simply call :</p>
+<h2>Setup</h2>
+<ul>
+<li><em>Server</em> -&gt; where actually <code>ssh</code> runs, is at <code>192.168.1.74</code></li>
+<li><em>Client</em> -&gt; who will connect to the server ( pseudo server ), is at <code>192.168.1.70</code></li>
+<li><em>Host</em> -&gt; who is doing port forwarding, is at <code>192.168.1.69</code></li>
+</ul>
+<h2>With DNAT and SNAT</h2>
+<p>If you are familier with <a href="iptables">iptables</a>, you should know the <a href="packet-traversal">traversal rule</a>. Please do some research on how it works, if you are new to it. Remember, all of the configuration will be done only on <em>Host</em> machine. Let's dive in :</p>
+<ul>
+<li>The <code>Client:&lt;port&gt;</code> with whatever source port will connect in your exposed port. Since, you are not the actuall server, change dest address for what comes in <code>Host:2222</code> to <code>Server:22</code>.</li>
+</ul>
+<pre><code>sudo iptables -t nat -A PREROUTING -p tcp --dport 2222 -j DNAT --to-destination 192.168.1.74:22
+</code></pre>
+<ul>
+<li>Since, this is related on <strong>FORWARD</strong> chain, if this chain does not have the default policy to <em>ACCEPT</em> the packet, you might consider adding more rule like :</li>
+</ul>
+<pre><code>sudo iptables -A FORWARD -p tcp --dport 22 -d 192.168.1.74 -j ACCEPT
+</code></pre>
+<p>Why do I use <code>Server:22</code>, instead of <code>Host:2222</code>, fairly simple enough i.e. the destination is already modified by <code>DNAT</code> rule.</p>
+<p><strong>Everything should work right ?</strong>
+Let's see wirecapture after <code>Client</code> tries to connect <code>Host:2222</code> in our <code>Host</code>. </p>
+<p><img src="/pics/blog-host.png" alt="blog-host.png"></p>
+<p>Seems like it was even unable to complete initial tcp connection. <strong><em>Why is it retransmitting</em></strong> ? For that to be answered, first, look at the <code>Client</code> :</p>
+<p><img src="/pics/blog-client.png" alt="blog-client.png"></p>
+<p>This was the reason. <code>Client</code> was doing that retransmission. This is usual when you could not complete the <strong>TCP Handshake</strong>. One more thing is present here, <strong><em>What are those RST messages ?</em></strong> Again to answer those, let's see, what <code>Server</code> did :</p>
+<p><img src="/pics/blog-server.png" alt="blog-server.png"></p>
+<p>Having look at the capture, the <code>Server:22</code> was greeted with new connection. This is actually done by the forwarding mechanism we set for <code>Host:22</code>. So, it sends usual syn, ack. As our <code>Host:22</code> sends that new conn request, actuall <code>Client</code> had no idea about that. But now <code>Server:22</code> is sending syn,ack which is user for <code>Server</code>, but for <code>Client</code>, it is not. When <code>Client</code> receives : syn, ack for the request it did not actually initiated, <code>Client</code> simply close the connection with <em><strong>RST</strong></em> message. For each retransmission, there is <em><strong>RST</strong></em>.</p>
+<h3>Actual Problem</h3>
+<blockquote>
+<p>Why <code>Server</code> not forward to <code>Host</code>, instead it sends directly to <code>Client</code> ?</p>
+</blockquote>
+<p>-&gt;  This is simple. your <code>Host</code> have send with the ip address of <code>Client</code>, while your <code>Host</code> don't posses that ip address. So it is just like other packet, it replies to what address comes in.</p>
+<h3>How to solve ?</h3>
+<ul>
+<li>You should modify those source address too, so that you receive those packets instead of server directly sending to client : </li>
+</ul>
+<pre><code>sudo iptables -t nat -A POSTROUTING -p tcp -d 192.168.1.74 --dport 22 -j SNAT --to-source 192.168.1.69
+</code></pre>
+<ul>
+<li>Again you should consider adding <strong>FORWARD</strong> rule, when default policy is not to <em>ACCEPT</em>.</li>
+</ul>
+<pre><code>sudo iptables -A FORWARD -p tcp -s 192.168.1.74 --sport 22 -j ACCEPT
+</code></pre>
+<p>Now see what our <code>Host</code> is transmitting :</p>
+<p><img src="/pics/blog-host2.png" alt="blog-host2.png"></p>
+<p><strong>AWESOME !!</strong> This is desired as connection is taken from <code>Client</code> and then forwarded using DNAT and SNAT to the srever, back when <code>Server</code> replies, Host will un-DNAT and un-SNAT to show as if the replies are actually from the host and not from the server (client sees the replies comes from host) :
+What client sees is that as it has requested for service to <code>Host:2222</code>, it is actually getting one.</p>
+<p><img src="/pics/blog-client2.png" alt="blog-client2.png"></p>
+<p>But, what server has actually send is you could see different ip address i.e. of <code>Host:22</code>.</p>
+<p><img src="/pics/blog-server2.png" alt="blog-server2.png"></p>
+<p><strong>This was simply the magic of SNAT and DNAT.</strong></p>
+<h1>Recommendations</h1>
+<p>I do recommend you to study :</p>
+<p><a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#SNATTARGET">How SNAT Works</a></p>
+<p><a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#DNATTARGET">Hoow DNAT Works</a></p></div>

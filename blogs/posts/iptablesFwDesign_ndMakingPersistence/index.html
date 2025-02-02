@@ -1,0 +1,403 @@
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>How did I design a basic Firewall using iptables and keep it persistence through reboot ?</h1>
+<p>After understanding some basics of <a href="https://en.wikipedia.org/wiki/Iptables">iptables</a>, I decided to create some basic rules for my machine. As I know that the rules will be vanished after I reboot the computer, there were several challenges to develop approach that will be persistence and well easy to deploy and modify on the fly. We can't modify rules on it as fast and as smooth or flexible as something like <a href="https://help.ubuntu.com/community/UFW">ufw</a>. But iptables, is kernel level stuff providing low level support and much more powerful.</p>
+<h2>How will I pull up</h2>
+<ul>
+<li>Create bash script to setup firewall. This can be edited.</li>
+<li>Create bash script to destroy firewall. This can be modify accordingly.</li>
+<li>Create bash script to reload firewall.</li>
+<li>I use <code>netfilter-persistence</code> for persistence.</li>
+</ul>
+<h2>Challenges and WorkAround</h2>
+<ul>
+<li>If firewall script is modified, we should modify destroy script also.</li>
+<li>If firewall script is modified, you should use reload script to reload it. This will destroy and re-create the rule.</li>
+<li>Since, it includes destroying to recreate on the fly, this can be a security risk for that short period of time. </li>
+<li>So, I decided to make my machine isolated and then only modify and reload the rules.</li>
+<li><code>netfilter-persistence</code> don't know why was not working on <em>@reboot</em> while it was working when you <em>shutdown + start</em>,  I had to create a <em>cron job</em>.</li>
+<li>Again, may be because the target was <code>netfilter-persistence</code> again, the <em>cron job</em> for <em>@reboot</em> was not working.</li>
+<li>So, I decided to create <em>systemd service</em>.</li>
+<li>This service should start before our network interfaces are up (for security), I had to modify that configuration file to be so.</li>
+</ul>
+<p>Since you see there were some work to do. Let's Get Started.</p>
+<h2>Firewall Script Walkthrough</h2>
+<p>This script can only be run by <strong>root</strong>. You can place it on <code>/usr/local/bin</code>. </p>
+<ul>
+<li>Ensure Only <strong>root</strong> can run :</li>
+</ul>
+<pre><code class="language-bash">if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+        echo &quot;Run as Root&quot;
+        exit
+fi
+</code></pre>
+<ul>
+<li>Initialize your interfaces and other variables :</li>
+</ul>
+<pre><code class="language-bash">INTERFACE=&quot;wlp4s0&quot;
+ETH_INTERFACE=&quot;enp3s0&quot;
+LOOPBACK=&quot;lo&quot;
+INTERNAL_IP=$(ip -oneline -4 add show &quot;$INTERFACE&quot; | awk '{print $4}') #ip/cidr format
+OWN_IP_ADDR=$(cut -d '/' -f 1 &lt;&lt;&lt; &quot;$INTERNAL_IP&quot;)
+IPTABLES=$(which iptables)
+</code></pre>
+<ul>
+<li>Enable ip forwarding, if not already enabled. Uncomment the following to do so :</li>
+</ul>
+<pre><code class="language-bash"># echo 'net.ipv4.ip_forward=1' &gt; /etc/sysctl.conf &amp;&amp; sysctl -p
+</code></pre>
+<ul>
+<li>We will define our seperate chains, pre built chains will set these chains as target, these chains are designed as per their name, for eg : <code>in_tcp_packets</code> will be the target for <code>--protocol tcp</code> in the <strong>INPUT</strong> chain. You can define as per needed, but for now :<ul>
+<li><code>allowed</code> chain for packets to be allowed.</li>
+<li><code>bad_tcp_packets</code> to store rules for known tcp packets that are actually bad i.e. which are not regular traffic or does not match the feature of tcp.</li>
+<li><code>in_tcp_packets</code> -&gt; target for <code>--protocol tcp</code> in the <code>INPUT</code> chain.</li>
+<li>You could now identify other chain yourself.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-bash">$IPTABLES -N allowed
+
+$IPTABLES -N in_tcp_packets
+$IPTABLES -N out_tcp_packets
+
+$IPTABLES -N in_udp_packets
+$IPTABLES -N out_udp_packets
+
+$IPTABLES -N in_icmp_packets
+$IPTABLES -N out_icmp_packets
+
+$IPTABLES -N bad_tcp_packets 
+</code></pre>
+<ul>
+<li>What could be the <code>bad_tcp_packets</code> ?<ul>
+<li>packet part of new conversation but having both syn and ack set is bad tcp packet</li>
+<li>part of new conversation but syn is not set
+This could be as per your need. You can also <em>DROP, LOG, REJECT</em> these packets.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-bash">$IPTABLES -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG --log-prefix &quot;New not syn:&quot;
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+</code></pre>
+<ul>
+<li>You could code your <code>allowed</code> chain as per your need, for now :</li>
+</ul>
+<pre><code class="language-bash">$IPTABLES -A allowed -p TCP --syn -j ACCEPT
+$IPTABLES -A allowed -p TCP -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A allowed -p TCP -j DROP
+</code></pre>
+<ul>
+<li>Now, for <code>in_tcp_packets</code> and <code>out_tcp_packets</code> could be :</li>
+</ul>
+<pre><code class="language-bash"># write your rules for incomming tcp packets here
+$IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_IP&quot; --dport 80 -j allowed # allow web server from internal network
+# write your rules for outgoing tcp packets here
+</code></pre>
+<ul>
+<li>Write your rules for <code>in_udp_packets</code> and <code>out_udp_packets</code> here, (rules if you have any server or you are expecting data from any server (known server is only recommended for strong security)) :</li>
+</ul>
+<pre><code class="language-bash">$IPTABLES -A in_udp_packets -p UDP --sport 53 -j ACCEPT # for dns response from server
+$IPTABLES -A in_udp_packets -p UDP --sport 67 -j ACCEPT # for dhcp response from server
+$IPTABLES -A in_udp_packets -p UDP -i &quot;$ETH_INTERFACE&quot; --sport 68 --dport 67 -j ACCEPT # for dhcp request from my client
+</code></pre>
+<ul>
+<li>You could control your <code>in_icmp_packets</code> to only receive <code>echo request</code> from localhost or internal, this can also be flexible. I designed to receive <code>echo-request</code>, <code>dest-host-unavl + port-unavl</code> message and also type 11. I put some restriction for <code>out_icmp_packets</code> :</li>
+</ul>
+<pre><code class="language-bash"># for incomming icmp
+$IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 0/0 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 3/3 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 11 -j ACCEPT
+
+# for outgoing icmp 
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 8/0 -j ACCEPT # send icmp request only
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 3/3 -j LOG --log-prefix &quot;Attempted udp scan on closed port:&quot; # on udp close port s
+ystem will auto send type 3, code 3 message, so log any scan made
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 3/3 -j DROP 
+</code></pre>
+<ul>
+<li>Time for <strong>INPUT</strong> chain, best practice is : <ul>
+<li>Set Policy to DROP.</li>
+<li>DROP <code>bad_tcp_packets</code>.</li>
+<li>ACCEPT almost everything from <em>loopback</em> interface.</li>
+<li>ACCEPT everything if connection is valid and already connected.</li>
+<li>for different protocol, set the target be those user defined chains, so that they will do rest of the examine.</li>
+<li>LOG weidro packet that does not match any rule and DROP (since default policy is DROP, you may not explicitly specify) it.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-bash"># ---------------
+# | INPUT chain |
+# ---------------
+$IPTABLES -P INPUT DROP
+
+
+# input chain rules
+
+# Bad TCP Drop already
+$IPTABLES -A INPUT -p tcp -j bad_tcp_packets
+
+# accept everything from loopback, own interface as source
+$IPTABLES -A INPUT -p ALL -i &quot;$LOOPBACK&quot; -j ACCEPT
+$IPTABLES -A INPUT -p ALL -i &quot;$INTERFACE&quot; -s &quot;$OWN_IP_ADDR&quot;  -j ACCEPT
+
+# everything if already conn established or part of communication
+$IPTABLES -A INPUT -p ALL -i &quot;$INTERFACE&quot; -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# protocol specific rules
+$IPTABLES -A INPUT -p TCP -i &quot;$INTERFACE&quot; -j in_tcp_packets
+$IPTABLES -A INPUT -p UDP -i &quot;$INTERFACE&quot; -j in_udp_packets
+$IPTABLES -A INPUT -p ICMP -i &quot;$INTERFACE&quot; -j in_icmp_packets
+
+# log weidro packets i.e packets not matching any of above description
+$IPTABLES -A INPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 7 --log-prefix &quot;IPT INPUT packet died: &quot;
+</code></pre>
+<ul>
+<li>Similar kind of approach for <strong>FORWARD</strong> chain :</li>
+</ul>
+<pre><code class="language-bash"># -----------------
+# | FORWARD chain |
+# -----------------
+$IPTABLES -P FORWARD DROP
+
+
+# reject and log bad tcp
+$IPTABLES -A FORWARD -p tcp -j bad_tcp_packets
+
+
+# Accept the packets we really wanna forward
+$IPTABLES -A FORWARD -i &quot;$INTERFACE&quot; -j ACCEPT
+$IPTABLES -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+
+# Again log weidro packets not matching any of those rules
+$IPTABLES -A FORWARD -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 7 --log-prefix &quot;IPT FORWARD packet died: &quot;
+</code></pre>
+<ul>
+<li>Alike approach for <strong>OUTPUT</strong> chains, mostly you will allow because you have initiated that conversation. </li>
+</ul>
+<pre><code class="language-bash"># ----------------
+# | OUTPUT chain |
+# ----------------
+$IPTABLES -P OUTPUT DROP
+
+
+# reject bad tcp already
+# $IPTABLES -A OUTPUT -p tcp -j bad_tcp_packets
+
+
+# outgoing rules
+$IPTABLES -A OUTPUT -p ALL -o &quot;$LOOPBACK&quot; -j ACCEPT # allow all from loopback
+# icmp generated other than of loopback are to be further inspected
+$IPTABLES -A OUTPUT -p ICMP -o &quot;$INTERFACE&quot; -j out_icmp_packets 
+$IPTABLES -A OUTPUT -p ICMP -o &quot;$ETH_INTERFACE&quot; -j out_icmp_packets 
+
+$IPTABLES -A OUTPUT -p ALL -o &quot;$INTERFACE&quot; -j ACCEPT # allow everything except ICMP
+
+
+# log weidro packets, not matching above rules
+$IPTABLES -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 7 --log-prefix &quot;IPT OUTPUT packet died: &quot;
+</code></pre>
+<h2>How final script looks like ?</h2>
+<p>Well and true, make it flexible per your design. Modify those variables : ( <code>firewall.sh</code> )</p>
+<pre><code class="language-bash">#!/bin/bash
+if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+        echo &quot;Run as Root&quot;
+        exit
+fi
+
+# define variables to use
+INTERFACE=&quot;wlp4s0&quot;
+ETH_INTERFACE=&quot;enp3s0&quot;
+LOOPBACK=&quot;lo&quot;
+INTERNAL_IP=$(ip -oneline -4 add show &quot;$INTERFACE&quot; | awk '{print $4}') #ip/cidr format
+OWN_IP_ADDR=$(cut -d '/' -f 1 &lt;&lt;&lt; &quot;$INTERNAL_IP&quot;)
+
+# load command for iptable
+IPTABLES=$(which iptables)
+
+
+# enable ip forwarding if needed
+# echo 'net.ipv4.ip_forward=1' &gt; /etc/sysctl.conf &amp;&amp; sysctl -p
+
+
+# create 'allowed' chain that you will work on
+$IPTABLES -N allowed
+
+
+#
+# create seperate chains for TCP, UDP, ICMP traffic (these are main traffic)
+#
+
+
+$IPTABLES -N in_tcp_packets
+$IPTABLES -N out_tcp_packets
+
+$IPTABLES -N in_udp_packets
+$IPTABLES -N out_udp_packets
+
+$IPTABLES -N in_icmp_packets
+$IPTABLES -N out_icmp_packets
+
+
+# create bad_tcp_packets table to store known_bads for tcp protocol
+$IPTABLES -N bad_tcp_packets 
+
+#
+# bad_tcp_packets chain
+#
+
+# packet part of new conversation but having both syn and ack set is bad tcp packet
+$IPTABLES -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset # well you want to just DROP, if you are more concerned about your host discovery
+# log and drop packet which is part of new conversation but syn is not set
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG --log-prefix &quot;New not syn:&quot;
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+
+#
+# allowed chain
+#
+
+$IPTABLES -A allowed -p TCP --syn -j ACCEPT
+$IPTABLES -A allowed -p TCP -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A allowed -p TCP -j DROP
+
+# -------------
+# | tcp chain |
+# -------------
+
+# write your rules for incomming tcp packets here
+$IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_IP&quot; --dport 80 -j allowed # allow web server from internal network
+
+# write your rules for outgoing tcp packets here
+
+# -------------
+# | udp chain |
+# -------------
+
+# write your rules for incomming udp packets here, (rules if you have any server or you are expecting data from any server (known server is only recommended for strong security))
+
+$IPTABLES -A in_udp_packets -p UDP --sport 53 -j ACCEPT # for dns response from server
+$IPTABLES -A in_udp_packets -p UDP --sport 67 -j ACCEPT # for dhcp response from server
+$IPTABLES -A in_udp_packets -p UDP -i &quot;$ETH_INTERFACE&quot; --sport 68 --dport 67 -j ACCEPT # for dhcp request from my clients
+
+# write rules for controlling outgoing udp packets
+
+# --------------
+# | icmp chain |
+# --------------
+
+# for incomming icmp
+
+# $IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 8/0 -m limit --limit 1/m --burst-limit 0 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 0/0 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 3/3 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -d &quot;$INTERNAL_IP&quot; --icmp-type 11 -j ACCEPT
+
+# for outgoing icmp 
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 8/0 -j ACCEPT # send icmp request only
+</code></pre>
+<p>The destroy script is : ( <code>destroy-fw.sh</code> )</p>
+<pre><code class="language-bash">#!/bin/bash
+if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+    echo &quot;Run as Root&quot;
+    exit
+fi
+
+
+IPTABLES=$(which iptables)
+$IPTABLES -F
+$IPTABLES -X allowed
+$IPTABLES -X bad_tcp_packets
+$IPTABLES -X in_tcp_packets
+$IPTABLES -X out_tcp_packets
+
+$IPTABLES -X in_udp_packets
+$IPTABLES -X out_udp_packets
+
+$IPTABLES -X in_icmp_packets
+$IPTABLES -X out_icmp_packets
+</code></pre>
+<h2>Making it persistence</h2>
+<p>This was actually challenging but <em>noting is impossible in tech.</em> I could have created <code>crontab -e</code> to run the save each time machine shutdown or go to reboot and restore in my <code>.bashrc</code>:
+- <code>@reboot /usr/sbin/iptables-save &gt; /home/user/somefile.txt</code> in <code>crontab -e</code> and,
+- <code>iptables-restore &lt; /home/user/somefile.txt</code> in <code>.bashrc</code>
+But it comes with the challenge that sometimes <code>@reboot</code> job was not working ( don't know why ). Also, this will load rules after the interface is up which is bad for security practice.</p>
+<p>For that, I searched and found some folks were talking about keeping your scripts at :
+- <code>/etc/network/if-down.d</code> to run script if interface is down.
+- <code>/etc/network/if-post-down.d</code>  to run script after interface is down.
+- <code>/etc/network/if-pre-up.d</code>  to run script before interface is up.
+- <code>/etc/network/if-up.d</code> to run script if interface is up.
+I thought, that's it, it will work. But this also does not work.  Again I don't know Why.</p>
+<p>Now, I did further investigation and found : <code>iptables-persistence</code>, this will help. So, I :
+- Install with <code>sudo apt install iptables-persistence</code> which will give me <code>netfilter-persistent</code> binary and servce to manage.
+- The service will auto <em>enabled</em> and start running, which will save my configuration for firewall.
+- <code>netfilter-persistence</code> don't know why was not working on <em>@reboot</em> while it was working when you <em>shutdown + start</em>,  I had to create a <em>cron job</em>.
+-  Again, may be because the target was <code>netfilter-persistence</code> again, the <em>cron job</em> for <em>@reboot</em> was not working.
+ I was fustrated at this point and I decided to give my last try to <strong>systemd service</strong>.</p>
+<h2>What actually works</h2>
+<p>Here, <code>netfilter-persistence</code> was already available. So on stop I set <code>netfilter-persistence save</code> to be run in order to save the table. Again why it works and not <em>cron job</em>, because the command is actually same for both, <strong>God  Knows</strong>. Again, this service should start before network interfaces are up, I require <code>network-pre.target</code> to be set. 
+-   Install <code>iptables-persistence</code> and <code>enable</code>
+- Create file named <code>firewall.service</code> under <code>/etc/systemd/system</code> and populate it with the content given by <code>echo</code>: </p>
+<pre><code class="language-bash">sudo touch /etc/systemd/system/firewall.service
+echo '[Unit]
+Description=Power-off gpu
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStop=/bin/sh -c &quot;netfilter-persistent save&quot;
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target' | sudo tee /etc/systemd/system/firewall.service &gt; /dev/null
+</code></pre>
+<ul>
+<li>Enable the service</li>
+</ul>
+<pre><code class="language-bash">sudo systemctl enable firewall.service
+</code></pre>
+<h2>What for editng rules</h2>
+<ul>
+<li>Edit your <code>firewall.sh</code>.</li>
+<li>And run : </li>
+</ul>
+<pre><code class="language-bash">sudo destroy.sh
+sudo firewall.sh
+sudo systemctl restart firewall.service
+</code></pre>
+<ul>
+<li>Actually put these on <code>reload-fw.sh</code> for flexibility </li>
+</ul>
+<pre><code class="language-bash">#!/bin/bash
+if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+    echo &quot;Run as Root&quot;
+    exit
+fi
+destroy-fw.sh
+firewall.sh
+systemctl restart firewall.service
+</code></pre>
+<h2>Final Take</h2>
+<ol>
+<li>Place scripts ( <code>firewall.sh</code>, <code>destroy-fw.sh</code> ) at <code>/usr/local/bin</code></li>
+<li>Install and enable <code>netfilter-persistent</code> or <code>iptables-persistent</code>.</li>
+<li>Create your own service <code>firewall.service</code> and enable it.</li>
+<li>Place your <code>reload-fw.sh</code> at <code>/usr/local/bin</code>.</li>
+<li><strong>LETS ROCK</strong></li>
+</ol></div>
