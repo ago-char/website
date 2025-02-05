@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Demo of <em>bind9</em> in its default config</h1>
+<p>If you are here and don't know about how actually DNS works or what it is at all. Please consider reading <a href="https://en.wikipedia.org/wiki/Domain_Name_System">Wikipedia Article on DNS</a> for basic understanding. If you want core knowledge and understanding, you may refer to RFCs of DNS at <a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc1034.txt.pdf">rfc-1034</a> and <a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc1035.txt.pdf">rfc-1035</a>.</p>
+<p>Also, if you don't know what <code>bind9</code> is, it is a dns-daemon for linux system. You may want to study more than what present in this simple tutorial at <a href="https://bind9.readthedocs.io/en/v9.20.5/">bind9 docs</a>, <a href="https://wiki.debian.org/Bind9">debian wiki for bind9</a>, <a href="https://documentation.ubuntu.com/server/how-to/networking/install-dns/">ubuntu docs for dns installation</a>. </p>
+<h2>What to expect from this guide</h2>
+<p>You should study this guide, if you wanna test and run DNS server at it default config i.e. just to check the intstallation and configs are up and running. This guide does not claim to be the best and does not provide the core knowledge but help <strong>you set up DNS server</strong> for the first time on fly.</p>
+<h2>Installation</h2>
+<p>Install <code>bind9</code> for server and you may wanna install <code>dnsutils</code> and <code>net-tools</code> for debugging purpose.</p>
+<pre><code>sudo apt install bind9
+sudo apt install dnsutils
+sudo apt install net-tools
+</code></pre>
+<p>I write the command seperately because <code>dnsutils</code> and <code>net-tools</code> are optional but strongly recommended. This is because you want to check future configuration made on server are working or not.</p>
+<p><code>bind9</code> service will start automatically, in case it doesnot :</p>
+<pre><code>sudo systemctl start bind9
+sudo systemctl start named
+</code></pre>
+<p>Either of command will work.</p>
+<h2>Check It</h2>
+<ul>
+<li>Now, check if the server is up and running :</li>
+</ul>
+<pre><code>sudo systemctl status bind9
+</code></pre>
+<ul>
+<li>This should be running and listening on port 53 :</li>
+</ul>
+<pre><code>netstat -tuln | grep :53
+</code></pre>
+<ul>
+<li>You should see output something similar to this :</li>
+</ul>
+<pre><code class="language-bash">tcp        0      0 192.168.1.70:53         0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:53            0.0.0.0:*               LISTEN
+udp        0      0 192.168.1.70:53         0.0.0.0:*               LISTEN
+udp        0      0 127.0.0.1:53            0.0.0.0:*               LISTEN
+</code></pre>
+<p>This simply means server is running.</p>
+<ul>
+<li>Set client to use DNS of this host ( <code>192.168.1.70</code> in this case )</li>
+</ul>
+<pre><code class="language-ps">PS C:\Users\usr&gt; ipconfig /all
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : DESKTOP-J3N5TJH
+   Primary Dns Suffix  . . . . . . . :
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+
+Ethernet adapter Ethernet:
+
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Intel(R) PRO/1000 MT Desktop Adapter
+   Physical Address. . . . . . . . . : 08-00-27-A5-6D-0D
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   IPv4 Address. . . . . . . . . . . : 192.168.1.84(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.1.254
+   DNS Servers . . . . . . . . . . . : 192.168.1.70
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+</code></pre>
+<p>As, seen this client is set to use our server at <code>192.168.1.70</code>.</p>
+<ul>
+<li>Look at dns query for <a href="wikipedia.org">wikipedia.org</a> as <code>nslookup wikipedia.org</code> from that windows machine.</li>
+</ul>
+<pre><code class="language-ps">PS C:\Users\usr&gt; nslookup wikipedia.org
+Server:  UnKnown
+Address:  192.168.1.70
+
+Non-authoritative answer:
+Name:    wikipedia.org
+Addresses:  2001:df2:e500:ed1a::1
+          103.102.166.224
+</code></pre>
+<p>As see, this elicts response from <code>192.168.1.70</code>. This can be confirmed via wireshark also :</p>
+<p><img src="/pics/dns-capture-default-config.png" alt="dns-capture-default-config.png"></p>
+<p>Those address are same as in the capture.</p>
+<p><strong>YOU HAVE SUCCESSFULLY SET UP YOUR DNS SERVER AT LINUX WITH <code>bind9</code></strong>.</p>
+<p><strong><em>Let's Rock !</em></strong></p></div>

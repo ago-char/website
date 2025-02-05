@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="/css/main-style.css">
 <link rel="stylesheet" href="/css/tut-styl.css">
 <link rel="stylesheet" href="/css/md-style.css">
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+
 <script src="/javascript/load.js"></script>
 <script>
     includeHTML('/includes/navbar.html', 'navbar');
@@ -69,7 +71,7 @@
 <li>When a packet matches a rule whose target is a user-defined chain, the packet begins traversing the rules in that user-defined chain. If that chain doesn't decide the fate of the packet, then once traversal on that chain has finished, traversal resumes on the next rule in the current chain.</li>
 <li>This figure illustrate the traversal :</li>
 </ul>
-<p><img src="/temp/pics/table_subtraverse-chain.jpg" alt="table_subtraverse-chain.jpg"></p>
+<p><img src="/pics/table_subtraverse-chain.jpg" alt="table_subtraverse-chain.jpg"></p>
 <h2>Packet Traversal</h2>
 <p>When a packet first enters the firewall, it hits the hardware and then gets passed on to the proper device driver in the kernel. Then the packet starts to go through a series of steps in the kernel, before it is either sent to the correct application (locally), or forwarded to another host - or whatever happens to it.</p>
 <p><strong>Table 6-1. Destination local host (our own machine)</strong></p>
@@ -322,7 +324,7 @@
 </tbody>
 </table>
 <p>The Figure below can summerize these all tables :</p>
-<p><img src="/temp/pics/iptables_traverse.jpg" alt="iptables_traverse.jpg"></p>
+<p><img src="/pics/iptables_traverse.jpg" alt="iptables_traverse.jpg"></p>
 <h2>Playing with <code>iptables</code></h2>
 <h3>Basic Operations on Chain</h3>
 <ul>

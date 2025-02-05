@@ -1,0 +1,190 @@
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>How DNS Works ?</h1>
+<p>Ever thought, how your computer manages to resolve the hostnames you type as such <code>google.com</code> or <code>youtube.com</code> into numberical name like <code>142.250.196.174</code> or <code>172.217.163.206</code>. Here'is how .... But why ? Well, without those IP address, you can not communicate with those domain names, Coz internet system doesn't know name, they know numbers.</p>
+<p>Before continuing, I wanna tell, this is not <em>whatis</em> introducation for DNS. Visit <a href="https://en.wikipedia.org/wiki/Domain_Name_System">Wikipedia Article on DNS</a>, if you are not familier with it.</p>
+<h2>History</h2>
+<ul>
+<li>Host to Address mapping were maintained by the Network Information Center ( NIC) in single file (HOSTS.TXT) which will be fetched by all hosts in the network.</li>
+<li>As computers grows, network grows in 100s, this require standard system to map host &rarr; addr with core conecpt but flexible throughout different protocols and application format.</li>
+</ul>
+<h2>Components</h2>
+<ul>
+<li>
+<p><strong>DOMAIN NAME SPACE and RESOURCE RECORDS</strong> &rarr; tree structure where each node and leaf contains information for DNS which can be extracted with DNS query. Conceptually, each node and leaf of the domain name space tree names a set of information, and query operations are attempts to extract specific types of information from a particular set.</p>
+</li>
+<li>
+<p><strong>NAME SERVERS</strong> &rarr; information about domain tree of DOMAIN NAME SPACE, particullarly of a set or part of domain tree along with pointers for other trees, when query is received if found return else point to another NAME SERVERS. They know the parts of the domain tree for which they have complete information; a name server is said to be an AUTHORITY for these parts of the name space.</p>
+</li>
+<li>
+<p><strong>RESOLVERS</strong> &rarr; programs that extracts informaition from the NAME SERVERS, this info can be used by RESOLVES to answer directly the query of clients. Resolvers must be able to access at least one name server and use that name server’s information to answer a query directly, or pursue the query using referrals to other name servers.</p>
+</li>
+</ul>
+<h2>What each component views the DNS as ?</h2>
+<ul>
+<li>
+<p>For <strong>Users</strong>, they have access to <strong>Resolvers</strong> with system call or local call, they think domain system to be the single tree or database and they can request it.</p>
+</li>
+<li>
+<p>But for <strong>Resolvers</strong>, it is the collection of <strong>Name Servers</strong>, each will have info regarding whole tree or sub tree from where they will extract info for IP resolution.</p>
+</li>
+<li>
+<p>Again for <strong>Name Servers</strong>, it is a different story. It views Domain System as zones which can be extracted from the infromation extracted about domain tree.</p>
+</li>
+</ul>
+<h2>What's inside those RESOURCE RECORD ?</h2>
+<pre><code>RR
+  ------ Owner
+  ------ Type
+           ------ A
+           ------ CNAME
+           ------ HINFO
+           ------ MX
+           ------ NS
+           ------ PTR
+           ------ SOA
+  ------ Class
+           ------ IN
+           ------ CH
+  ------ TTL
+  ------ RDATA
+           ------ A
+           ------ CNAME
+           ------ MX
+           ------ NS
+           ------ PTR
+           ------ SOA
+</code></pre>
+<h2>Lookup Procedure</h2>
+<p><img src="/pics/dns-lookup-basic-process.webp" alt="dns-lookup-basic-process.webp"></p>
+<ul>
+<li>Say, you are visiting <code>surrorblog.wordpress.com</code> for the first time.</li>
+<li>It simply means that your browser won't have cache information regarding this.</li>
+<li>You may have set up your dns resolver be google's one as <code>8.8.8.8</code>.</li>
+<li>
+<p>Now, resolver will ask to <code>8.8.8.8</code> as such :</p>
+<blockquote>
+<p>Hey ? What's the ip addess of <code>surrorblog.wordpress.com</code> ?</p>
+</blockquote>
+</li>
+<li>
+<p>Google is such a big. It should have it right ? Well, to be honest, <strong>NO</strong>. It may have cached when someone has recently visited the site, if it has it will reply the ip address to our resolver and we are ready to go.</p>
+</li>
+<li>For now, let's assume, it does not have any info. But, google DNS is he knows a guy called <strong>Root Server</strong>. He will give the <code>8.8.8.8</code>, the address for <strong>Root Server</strong>. </li>
+<li>
+<p>Now the server <code>8.8.8.8</code> will ask that <strong>Root</strong> : </p>
+<blockquote>
+<p>Hey ? What's the ip addess of <code>surrorblog.wordpress.com</code> ?</p>
+</blockquote>
+</li>
+<li>
+<p><em><strong>NO</strong></em>, DNS lookup is divided, so it will only ask info regarding <strong>Top Level Domain (TLS)</strong> :</p>
+<blockquote>
+<p>Yo, Wassup <strong>Root</strong> ?, Who manages <code>com.</code> ?</p>
+</blockquote>
+</li>
+<li>
+<p>It will then reply with the list of name servers that manages <code>com.</code> domain.</p>
+</li>
+<li><code>nslookup</code> query will be :</li>
+</ul>
+<pre><code class="language-bash">nslookup -type=ns com.
+</code></pre>
+<ul>
+<li>You may get quite long answer :</li>
+</ul>
+<pre><code class="language-bash">Server:     8.8.8.8
+Address:    8.8.8.8#53
+
+Non-authoritative answer:
+com nameserver = j.gtld-servers.net.
+com nameserver = d.gtld-servers.net.
+com nameserver = a.gtld-servers.net.
+com nameserver = k.gtld-servers.net.
+com nameserver = g.gtld-servers.net.
+com nameserver = h.gtld-servers.net.
+com nameserver = c.gtld-servers.net.
+com nameserver = e.gtld-servers.net.
+com nameserver = f.gtld-servers.net.
+com nameserver = m.gtld-servers.net.
+com nameserver = b.gtld-servers.net.
+com nameserver = l.gtld-servers.net.
+com nameserver = i.gtld-servers.net.
+</code></pre>
+<ul>
+<li>
+<p>The <code>8.8.8.8</code> might use one of them to query :</p>
+<blockquote>
+<p>Please, <code>l.gtld-servers.net.</code>, who manages <code>wordpress.com</code>, which is second level domain under yours <code>.com</code> ?</p>
+</blockquote>
+</li>
+<li>
+<p>Now that <code>l.gtld-servers.net.</code> replies with the list of servers responsible for managing <code>wordpress.com</code> sub domain. </p>
+</li>
+<li><code>nslookup</code> query : </li>
+</ul>
+<pre><code class="language-bash">$ nslookup -type=ns wordpress.com
+Server:     8.8.8.8
+Address:    8.8.8.8#53
+
+Non-authoritative answer:
+wordpress.com   nameserver = ns1.wordpress.com.
+wordpress.com   nameserver = ns2.wordpress.com.
+wordpress.com   nameserver = ns3.wordpress.com.
+wordpress.com   nameserver = ns4.wordpress.com.
+</code></pre>
+<ul>
+<li>
+<p>Now, the <code>8.8.8.8</code> will finally with big hope asks one of the server in the list, because <code>surrorblog.wordpress.com</code>, is already sub domain for <code>wordpress.com</code>, those name server must have IP address, so it will ask ip address :</p>
+<blockquote>
+<p>I urge you <code>ns1.wordpress.com.</code>, greet me with ip address of <code>wordpress.com</code> ..</p>
+</blockquote>
+</li>
+<li>
+<p>As, <code>ns1.wordpress.com.</code> is authoritive for <code>wordpress.com</code>, it should have it and finally will reply:</p>
+<blockquote>
+<p>I know you have come a long way, <code>192.0.78.13</code> is the ip address for <code>surrorblog.wordpress.com</code></p>
+</blockquote>
+</li>
+<li>
+<p><code>nslookup</code> equivalent will be :</p>
+</li>
+</ul>
+<pre><code class="language-bash">$ nslookup -type=A surrorblog.wordpress.com ns1.wordpress.com.
+Server:     ns1.wordpress.com.
+Address:    2a04:fa87:ffff::c6b5:7409#53
+
+surrorblog.wordpress.com    canonical name = lb.wordpress.com.
+Name:   lb.wordpress.com
+Address: 192.0.78.12
+Name:   lb.wordpress.com
+Address: 192.0.78.13
+</code></pre>
+<ul>
+<li>Now the nameserver ( <code>8.8.8.8</code> ) will cache information for certain time and provide our resolver the address, Now we are good to visit website at <code>192.0.78.13</code></li>
+</ul>
+<p><strong>GO VIST BRO, my blogs there</strong> <a href="agochar.online">blogs</a></p>
+<h2>Lookup Procedure Might Vary</h2>
+<p>Yes, the process might vary according to the type of server if it is <strong>recursive</strong> or <strong>iterative</strong>. In our case, <code>8.8.8.8</code> is recursive.</p>
+<h2>Recursive Vs Iterative</h2>
+<p>A <strong>recursive DNS</strong> lookup is where one <strong>DNS</strong> server communicates with several other <strong>DNS</strong> servers to hunt down an IP address and return it to the client. This is in contrast to an <strong>iterative DNS query</strong>, where the client communicates directly with each <strong>DNS</strong> server involved in the lookup.</p>
+<h3>Pictorically</h3>
+<p><img src="/pics/recursive-iterative-DNS.png" alt="recursive-iterative-DNS.png"></p>
+<h2>More Examples</h2>
+<h3>TLS vs SLD vs Hostnames</h3>
+<p><img src="/pics/tld-sld.webp" alt="tld-sld.webp"></p>
+<h2>References</h2>
+<p><a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc1034.txt.pdf">DNS rfc-1034</a></p>
+<p><a href="https://www.youtube.com/watch?v=NiQTs9DbtW4">NetworkChuck YT Video</a></p>
+<p><a href="https://medium.com/networks-security/dns-queries-recursive-and-iterative-cdb73e290299">Medium Blog on Recursive Vs Iterative</a></p></div>
