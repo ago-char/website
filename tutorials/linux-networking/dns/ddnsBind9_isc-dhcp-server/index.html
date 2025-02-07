@@ -1,0 +1,235 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Configure Dynamic DNS for your Home Network</h1>
+<p>Before starting, I wanna tell, this is not <em>whatis</em> introducation for DNS. Visit <a href="https://en.wikipedia.org/wiki/Domain_Name_System">Wikipedia Article on DNS</a>, if you are not familier with it. The guide assumes you know the basic of what DNS is or even what Dynamic DNS is and what to use for. Overall, <a href="https://en.wikipedia.org/wiki/Dynamic_DNS">Dynamic DNS</a> is real time automatic update of name servers and its settings like zones, hostnames, addresses, etc.</p>
+<h2>Installation</h2>
+<ul>
+<li>Installing our favorite <a href="https://packages.debian.org/source/sid/bind9">bind9 server</a> for DNS and <a href="https://packages.debian.org/search?keywords=isc-dhcp-server">isc-dhcp-server</a> for DHCP.</li>
+</ul>
+<pre><code class="language-bash">sudo apt install bind9 &amp;&amp; sudo apt install isc-dhcp-server
+</code></pre>
+<ul>
+<li>They will be enabled by defualt but you can always enable.</li>
+</ul>
+<pre><code>sudo systemctl enable bind9 &amp;&amp; sudo systemctl enable isc-dhcp-server
+</code></pre>
+<p><strong>We also assume you are familier with these servers. Hence, we won't waste time knowing behaviours of these in details, rather jump into configuration directly.</strong></p>
+<h2>Overview</h2>
+<p>When our DHCP Server adds or removes IP Address from its database which depends on if the client is trying to connect or disconnect, the server will send DNS update message to DNS Server. This message will often be signed by the key configured. This key is kind of symmetric meaning both server will use same key. When DNS server receives DNS update, it verifies if it came from the server which holds the same key, if yes it will update zone records else denied. Well, these updates can be controlled by different ACLs, but this is for another day.</p>
+<h2>Server Side Configuration</h2>
+<h3>Key Configuration</h3>
+<ul>
+<li>As discussed above, <em>key</em> is the main element defing trust for DNS update. So generate key with <code>ddns-confgen</code>. Output may look like :</li>
+</ul>
+<pre><code># To activate this key, place the following in named.conf, and
+# in a separate keyfile on the system or systems from which nsupdate
+# will be run:
+key &quot;ddns-key&quot; {
+    algorithm hmac-sha256;
+    secret &quot;MP+jY90qZmItTT5VImPCvj8AbW/ntKJcNxsS0EtBlX0=&quot;;
+};
+
+# Then, in the &quot;zone&quot; statement for each zone you wish to dynamically
+# update, place an &quot;update-policy&quot; statement granting update permission
+# to this key.  For example, the following statement grants this key
+# permission to update any name within the zone:
+update-policy {
+    grant ddns-key zonesub ANY;
+};
+
+# After the keyfile has been placed, the following command will
+# execute nsupdate using this key:
+nsupdate -k &lt;keyfile&gt;
+</code></pre>
+<ul>
+<li>We only require the key part :</li>
+</ul>
+<pre><code>key &quot;ddns-key&quot; {
+    algorithm hmac-sha256;
+    secret &quot;MP+jY90qZmItTT5VImPCvj8AbW/ntKJcNxsS0EtBlX0=&quot;;
+};
+</code></pre>
+<p>which should be placed on <code>/etc/bind/ddns.key</code>, you can name the keyfile as  you want but this shoule be readable by <code>bind</code> group or user. Example permission will be :</p>
+<pre><code>-rw-r----- 1 root bind 100 Feb  6 23:42 ddns.key
+</code></pre>
+<ul>
+<li>This is the same key for the DHCP server, so you should place it under <code>/etc/dhcp/ddns-keys/ddns.key</code>. Essentially, you could place anywhere but <code>/etc/dhcp/ddns-keys</code> directory is by default configured at the time of installation with required permission, owner, group.</li>
+</ul>
+<pre><code>drwxr-x--- 2 root dhcpd 4096 Feb  7 19:25 /etc/dhcp/ddns-keys
+</code></pre>
+<p>Give this key access to <code>root</code> and <code>dhcpd</code>.</p>
+<h3>DNS Configuration</h3>
+<ul>
+<li>
+<p>We know <code>bind9</code> manages its configuration from <code>/etc/bind/named.conf</code> which includes :</p>
+<ul>
+<li><code>/etc/bind/named.conf.local</code></li>
+<li><code>/etc/bind/named.conf.options</code></li>
+<li><code>/etc/bind/named.conf.default-zones</code></li>
+</ul>
+</li>
+<li>
+<p>Starting with <code>/etc/bind/named.conf.options</code> shoule be someting like this for global options :</p>
+</li>
+</ul>
+<pre><code>options {
+    directory &quot;/var/cache/bind&quot;;
+    allow-query { any; };
+    allow-transfer { none; };
+    listen-on { any; };
+    forwarders {
+        8.8.8.8;
+        8.8.4.4;
+    };
+dnssec-validation auto;
+    listen-on-v6 { any; };
+};
+</code></pre>
+<ol>
+<li>
+<p>Please make sure to backup old one before editing content.</p>
+</li>
+<li>
+<p><code>allow-query {any; }</code> defines anybody be allowed to query this server. This might not the best security practice, you may want to restrict this to particular subnet or hosts.</p>
+</li>
+<li>
+<p><code>allow-transfer { none; };</code> means no zone transfer is allowed.</p>
+</li>
+<li>
+<p><code>dnssec-validation auto;</code> means DNSSEC validation is enabled and a default trust anchor for the DNS root zone is used. This trust anchor is provided as part of BIND and is kept up-to-date using Dynamic Trust Anchor Management key management.</p>
+</li>
+<li>
+<p>Others are pretty self explantory.</p>
+</li>
+</ol>
+<hr />
+<ul>
+<li>Now for local DNS zone use <code>/etc/bind/named.local</code> as such :</li>
+</ul>
+<pre><code>include &quot;/etc/bind/dhcp.key&quot;;
+
+// Zone Configuration
+zone &quot;example.com&quot; {
+    type master;
+    notify no;
+    file &quot;/var/lib/bind/example.com.zone&quot;;
+    allow-update { key ddns-key; };
+};
+</code></pre>
+<ol>
+<li>
+<p>Everything seems to be self sufficient in explanation but also :</p>
+<ul>
+<li><code>type master;</code> means this is primary server.</li>
+<li><code>notify no;</code> simply notify is disabled. (you can enable for logs)</li>
+<li><code>file "/var/lib/bind/example.com.zone";</code> specifies location of zone file.</li>
+<li><code>allow-update { key ddns-key; };</code> means zone file specified be only updated by the key.</li>
+</ul>
+</li>
+<li>
+<p><strong>Why zone file is under <code>/var/lib/bind/</code> and not under <code>/etc/bind/</code> ?</strong></p>
+<blockquote>
+<p>🔴 <strong>Problem:</strong><br />
+  If you try to store dynamically updated zone files in <code>/etc/bind/</code>, you might face:</p>
+<ol>
+<li><strong>Permission Issues</strong> – BIND may not have permission to write.</li>
+<li><strong>Security Risks</strong> – <code>/etc/</code> is for system-wide configuration, not runtime data.</li>
+<li><strong>SELinux/AppArmor Restrictions</strong> – Security policies may block writes to <code>/etc/</code>.</li>
+<li><strong>Manual Updates Needed</strong> – Dynamic updates won’t be stored, requiring manual reloads.</li>
+</ol>
+<p>✅ <strong>Solution:</strong><br />
+  To allow DDNS, use <code>/var/lib/bind/</code> for writable zone files. This is recommended by <code>bind9</code> too.</p>
+</blockquote>
+</li>
+<li>
+<p>Example zone file at <code>/var/lib/bind/example.com.zone</code> :</p>
+</li>
+</ol>
+<pre><code>$ORIGIN .
+$TTL 86400  ; 1 day
+example.com     IN SOA  doctorG.example.com. root.example.com. (
+                2025020769 ; serial
+                3600       ; refresh (1 hour)
+                1800       ; retry (30 minutes)
+                1209600    ; expire (2 weeks)
+                86400      ; minimum (1 day)
+                )
+            NS  doctorG.example.com.
+</code></pre>
+<p>Basic Zone file <a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/4/html/reference_guide/s2-bind-zone-examples#s2-bind-zone-examples">details</a></p>
+<h2>DHCP Configuration</h2>
+<ul>
+<li>There is a single <code>/etc/dhcp/dhcpd.conf</code> file we have to manage for DHCP. First of all please have your defualt backup and then edit the original to look like the following :</li>
+</ul>
+<pre><code># Include key for DDNS updates
+include &quot;/etc/dhcp/ddns-keys/dhcp.key&quot;;
+
+# DDNS Settings
+ddns-updates on; # enable ddns update it is our main goal
+ddns-update-style standard;
+ignore client-updates;
+update-static-leases off;
+authoritative;
+
+# Subnet Configuration for DHCP
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    range 192.168.1.10 192.168.1.50;
+    # DHCP Options
+    option domain-name &quot;example.com&quot;;
+    option domain-name-servers 192.168.1.80;  # BIND DNS Server
+    option subnet-mask 255.255.255.0;
+    option routers 192.168.1.254;             # Gateway IP
+
+    # lease times
+    default-lease-time 600;
+    max-lease-time 7200;
+
+    # Add dynamic host updates for DHCP clients
+    zone example.com. {
+        primary 192.168.1.80;    # DNS Server IP
+        key ddns-key;
+    }
+}
+</code></pre>
+<p>Most of them can be self explained, but something additional :
+1. <code>ddns-update-style standard;</code> means to follow standard update. You may find using <code>interim</code> but this is deprecated.</p>
+<ol>
+<li>
+<p><code>ignore client-updates;</code> meaning to ignore the update requested by the clients.</p>
+</li>
+<li>
+<p><code>update-static-leases off;</code> means :</p>
+<blockquote>
+<p>The <em>update-static-leases</em> flag, if enabled, causes the DHCP server to do DNS updates for clients even if those clients are being assigned their IP address using a <em>fixed-address</em> or <em>fixed-address6</em> statement - that is, the client is being given a static assignment. It is not recommended because the DHCP server has no way to tell that the update has been done, and therefore will not delete the record when it is not in use. Also, the server must attempt the update each time the client renews its lease, which could have a significant performance impact in environments that place heavy demands on the DHCP server. This feature is supported for both DHCPv4 and DHCPv6, and update modes standard or interim. It is disabled by default.</p>
+</blockquote>
+</li>
+<li>
+<p><code>authoritative;</code> :</p>
+<blockquote>
+<p>The DHCP server will normally assume that the configuration information about a given network segment is not known to be correct and is not authoritative. This is so that if a naive user installs a DHCP server not fully understanding how to configure it, it does not send spurious DHCPNAK messages to clients that have obtained addresses from a legitimate DHCP server on the network.</p>
+</blockquote>
+</li>
+<li>
+<p>This config :</p>
+</li>
+</ol>
+<pre><code>    zone example.com. {
+        primary 192.168.1.80;    # DNS Server IP
+        key ddns-key;
+    }
+</code></pre>
+<p>means primary DNS Server is <code>192.168.1.80</code> which is self, and <code>key ddns-key</code> be use to sign updates regarding DHCP/DDNS.</p>
+<p><strong>THAT'S IT ! ENJOY</strong></p>
+<p>You may use for debug :</p>
+<pre><code>tail -f /var/log/syslog
+</code></pre></div>

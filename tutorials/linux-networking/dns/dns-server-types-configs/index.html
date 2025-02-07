@@ -1,0 +1,228 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Configure Primary DNS server in Ubuntu</h1>
+<p>Install out favorite DNS server for Debian Based Linux ( <code>bind9</code> aka <code>named</code> ), also enable</p>
+<pre><code>sudo apt install bind9 &amp;&amp; sudo systemctl enable bind9
+</code></pre>
+<h2>Server Configuration</h2>
+<h3>Global Config ( <code>/etc/bind/named.conf.options</code> )</h3>
+<ul>
+<li>
+<p>By default is listening on every ipv4 and ivp6 interface.</p>
+</li>
+<li>
+<p>if you change : </p>
+</li>
+</ul>
+<pre><code>listen-on-v6 { any; };
+</code></pre>
+<ul>
+<li>to :</li>
+</ul>
+<pre><code>listen-on-v6 { none; };
+</code></pre>
+<ul>
+<li>it stops listening on ipv6 but still operates on v4., but if you add :</li>
+</ul>
+<pre><code>listen-on port 53 { none; };
+</code></pre>
+<ul>
+<li>
+<p>stops listening on v4 tooo</p>
+</li>
+<li>
+<p>For now we have not deployed v6, so continue with v4.</p>
+</li>
+</ul>
+<pre><code>listen-on port 53 { any; };
+</code></pre>
+<ul>
+<li>You will also want your server be recursive. So add :</li>
+</ul>
+<pre><code>recursion yes;
+</code></pre>
+<h3>Host Configuration ( Something other that DNS server but related and recommended )</h3>
+<ul>
+<li>
+<p>First of all you may want to make your dns server  ip static, this is because most of the servers ip are static and it will be easy to deploy them in client, for that use one of the ways <a href="https://linuxconfig.org/how-to-configure-static-ip-address-on-ubuntu-18-04-bionic-beaver-linux">described here</a>. I did it and now ip is <code>192.168.1.80</code></p>
+</li>
+<li>
+<p>now change your hostname ( this is because you want your dnsdomainname look like it ) at <code>/etc/hostname</code>, and at <code>/etc/hosts</code>, suppose you set hostname as <em>doctorG.example.com</em>, the first line on <code>/etc/hosts</code> shoud be <code>192.168.1.80 doctorG.example.com doctorG</code>, run following as root :</p>
+</li>
+</ul>
+<pre><code>echo doctorG.example.com &gt; /etc/hostname
+sed -i '1i192.168.1.80 doctorG.example.com doctorG' /etc/hosts
+</code></pre>
+<ul>
+<li>Make sure for <code>/etc/resolv.conf</code> file at server consists first line as :<code>nameserver 192.168.1.80</code>, which is you own IP ( if you use other server how would they know your local config, so using own ) you can run :</li>
+</ul>
+<pre><code>sed -i '1inameserver 192.168.1.80' /etc/resolv.conf
+</code></pre>
+<h3>Local Config for Zone ( <code>/etc/bind/named.conf.local</code> )</h3>
+<ul>
+<li>
+<p>Dns records mainly are collection of zone files for each dns domain.</p>
+</li>
+<li>
+<p>Let's have our domain <code>example.com</code> a zone :</p>
+</li>
+<li>
+<p>In your <code>/etc/bind/named.conf.local</code>, you will be placing any local configs.</p>
+</li>
+<li>
+<p>We have already set to listen on global file, also recursive on global file, so not needed to explicitly mention here, as they are inherited.</p>
+</li>
+<li>
+<p>Config :</p>
+</li>
+</ul>
+<pre><code>zone &quot;example.com&quot; {
+    type master;
+    file &quot;/etc/bind/my-zones/zone_db-example.com&quot;;
+    allow-update { none; };
+};
+</code></pre>
+<ul>
+<li>
+<p>We are primary server so we are <strong>master</strong>, we will be creating seperate dir <code>/etc/bind/my-zones</code> to store our zone database files, we will not be allowig update automatically so it is <strong>none</strong>.</p>
+</li>
+<li>
+<p>create dir <code>mkdir -p /etc/bind/my-zones</code> and get templete for our zone file :</p>
+</li>
+</ul>
+<pre><code>cp /etc/bind/db.local /etc/bind/my-zones/zone_db-example.com
+</code></pre>
+<ul>
+<li>Edit changes to look similar to this :</li>
+</ul>
+<pre><code>;
+; BIND data file for local loopback interface
+;
+
+; ttl in seconds
+$TTL    604800
+
+; origin directive
+$ORIGIN example.com
+
+@       IN      SOA    example.com.    email@example.com. (
+                  2     ; Serial
+             604800     ; Refresh
+              86400     ; Retry
+            2419200     ; Expire
+             604800 )   ; Negative Cache TTL
+; Name Servers
+@       IN     NS   doctorG.example.com.
+
+; DNS A records
+doctorG IN     A    192.168.1.80
+demo    IN     A    192.168.1.88
+win     IN     A    192.168.1.84
+
+; CNAME Records Here
+
+; TXT Here
+
+
+</code></pre>
+<ul>
+<li>
+<p><code>$TTL</code> directive implies how much time the record be cached in the server, here we specify in seconds but we can <code>$TTL 2d</code> to specify in days.</p>
+</li>
+<li>
+<p>Zone record mostly starts with <code>SOA</code> Start of Authority Record where you specify administrative ascept of it like <code>Serial</code> for updating records, most Admis like serial num keeping in date a like format like : ddmmyyyy for eg: 01092020. <code>Refresh</code> telling when to refresh record, <code>Retry</code> means retry to fetch up to date record in every x seconds, <code>Expire</code> means no matter what record will expire in that time, <code>Negative Cache TTL</code>, time for negative caching i.e error cache.</p>
+</li>
+<li>
+<p>Those <code>.</code> after <code>example.com</code> are what they are, well that's the syntax you can not ignore that. Well it has quite a good reason check that from <a href="https://serverfault.com/questions/18113/dns-trailing-periods">this serverfault post</a>:</p>
+</li>
+</ul>
+<blockquote>
+<p>The trailing '.' makes the name into a "Fully Qualified Domain Name", i.e. an absolute domain name.
+  In standard "master file format" files if you don't add the trailing '.' then the name is assumed to be relative to the current zone file's <code>$ORIGIN</code> (which is either specified in the zone file as shown below, or taken from the <code>zone</code> statement in <code>named.conf</code> otherwise).</p>
+</blockquote>
+<h2>Client Configuration</h2>
+<ul>
+<li>Configure client to use our won dns server <code>192.168.1.80</code></li>
+<li>Use <code>nslookup demo.example.com</code> it should resolve.</li>
+</ul>
+<pre><code>PS C:\Users\usr&gt; nslookup doctorG.example.com
+Server:  UnKnown
+Address:  192.168.1.80
+
+Name:    doctorG.example.com
+Address:  192.168.1.80
+</code></pre>
+<ul>
+<li>Use <code>ping doctorG.example.com</code> it should ping.</li>
+</ul>
+<pre><code>PS C:\Users\usr&gt; ping doctorG.example.com
+
+Pinging doctorG.example.com [192.168.1.80] with 32 bytes of data:
+Reply from 192.168.1.80: bytes=32 time=1ms TTL=63
+Reply from 192.168.1.80: bytes=32 time=1ms TTL=63
+Reply from 192.168.1.80: bytes=32 time=1ms TTL=63
+Reply from 192.168.1.80: bytes=32 time=2ms TTL=63
+
+Ping statistics for 192.168.1.80:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 1ms, Maximum = 2ms, Average = 1ms
+</code></pre>
+<h2>Common Mistakes / Errors</h2>
+<ul>
+<li>Don't forget to add trailing dot ( <code>.</code> ) while writing DNS Zone file.</li>
+<li>Please, Add your own server <code>192.168.1.80</code> at the server side <code>/etc/resolv.conf</code>.</li>
+<li>Most of the syntax at server side are ended with <code>;</code> (semicolon), check them.</li>
+<li>Syntax Error can be check by :</li>
+</ul>
+<pre><code>named-checkconf
+</code></pre>
+<h1>Secondary Server Configuration</h1>
+<ul>
+<li>There is essentially nothing, just allow secondary server ( you may also want static IP for secondary server ) to update in this block of <code>/etc/bind/named.local</code> in primary one stated by <code>type master</code> :</li>
+</ul>
+<pre><code>zone &quot;example.com&quot; {
+    type master;
+    file &quot;/etc/bind/my-zones/zone_db-example.com&quot;;
+    allow-transfer { 192.168.1.81; };
+};
+</code></pre>
+<ul>
+<li>Now for <code>192.168.1.81</code> which will be our secondary server, being all other default configs at the time of installation be constant just change <code>type slave;</code> and the <code>masters</code> be the primary server.  </li>
+</ul>
+<pre><code>zone &quot;example.com&quot; {
+    type slave;
+    file &quot;/etc/bind/my-zones/zone_db-example.com&quot;;
+    masters { 192.168.1.80; };
+};
+</code></pre>
+<p>You wouldnot need zone file, you will receive from master. Also make sure you use <code>192.168.1.81</code> as your secondary DNS resolver at <code>/etc/reolv.conf</code>.</p>
+<h1>Caching Server Configuration</h1>
+<ul>
+<li>
+<p>This is simple, once you install and start server, it is automatically a caching server.</p>
+</li>
+<li>
+<p>You may wanna change the <code>options</code> block's child block <code>forwarders</code> in <code>/etc/bind/named.conf.options</code> to the upper level dns servers. :</p>
+</li>
+</ul>
+<pre><code>    forwarders {
+        8.8.8.8;
+        8.8.4.4;
+    };
+</code></pre>
+<hr />
+<hr />
+<p>@&copy; agochar.  <strong>JAI MATA DI, LETS ROCK</strong></p>
+<hr />
+<hr /></div>

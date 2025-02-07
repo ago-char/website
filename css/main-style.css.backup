@@ -1,19 +1,22 @@
+/* body{
+    margin: 0;
+    padding: 0;
+} */
+
 body.home {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    /* background-color: rgb(79, 79, 58); */
     background-image: url('/pics/com.jpeg');
     background-repeat: repeat;
-    background-size: cover;
 }
 
-/* Responsive Navbar */
 .navbar {
     background-color: #333;
     overflow: hidden;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap; /* Allow items to wrap if needed */
     padding: 10px 0;
 }
 
@@ -28,33 +31,11 @@ body.home {
 }
 
 .navbar a:hover {
+    background-color: #575757;
     background-color: #000000;
 }
 
 .navbar a.current {
     background-color: #3a723a;
     color: white;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .navbar a {
-        display: block;
-        width: 100%;
-        text-align: center;
-        padding: 10px;
-        font-size: medium;
-    }
-}
-
-@media (max-width: 480px) {
-    .navbar a {
-        padding: 8px;
-        font-size: small;
-    }
 }
