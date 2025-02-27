@@ -1,0 +1,603 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>EMAIL SERVER FORM CLI (UNAUTHENTICATED, UNENCRYPTED) TO CLI (AUTHENTICATED, ENCRYPTED) TO GUI (AUTHENTICATED, ENCRYPTED)</h1>
+<ul>
+<li>
+<p><strong><em>We assume, you have already set up domain names, dns records also mail server record in your zone file over your network, your other device are using the same dns server configured for local purpose as their main or primary server.</em></strong></p>
+</li>
+<li>
+<p>First of all, you should know there are 2 most important factor to send and receive emails i.e. you gonna need Email Server and Email Client.</p>
+</li>
+<li>
+<p>Your Email Server is more often <code>smtpd</code>. This is actually a part of <em>Mail Transfer Agent</em> (MTA). We will be using <code>postfix</code> for this.</p>
+</li>
+<li>
+<p>Your Email client can be command line based or GUI based. <code>mail</code>, <code>sendmail</code> are popular CLI Email Clients, you can use <code>thunderbird</code> for GUI but it do require <em>Mail Delivery Agent</em> ( <code>dovecot</code> ) setup.</p>
+</li>
+</ul>
+<h2>CLI based email, just for local run.</h2>
+<h3>Step1 : We need MTA - postfix</h3>
+<ul>
+<li><code>postfix</code> is actually MTA which will act as our <code>smtpd</code> i.e. mail server. This is not whole of <code>smtpd</code> server, it has more task to serve but most importantly it also serves as our mail server. Let's install it with the simple command ( <code>mailutils</code> is installed for various related troubleshooting plus mail sening purpose ) :</li>
+</ul>
+<pre><code>sudo apt install postfix  mailutils
+</code></pre>
+<h3>Step2 : We need MUA - sendmail / mail / ssmtp</h3>
+<ul>
+<li>Yes we need one of those i.e. <code>sendmail / mail / ssmtp</code> and there are more of those User Agent for mailing. Actually <code>mailutils</code> or <code>postfix</code> ships us <code>sendmail</code> utility, so there is no need to explicitly install one on the server.</li>
+</ul>
+<h3>Step3 : We need to set up Server</h3>
+<ul>
+<li>
+<p>We do have our mail configuration for <code>postfix</code> at <code>/etc/postfix/main.cf</code>.</p>
+</li>
+<li>
+<p>If you need to understand something from basic, you require to build one from scratch. While MDA such as <code>dovecot</code> has several files to manage for config, it could be tedious task to poke all the default config but <code>postfix</code> contains few of those, so let's create a copy of that and populate with the given content :</p>
+</li>
+</ul>
+<pre><code>sudo cp /etc/postfix/main.cf{,.bak}
+echo 'mydomain = pastcast.com 
+myhostname = mail.pastcast.com
+mydestination = $mydomain $myhostname 
+mynetworks = 127.0.0.0/8' | sudo tee /etc/postfix/main.cf
+</code></pre>
+<ul>
+<li>
+<p>We only specify few variables, other undeclared variables in the config file will be with their own default settings, but we will add one by one, the required ones later.</p>
+</li>
+<li>
+<p><code>mydomain</code> means declaring your domain, <code>mydestination</code> is like what domains this machine will deliver locally, instead of forwarding to another machine, <code>mynetworks</code> means these networks are allowed and authorized to send email.</p>
+</li>
+<li>
+<p>As <code>localhost</code> i.e. <code>127.0.0.1/8</code> is specified and we live under <code>mydomain</code> and it falls under <code>mydestination</code>, we can now send emails locally.</p>
+</li>
+</ul>
+<h3>Step4 : Send it</h3>
+<ul>
+<li>
+<p>We are quite ready to send one email locally. You need to understand that your email address here looks lilke <code>user@server</code>, that <code>user</code> will be any of the user at <code>server</code>. For example, we do have <code>maharaja@mail.pastcast.com</code> as your email where <code>maharaja</code> is user at <code>mail.pastcast.com</code> server.</p>
+</li>
+<li>
+<p>Try to send one :</p>
+</li>
+</ul>
+<pre><code>echo &quot;this is body of the email&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>
+<p>Check at <code>/var/mail/maharaja</code>, there shoule be email</p>
+</li>
+<li>
+<p>Send to another user :</p>
+</li>
+</ul>
+<pre><code>echo &quot;hey windows usr, is there any problem with the system you runing out there ? let me know I am the administrator here.&quot; | sendmail windows@mail.pastcast.com
+</code></pre>
+<h2>Expand to Local Network (intranet), still CLI</h2>
+<ul>
+<li>
+<p>We will be using same <code>sendmail</code> utility here too in different machine <code>kali</code>. For this <code>postfix</code> be installed here too. <em>Don't worry this is not postfix server, just for sending postfix config is required for <code>sendmail</code> to work.</em></p>
+</li>
+<li>
+<p><strong><em>Again we assue that <code>kali</code> is using same dns server as of <code>mail</code>. This is quite necessity because, <code>postfix</code> will grab info for different variables from these different place.</em></strong></p>
+</li>
+<li>
+<p>Let's try and send email : </p>
+</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>And the capture for this :</li>
+</ul>
+<p><img src="/pics/blog-nothing-sendmail.png" alt="blog-nothing-sendmail.png"></p>
+<ul>
+<li>As seen, nothing is captured because <code>sendmail</code> which relies on <code>postfix</code> has no way to tell where the mail to be sent. If <code>postfix</code> was listening locally, it may had tried to send local email but since it is not the situation here (and this won't have solve either because we need the server be external one), we need to tell <code>postfix</code> to use relay server :</li>
+</ul>
+<pre><code>sudo postconf -e relayhost=[mail.pastcast.com]:587
+sudo postfix reload
+sudo systemctl restart postfix
+</code></pre>
+<ul>
+<li>Also, have to enable submission on server at <code>/etc/postfix/master.cf</code> as such :</li>
+</ul>
+<pre><code>submission inet n       -       n       -       -       smtpd
+</code></pre>
+<ul>
+<li>Let's try now :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>See, what's captured now :</li>
+</ul>
+<p><img src="/pics/blog-email-not-sent.png" alt="blog-email-not-sent.png"></p>
+<ul>
+<li>As seen, it has been able to make the tcp connection but no emails were sent, <strong>this is because in our server, it is not specified to receive emails from intranet, only localhost was specified, change it :</strong></li>
+</ul>
+<pre><code>sudo postconf -e mynetworks=127.0.0.0/8 192.168.1.0/24
+sudo postconf reload
+sudo systemctl restart postfix
+</code></pre>
+<ul>
+<li>Try Again :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>See Capture :</li>
+</ul>
+<p><img src="/pics/blog-email-yet-not-sent-after-mydest-configured.png" alt="blog-email-yet-not-sent-after-mydest-configured.png"></p>
+<ul>
+<li>
+<p>What the hell, <em>we are going through fustration now.</em> Leave that, and say "we are glad we are having trouble", coz we can solve.</p>
+</li>
+<li>
+<p><em><strong>SERVER SIDE</strong></em>, configure ACLs on :</p>
+</li>
+</ul>
+<pre><code>smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
+</code></pre>
+<ul>
+<li>Actually, only <code>smtpd_recipient_restrictions</code> should work but it worth noting to configure both as this does no harm. Now try :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li><strong>_CONGRATS  CAPTURE:</strong>_</li>
+</ul>
+<p><img src="/pics/blog-mail-sent.png" alt="blog-mail-sent.png"></p>
+<h1>Oh, boy, its unauthenticated, everyone is sending email bro. Authenticate IT</h1>
+<ul>
+<li>
+<p>If you don't enable <em>authentication</em> in server side, everyone could pretend to be someone on the network or email.  <strong><em>NO PASSWORD REQUIRED</em></strong></p>
+</li>
+<li>
+<p>We will be using <strong>sasl</strong> authentication method for authenticating server. For that in <code>/etc/postfix/main.cf</code> in our server :</p>
+</li>
+</ul>
+<pre><code>echo '# Enable SMTP authentication
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous, noplaintext
+smtpd_sasl_local_domain = $myhostname
+smtpd_sasl_path = /var/run/saslauthd/mux
+broken_sasl_auth_clients = yes
+' | sudo tee -a /etc/postfix/main.cf &gt; /dev/null
+</code></pre>
+<p>**Make sure <code>sasl</code>  properly  installed, it not :</p>
+<pre><code>sudo apt install libsasl2-modules sasl2-bin -y
+</code></pre>
+<ul>
+<li>We enable auth, let's try to send email, we should be authenticated, right :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>Let's see the capture :</li>
+</ul>
+<p><img src="/pics/blog-sasl-in-server_client-not-enabled.png" alt="blog-sasl-in-server_client-not-enabled.png"></p>
+<ul>
+<li>Also log in the server :</li>
+</ul>
+<pre><code>$ tail -fn0 /var/log/mail.log
+2025-02-20T15:52:15.576691+05:45 doctorG postfix/smtpd[17522]: connect from unknown[192.168.1.16]
+2025-02-20T15:52:15.579569+05:45 doctorG postfix/smtpd[17522]: NOQUEUE: reject: RCPT from unknown[192.168.1.16]: 554 5.7.1 &lt;maharaja@mail.pastcast.com&gt;: Recipient address rejected: Access denied; from=&lt;kali@kali.pastcast.com&gt; to=&lt;maharaja@mail.pastcast.com&gt; proto=ESMTP helo=&lt;kali.pastcast.com&gt;
+2025-02-20T15:52:15.579720+05:45 doctorG postfix/smtpd[17522]: using backwards-compatible default setting smtpd_relay_before_recipient_restrictions=no to reject recipient &quot;maharaja@mail.pastcast.com&quot; from client &quot;unknown[192.168.1.16]&quot;
+2025-02-20T15:52:15.587761+05:45 doctorG postfix/smtpd[17522]: disconnect from unknown[192.168.1.16] ehlo=1 mail=1 rcpt=0/1 data=0/1 rset=1 quit=1 commands=4/6
+</code></pre>
+<ul>
+<li>
+<p>These both things are suggesting, our host is not authenticated so <em>rejected and denied</em>.</p>
+</li>
+<li>
+<p>There could be various aspect, but this is because unauthenticated host is denied by the server, so we need to set up client in such a way so that we could authenticate.</p>
+</li>
+<li>
+<p>Actually, server is using <code>/etc/sasldb2</code> as database for username and password. We ( server ) have not created any user:pass for this database or for our email, so let's create one :</p>
+</li>
+</ul>
+<pre><code>sudo saslpasswd2 -c -u mail.pastcast.com windows
+</code></pre>
+<p>This will prompt the password for <code>windows</code> user we created. This has no restriction on password creation, so please use longer password. Now if you :</p>
+<pre><code>$ sudo sasldblistusers2
+windows@mail.pastcast.com: userPassword 
+</code></pre>
+<ul>
+<li><code>postfix</code> is using <code>/etc/sasldb2</code>, so make sure this file can be read by <code>postfix</code> user to look up for the authentication process later :</li>
+</ul>
+<pre><code>$ ls -l /etc/sasldb2 
+-rw-r----- 1 root sasl 12288 Feb 20 16:02 /etc/sasldb2
+$ groups postfix
+postfix : postfix sasl
+</code></pre>
+<p>The above prompt says, <code>postfix</code> is in group <code>sasl</code> which have <code>r</code> (read) permission. So, maybe we are good to go for client setup now. Also make sure <code>saslauthd</code> service is running on server.</p>
+<ul>
+<li>On client, make sure to have following in <code>/etc/postfix/main.cf</code> :</li>
+</ul>
+<pre><code>echo 'smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous noplaintext' | sudo tee -a /etc/postfix/main.cf &gt; /dev/null
+</code></pre>
+<p>It says password should be on hash format at location <code>/etc/postfix/sasl_passwd</code></p>
+<ul>
+<li>So, <code>/etc/postfix/sasl_passwd</code> should be :</li>
+</ul>
+<pre><code>echo '[mail.pastcast.com]:587 windows@mail.pastcast.com:password_you_set_previously' | sudo tee -a /etc/postfix/sasl_passwd
+</code></pre>
+<p>This file contains sensitive information i.e. password as plain text, so please restrict ownership and permission.</p>
+<ul>
+<li>Let's send email now :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>Captured :</li>
+</ul>
+<p><img src="/pics/blog-sasl_db-notfound-client.png" alt="blog-sasl_db-notfound-client.png"></p>
+<ul>
+<li>Log on client side :</li>
+</ul>
+<pre><code>2025-02-20T05:36:37.006109-05:00 kali postfix/pickup[7026]: 015B02822B9: uid=1000 from=&lt;kali&gt;
+2025-02-20T05:36:37.007653-05:00 kali postfix/cleanup[7029]: 015B02822B9: message-id=&lt;20250220103637.015B02822B9@kali.pastcast.com&gt;
+2025-02-20T05:36:37.011832-05:00 kali postfix/qmgr[7027]: 015B02822B9: from=&lt;kali@kali.pastcast.com&gt;, size=270, nrcpt=1 (queue active)
+2025-02-20T05:36:37.025707-05:00 kali postfix/smtp[7033]: warning: hash:/etc/postfix/sasl_passwd is unavailable. open database /etc/postfix/sasl_passwd.db: No such file or directory
+2025-02-20T05:36:37.025819-05:00 kali postfix/smtp[7033]: warning: hash:/etc/postfix/sasl_passwd lookup error for &quot;mail.pastcast.com&quot;
+2025-02-20T05:36:37.025981-05:00 kali postfix/smtp[7033]: warning: 015B02822B9: smtp_sasl_password_maps lookup error
+2025-02-20T05:36:37.033601-05:00 kali postfix/smtp[7033]: 015B02822B9: to=&lt;maharaja@mail.pastcast.com&gt;, relay=mail.pastcast.com[192.168.1.80]:587, delay=0.03, delays=0.02/0/0.01/0, dsn=4.3.0, status=deferred (local data error while talking to mail.pastcast.com[192.168.1.80])
+</code></pre>
+<ul>
+<li>It seems like <code>/etc/postfix/sasl_passwd.db</code> which postfix uses to send creds, is missing. Let's create one :</li>
+</ul>
+<pre><code>sudo postmap /etc/postfix/sasl_passwd
+</code></pre>
+<ul>
+<li>Try again to send :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>Captured :</li>
+</ul>
+<p><img src="/pics/blog-pw-sent-auth-failed-from-server.png" alt="blog-pw-sent-auth-failed-from-server.png"></p>
+<ul>
+<li>
+<p>This seems, some error on server side because hash of password is already sent from the client and is correct.</p>
+</li>
+<li>
+<p>The server is not having correct lookup for the password or so, but again <code>/etc/sasldb2</code> has correct permission. <strong>I spend sometime and found</strong> :</p>
+<ul>
+<li>In <code>/etc/postfix/main.cf</code>, there is <code>smtpd_sasl_path = /var/run/saslauthd/mux</code></li>
+<li>In <code>/etc/default/saslauthd</code>, there is <code>OPTIONS="-c -m /var/run/saslauthd"</code></li>
+<li>These both suggests, <code>postfix</code> is not <strong>chroooted jailed</strong>, which simply means, <code>postfix</code> should be able to access <code>/var/run/saslauthd/mux</code> which is socket required while authentication process.</li>
+<li>If all of these features are suggesting postfix not be chrooted, <code>/etc/postfix/master.cf</code>, for the <em>submission</em>, should contain something like :</li>
+<li><code>submission inet n       -       n       -       -       smtpd</code></li>
+<li>That second <code>n</code> says, <strong>no chroot</strong> but when I see in the file it was :</li>
+<li><code>submission inet n       -       y       -       -       smtpd</code></li>
+<li>Also running <code>stat /var/run/saslauthd/mux</code> gives me idea that file was not accessed or modified or created at the time client was trying to send email.</li>
+</ul>
+</li>
+<li>
+<p>After changing submission server look like this is <code>/etc/postfix/master.cf</code> :</p>
+</li>
+</ul>
+<pre><code>submission inet n       -       y       -       -       smtpd
+</code></pre>
+<ul>
+<li>Restart now at server side :</li>
+</ul>
+<pre><code>sudo systemctl restart postfix saslauthd.service
+</code></pre>
+<ul>
+<li>Try again :</li>
+</ul>
+<pre><code>echo &quot;Email To some host&quot; | sendmail maharaja@mail.pastcast.com
+</code></pre>
+<ul>
+<li>Capture :</li>
+</ul>
+<p><img src="/pics/blog-authenticated-email-sent.png" alt="blog-authenticated-email-sent.png"></p>
+<ul>
+<li><strong>Finally Success</strong>, check at <code>/var/mail/maharaja</code> at server :</li>
+</ul>
+<pre><code class="language-mail">From kali@kali.pastcast.com  Thu Feb 20 17:10:55 2025
+Return-Path: &lt;kali@kali.pastcast.com&gt;
+X-Original-To: maharaja@mail.pastcast.com
+Delivered-To: maharaja@mail.pastcast.com
+Received: from kali.pastcast.com (unknown [192.168.1.16])
+        by mail.pastcast.com (Postfix) with ESMTPA id 84D683C1760
+        for &lt;maharaja@mail.pastcast.com&gt;; Thu, 20 Feb 2025 17:10:55 +0545 (+0545)
+Received: by kali.pastcast.com (Postfix, from userid 1000)
+        id 6D36C2822CF; Thu, 20 Feb 2025 06:25:53 -0500 (EST)
+Message-Id: &lt;20250220112553.6D36C2822CF@kali.pastcast.com&gt;
+Date: Thu, 20 Feb 2025 06:25:53 -0500 (EST)
+From: kali@kali.pastcast.com
+
+Email To some host
+</code></pre>
+<h2>Danger</h2>
+<ul>
+<li>
+<p>Please make sure <code>#smtpd_sasl_mechanism_filter = plain</code>, this guy is not in server side <code>/etc/postfix/main.cf</code></p>
+</li>
+<li>
+<p>This is because, it will offer <code>plain</code> password authentication, and by default <code>saslauthd</code> will send  <strong>base64 encoded credentials</strong> when decoded will get username and password. So, dangerous to use that one.</p>
+</li>
+</ul>
+<h3>Can't be avoid, but avoided here at practice environment</h3>
+<ul>
+<li><code>postfix</code> is not running on <em>chroot jail</em>. </li>
+</ul>
+<pre><code>ls -ld /var/run/saslauthd/
+drwxr-xr-x 2 root root 140 Feb 20 17:10 /var/run/saslauthd/
+ls -l /var/run/saslauthd/mux
+srwxrwxrwx 1 root root      0 Feb 20 17:10 mux
+</code></pre>
+<p>This means everyone can go to <code>/var/run/saslauthd</code>, so everyone can run this <code>mux</code>, imagine how dangerous it could be in real environment.</p>
+<h1>Even though, Authenticated, our Messages are in plain text, Lets Enable TLS to encrypt</h1>
+<ul>
+<li>
+<p>You will require to have certs and keys in order to enable encryption in any kind of application. The best way to acquire cert is through <a href="https://letsencrypt.org/">let's encrypt</a>. But this only works for public domain, since we are doing for internal one, we have to self sign using <a href="https://www.openssl.org/">openssl</a>.</p>
+</li>
+<li>
+<p>Many applications may not trust self sign certs and key as part of their security but as the need exists and no simpler alternatives remain, you should accept the security risk (which is not risk at all when  you manage it sincerly).</p>
+</li>
+<li>
+<p>Generate key (<code>/etc/ssl/private/postfix-selfsigned.key</code>) and cert (<code>/etc/ssl/certs/postfix-selfsigned.crt</code>) :</p>
+</li>
+</ul>
+<pre><code>sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048  -keyout /etc/ssl/private/postfix-selfsigned.key  -out /etc/ssl/certs/postfix-selfsigned.crt
+</code></pre>
+<p>You may wanna adjust permissions if you are more concerned with security.</p>
+<ul>
+<li>On the server, <code>/etc/main.cf</code> edit as to enable TLS Encryption :</li>
+</ul>
+<pre><code>echo '# Enable TLS for incoming mail
+smtpd_tls_cert_file=/etc/ssl/certs/postfix-selfsigned.crt
+smtpd_tls_key_file=/etc/ssl/private/postfix-selfsigned.key
+smtpd_use_tls=yes
+smtpd_tls_auth_only=yes
+smtpd_tls_loglevel=1
+smtpd_tls_received_header=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+
+# Enable TLS for outgoing mail
+smtp_tls_loglevel=1
+smtp_tls_CAfile=/etc/ssl/certs/ca-certificates.crt
+
+
+# Enforce Encryption
+smtpd_tls_security_level=encrypt
+smtp_tls_security_level=encrypt
+' | sudo tee -a /etc/postfix/main.cf
+</code></pre>
+<ul>
+<li>
+<p>Since, client is already using the server as relay host, <strong><em>no additional configuration is required at client side</em></strong>.</p>
+</li>
+<li>
+<p>Let's send email to <code>windows</code> user from the client: </p>
+</li>
+</ul>
+<pre><code>echo &quot;Hey windows user&quot; | sendmail windows@mail.pastcast.com
+</code></pre>
+<ul>
+<li>Captured : </li>
+</ul>
+<p><img src="/pics/blog-no-capured-after-tls-enable.png" alt="blog-no-capured-after-tls-enable.png"></p>
+<ul>
+<li>
+<p>This was not intended, also <code>tail -fn0 /var/log/mail.log</code> was empty.</p>
+</li>
+<li>
+<p><strong>I begin to think and think and also toogle some configs but the problem actually was <em>the client relies on postfix and postfix was not started on client side</em></strong>.</p>
+</li>
+<li>
+<p>As soon as I restarted, since <code>sendmail</code> queued the email, the previously unsent mail was send and captured as :</p>
+</li>
+</ul>
+<p><img src="/pics/blog-captured-after-restart-tls.png" alt="blog-captured-after-restart-tls.png"></p>
+<ul>
+<li>Aslo, log was flooded : </li>
+</ul>
+<pre><code> tail -fn0 /var/log/mail.log 
+2025-02-27T15:53:30.094519+05:45 doctorG postfix/smtpd[19177]: warning: dict_nis_init: NIS domain name not set - NIS lookups disabled
+2025-02-27T15:53:30.105657+05:45 doctorG postfix/smtpd[19177]: connect from kali.pastcast.com[192.168.1.16]
+2025-02-27T15:53:30.114312+05:45 doctorG postfix/smtpd[19177]: Anonymous TLS connection established from kali.pastcast.com[192.168.1.16]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits) key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
+2025-02-27T15:53:30.165116+05:45 doctorG postfix/smtpd[19177]: 2846E3C1779: client=kali.pastcast.com[192.168.1.16], sasl_method=SCRAM-SHA-512, sasl_username=windows@mail.pastcast.com
+2025-02-27T15:53:30.167534+05:45 doctorG postfix/cleanup[19180]: 2846E3C1779: message-id=&lt;20250227100829.E48732822B2@kali.pastcast.com&gt;
+2025-02-27T15:53:30.168461+05:45 doctorG postfix/qmgr[17923]: 2846E3C1779: from=&lt;kali@kali.pastcast.com&gt;, size=661, nrcpt=1 (queue active)
+2025-02-27T15:53:30.168548+05:45 doctorG postfix/smtpd[19177]: disconnect from kali.pastcast.com[192.168.1.16] ehlo=2 starttls=1 auth=1 mail=1 rcpt=1 data=1 quit=1 commands=8
+2025-02-27T15:53:30.173170+05:45 doctorG postfix/local[19181]: warning: dict_nis_init: NIS domain name not set - NIS lookups disabled
+2025-02-27T15:53:30.174206+05:45 doctorG postfix/local[19181]: 2846E3C1779: to=&lt;windows@mail.pastcast.com&gt;, relay=local, delay=0.02, delays=0.02/0/0/0, dsn=2.0.0, status=sent (delivered to mailbox)
+2025-02-27T15:53:30.174608+05:45 doctorG postfix/qmgr[17923]: 2846E3C1779: removed
+
+</code></pre>
+<ul>
+<li>The given logs and captures indicates <strong>we have successfully enabled tls to work with postfix to send and receive message within the domain network</strong>.</li>
+</ul>
+<h1>Let's Introduce GUI, since CLI is not reliable medium to send/receive message in long run or professionally</h1>
+<ul>
+<li>
+<p>The first step towards getting GUI based email client is to install that client at the client side and the server related to that client at the server side.</p>
+</li>
+<li>
+<p>So, install <code>thunderbird</code> as mail agent at client side :</p>
+</li>
+</ul>
+<pre><code>sudo apt install thunderbird
+</code></pre>
+<ul>
+<li>You will require <code>dovecot</code> server for <code>imap</code> to retrieve messages using <code>thunderbird</code>, so install <code>dovecot</code> on the server :</li>
+</ul>
+<pre><code>sudo apt install dovecot
+</code></pre>
+<ul>
+<li>
+<p>We will not create <code>dovecot</code> config from scratch, we will build from existing one.</p>
+</li>
+<li>
+<p>First of all, dovecot does not work will <code>/etc/sasldb2</code> or <code>saslauthd.service</code>, so we will require <code>postfix</code> to use <code>dovecot</code> as its auth type. Also set up <code>dovecot</code> server for that auth type. Well again, this is only possible if <code>dovecot</code> is one of the output of :</p>
+</li>
+</ul>
+<pre><code>$ postconf -a
+cyrus
+dovecot
+</code></pre>
+<p>In our case, it is so. Let's move further.</p>
+<ul>
+<li>Edit <code>/etc/postfix/main.cf</code> as to include :</li>
+</ul>
+<pre><code>echo 'smtpd_sasl_type = dovecot
+# if using postfix with dovecot auth, then use this i.e. relative to $queue_dire
+ctory where postfix is set up to run chrooted
+smtpd_sasl_path = private/auth
+broken_sasl_auth_clients = yes' | sudo tee -a /etc/postfix/main.cf
+</code></pre>
+<ul>
+<li>Remember, we were not <strong>chrooted</strong> while using <code>saslauthd</code>, So please edit <code>/etc/postfix/master.cf</code> to be <strong>chrooted</strong>, also add that submission server some options to enable TLS and dovecot auth method (to add options please leave at least one whitespace before that <code>-o</code>) :</li>
+</ul>
+<pre><code>submission inet n       -       y       -       -       smtpd
+#options start added by me
+   -o smtpd_tls_security_level=encrypt
+   -o smtpd_sasl_auth_enable=yes
+   -o smtpd_tls_wrappermode=no
+   -o smtpd_sasl_type=dovecot
+   -o smtpd_sasl_path=private/auth
+   -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+   -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
+#options end added by me
+</code></pre>
+<ul>
+<li>Let's edit <code>/etc/dovecot/conf.d/10-auth.conf</code> for authentication related settings :</li>
+</ul>
+<pre><code>echo '
+By default, when Dovecot tries to find or deliver emails for a user, it uses the full email address. Since in this part, we only set up **canonical mailbox users** (using OS users as mailbox users), Dovecot can’t find the mailbox user in full domain format (username@example.com), so we need to set `auth_username_format = %n` to drop the domain part, then Dovecot should be able to find the mailbox user. This also allows us to use the full email address (username@example.com) to log in.
+auth_username_format = %n
+disable_plaintext_auth = yes
+auth_mechanisms = plain login' | sudo tee -a /etc/dovecot/conf.d/10-auth.conf
+</code></pre>
+<ul>
+<li>Now, in the <code>service auth {</code> block of <code>/etc/dovecot/conf.d/10-master.conf</code> edit as :</li>
+</ul>
+<pre><code>service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0660
+    # Assuming the default Postfix user and group
+    user = postfix
+    group = postfix
+  }
+</code></pre>
+<ul>
+<li>Enable <strong>ssl/tls</strong> in <code>/etc/dovecot/conf.d/10-ssl.conf</code> :</li>
+</ul>
+<pre><code>ssl = yes
+# self signed certs and key
+ssl_cert = &lt;/etc/ssl/certs/postfix-selfsigned.crt
+ssl_key = &lt;/etc/ssl/private/postfix-selfsigned.key
+</code></pre>
+<p>These are the same keys and certs we generated before. Remember <code>&lt;</code> is part of syntax.</p>
+<ul>
+<li>
+<p>It is usally nice to set up mail at <code>~/Maildir</code> for user rather than at <code>/var/mail</code> for all users, for that :</p>
+<ul>
+<li>Edit <code>/etc/dovecot/conf.d/10-mail.conf</code> to have <code>mail_location = maildir:~/Maildir</code> instead of <code>mail_location = mbox:~/mail:INBOX=/var/mail/%u</code>.</li>
+<li>Edit <code>/etc/postfix/main.cf</code> to have <code>mailbox_transport = lmtp:unix:private/dovecot-lmtp</code> and <code>smtputf8_enable = no</code></li>
+</ul>
+</li>
+<li>
+<p>As seen <code>lmtp</code> protocol is used to deliver mail to <code>~/Maildir</code>, the <code>protocols</code> variable at <code>/etc/dovecot.conf</code> should be :</p>
+</li>
+</ul>
+<pre><code>protocols = imap lmtp
+</code></pre>
+<ul>
+<li>Also, <code>lmtp</code> unix-listener is required so edit <code>service lmtp {</code> block at <code>/etc/dovecot/conf.d/10-master.conf</code> to include :</li>
+</ul>
+<pre><code>service lmtp {
+ unix_listener /var/spool/postfix/private/dovecot-lmtp {
+   mode = 0600
+   user = postfix
+   group = postfix
+  }
+}
+</code></pre>
+<ul>
+<li>Configure <code>thunderbird</code> on client as such : </li>
+</ul>
+<p><img src="/pics/blog-thunderbird-config.png" alt="blog-thunderbird-config.png"></p>
+<ul>
+<li>Sening Test Email generates : </li>
+</ul>
+<p><img src="/pics/blog-test-mail-fail-thunderbird.png" alt="blog-test-mail-fail-thunderbird.png"></p>
+<ul>
+<li>With the information provided <a href="https://unix.stackexchange.com/questions/763565/ubuntu-server-22-04-postfix-dovecot-error-postfix-smtpd-fatal-no-sasl-authenti">here</a>, the following settings seems not to work at <code>/etc/postfix/main.cf</code> :</li>
+</ul>
+<pre><code>smtpd_sasl_security_options = noanonymous, noplaintext
+</code></pre>
+<p>So remove <code>noplaintext</code> and restart :</p>
+<pre><code>smtpd_sasl_security_options = noanonymous
+</code></pre>
+<pre><code>sudo systemctl restart postfix
+</code></pre>
+<ul>
+<li>Check now, <strong>IT WILL WORK</strong>.</li>
+</ul>
+<p><img src="/pics/blog-sent-thunderbird.png" alt="blog-sent-thunderbird.png"></p>
+<ul>
+<li>Let's see if mail is delivered at <code>~/Maildir</code> for <code>maharaja</code> :</li>
+</ul>
+<pre><code>Return-Path: &lt;windows@mail.pastcast.com&gt;
+Delivered-To: maharaja@mail.pastcast.com
+Received: from mail.pastcast.com
+        by doctorG.pastcast.com with LMTP
+        id CSkBCUJPwGfiWwAAQE3mQA
+        (envelope-from &lt;windows@mail.pastcast.com&gt;)
+        for &lt;maharaja@mail.pastcast.com&gt;; Thu, 27 Feb 2025 17:25:50 +0545
+Received: from [192.168.1.16] (kali.pastcast.com [192.168.1.16])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.pastcast.com (Postfix) with ESMTPSA id 16C683C1778
+        for &lt;maharaja@mail.pastcast.com&gt;; Thu, 27 Feb 2025 17:25:50 +0545 (+0545)
+Message-ID: &lt;86fcea81-4608-44d6-98f8-3e020739947f@mail.pastcast.com&gt;
+Date: Thu, 27 Feb 2025 06:40:49 -0500
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: maharaja &lt;maharaja@mail.pastcast.com&gt;
+From: windows &lt;windows@mail.pastcast.com&gt;
+Subject: test
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+test email
+</code></pre>
+<p><strong>YEP !!</strong></p>
+<ul>
+<li>
+<p>Also, verify, if <code>thunderbird</code> is able to retrieve message, by logging on <code>maharaja</code> user in different computer (where <code>postfix</code> is setup similar as client).</p>
+</li>
+<li>
+<p>I set up <code>thunderbird</code> in my phone and check it has received :</p>
+</li>
+</ul>
+<p><img src="/pics/blog-mail-received-maharaja.jpg" alt="blog-mail-received-maharaja.jpg"></p>
+<ul>
+<li>Also, email to <code>windows@mail.pastcast.com</code> from mobile was success :</li>
+</ul>
+<p><img src="/pics/blog-sent-from-mobile.png" alt="blog-sent-from-mobile.png"></p>
+<h1>References :</h1>
+<p><a href="https://www.linuxbabe.com/mail-server/install-dovecot-imap-server-debian">linuxbebe docs</a></p>
+<p><a href="https://doc.dovecot.org/2.4.0/howto/sasl/postfix.html">official dovecot docs for set up auth</a></p>
+<p><a href="https://doc.dovecot.org/2.4.0/core/config/ssl.html#configuration-overview">official dovecot for set up ssl</a></p>
+<p><a href="https://unix.stackexchange.com/questions/763565/ubuntu-server-22-04-postfix-dovecot-error-postfix-smtpd-fatal-no-sasl-authenti">unix stackexchange post to solve error</a></p>
+<p><a href="https://postfix-configuration.readthedocs.io/en/latest/">some postfix docs for configuration</a></p></div>

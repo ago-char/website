@@ -1,0 +1,101 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/monitoring-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Setting up Nagios For the First Time</h1>
+<p><a href="https://en.wikipedia.org/wiki/Nagios">Nagios</a> is open source tool use for monitoring your system or systems in your network. So, we are going to set it up. This is not full guide on how it works, what it does, instead focus on setting up the Nagios for the first time that too on Ubuntu.</p>
+<p>This guide is based on SELinux being disabled or in permissive mode. SELinux is not enabled by default on Ubuntu. If you would like to see if it is installed run the following command:</p>
+<pre><code>sudo dpkg -l selinux*
+</code></pre>
+<p>You may have question on why building from source, we already can install from :</p>
+<pre><code>sudo apt-get install -y nagios4-core
+</code></pre>
+<p>Because :</p>
+<blockquote>
+<p>Installing Nagios 4 from the package repository on Ubuntu can be done using the <code>apt</code> package manager, but it may encounter issues with authentication and permissions. For example, users have reported problems with basic authentication and enabling services, receiving messages like "Sorry Dave, I can't let you do that...". Not only this, building from source gives you more control on what and how to install among different options of <code>nagios</code>.</p>
+</blockquote>
+<h2>Prerequisites</h2>
+<p>You will have to install the following packages before installing <code>nagios</code>. This ensures seamless installation. </p>
+<pre><code>sudo apt-get update  
+sudo apt-get install -y autoconf gcc libc6 make wget unzip apache2 php libapache2-mod-php libgd-dev 
+sudo apt-get install -y openssl libssl-dev
+</code></pre>
+<p>On the official guide they asked to install <code>ufw</code> too, as <code>ufw</code> can conflict with <code>netfilter</code> or <code>iptables</code> and remove your entire firewall at the time of installation, this could be dangerous for your production. So, it is not installed here. If you understand the risk and manually install this firewall client, you can :</p>
+<pre><code>sudo apt-get install -y ufw
+</code></pre>
+<h2>Downloading The Source</h2>
+<p>I, personally would like to have <code>tools</code> directory in my home for installing these tools. You can install anywhere you like.</p>
+<pre><code>mkdir tools &amp;&amp; cd tools  
+wget -O nagioscore.tar.gz $(wget -q -O - https://api.github.com/repos/NagiosEnterprises/nagioscore/releases/latest  | grep '&quot;browser_download_url&quot;:' | grep -o 'https://[^&quot;]*')  
+tar xzf nagioscore.tar.gz
+</code></pre>
+<h2>Compile what you downloaded</h2>
+<p>Installing from source, almost always require compiling, Navigate to <code>~/tools/nagios-*</code> directory and compile.</p>
+<pre><code>cd ~/tools/nagios-*
+sudo ./configure --with-httpd-conf=/etc/apache2/sites-enabled  
+sudo make all
+</code></pre>
+<p>The second command will configure web related things with <code>apache2</code>.</p>
+<h2>Create User And Group</h2>
+<p>This creates the <strong>nagios</strong> user and group. The <em>www-data</em> user is also added to the nagios group. This is for web purpose because website or web related group is <em>www-data</em>.</p>
+<pre><code>sudo make install-groups-users  
+sudo usermod -a -G nagios www-data
+</code></pre>
+<h2>Install Binaries</h2>
+<p>This step installs the binary files, CGIs, and HTML files.</p>
+<pre><code>sudo make install
+</code></pre>
+<h2>Install Service / Daemon</h2>
+<p>This installs the service or daemon files and also configures them to start on boot.</p>
+<pre><code>sudo make install-daemoninit
+</code></pre>
+<p>Information on starting and stopping services will be explained further on.</p>
+<h2>Install Command Mode</h2>
+<p>This installs and configures the external command file.</p>
+<pre><code>sudo make install-commandmode
+</code></pre>
+<h2>Install Configuration Files</h2>
+<p>This installs the <em>SAMPLE</em> configuration files. These are required as Nagios needs some configuration files to allow it to start.</p>
+<pre><code>sudo make install-config
+</code></pre>
+<h2>Install Apache Config Files</h2>
+<p>This installs the Apache web server configuration files and configures Apache settings.</p>
+<pre><code>sudo make install-webconf  
+sudo a2enmod rewrite  
+sudo a2enmod cgi
+</code></pre>
+<h2>Configure Firewall ( Depends which fw you are using )</h2>
+<p>You need to allow port 80 inbound traffic on the local firewall so you can reach the Nagios Core web interface.</p>
+<pre><code>sudo ufw allow Apache  
+sudo ufw reload
+</code></pre>
+<h2>Create nagiosadmin User Account</h2>
+<p>You'll need to create an Apache user account to be able to log into Nagios.</p>
+<p>The following command will create a user account called nagiosadmin and you will be prompted to provide a password for the account.</p>
+<pre><code>sudo htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+</code></pre>
+<blockquote>
+<p>When adding additional users in the future, you need to remove <strong>-c</strong> from the above command otherwise it will replace the existing nagiosadmin user <em>(and any other users you may have added)</em>.</p>
+</blockquote>
+<h2>Restart Apache Web Server and Nagios Service</h2>
+<p>To reload the configs we did, lets restart :</p>
+<pre><code>sudo systemctl restart apache2.service
+sudo systemctl restart nagios.service
+</code></pre>
+<h2>Test Nagios</h2>
+<p><strong>Finger Crossed</strong></p>
+<p>Nagios is now running, to confirm this you need to log into the Nagios Web Interface.</p>
+<p>Point your web browser to the ip address or FQDN of your Nagios Core server, for example:</p>
+<p><code>http://10.25.5.143/nagios</code></p>
+<p><code>http://core-013.domain.local/nagios</code></p>
+<blockquote><p>You will be prompted for a username and password. The username is nagiosadmin (you created it in a previous step) and the password is what you provided earlier.</p><p>Once you have logged in you are presented with the Nagios interface. <strong>Congratulations you have installed Nagios Core.</strong></p></blockquote>
+<h1>References</h1>
+<p>All the Reference : <a href="https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html#Ubuntu">nagios support</a></p></div>
