@@ -124,6 +124,11 @@ tr:nth-child(even) {
     cursor: pointer;
     font-size: 12px;
     border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+pre:hover .copy-btn {
+    opacity: 1;
 }
 .copy-btn:hover {
     background: #0056b3;
