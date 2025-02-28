@@ -1,0 +1,276 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/intrusion-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>IDS with Snort</h1>
+<p>Hey, we assme you do know about <a href="https://www.ibm.com/think/topics/intrusion-detection-system">Intrusion Detection System</a>. <a href="https://en.wikipedia.org/wiki/Snort_(software)">Snort</a> is one of the most popular tool for this task to detect intrustion on your network, it is cross platform tool, but mainly used in <code>*ix</code> systems. We are going to set it up on our ubuntu machine.</p>
+<h2>Installation</h2>
+<ul>
+<li>Installing <code>snort</code> via <code>apt</code> is the easiest task to do, but only version 2.9 is available on the ubtuntu repository, you can check :</li>
+</ul>
+<pre><code>apt-cache policy snort
+</code></pre>
+<p>which will show you output similar to :</p>
+<pre><code>snort:
+Installed: (none)
+
+Candidate: 2.9.15.1-6build1
+
+Version table:
+
+2.9.15.1-6build1 500
+
+500 http://tr.archive.ubuntu.com/ubuntu jammy/universe amd64 Packages
+</code></pre>
+<ul>
+<li>But snort vs comes with different <a href="https://blog.snort.org/2020/08/snort-3-2-differences.html">benifits</a> to explore. Hence, we are building it from source.</li>
+</ul>
+<h2>Build From Source</h2>
+<h3>Step1 : Update and Install dependencies</h3>
+<ol>
+<li>Update, Upgrade and Install required dependencies libraries :</li>
+</ol>
+<pre><code>sudo apt update &amp;&amp; sudo apt upgrade &amp;&amp; sudo apt install build-essential libpcap-dev libpcre3-dev libnet1-dev zlib1g-dev luajit hwloc libdnet-dev libdumbnet-dev bison flex liblzma-dev openssl libssl-dev pkg-config libhwloc-dev cmake cpputest libsqlite3-dev uuid-dev libcmocka-dev libnetfilter-queue-dev libmnl-dev autotools-dev libluajit-5.1-dev libunwind-dev libfl-dev -y
+</code></pre>
+<p><code>libnet1-dev</code> might not be available, you could remove that from the command.</p>
+<ol>
+<li>Dedicate a directory for installation, I prefer to have at <code>~/tools</code>, you can do whereever you like :</li>
+</ol>
+<pre><code>mkdir ~/tools/snort_src &amp;&amp; cd ~/snort_src
+</code></pre>
+<ol>
+<li>Snort DAQ (Data Acquisition Library) iis not included on Ubuntu repos, so install via :</li>
+</ol>
+<pre><code>git clone https://github.com/snort3/libdaq.git
+cd libdaq
+./bootstrap
+./configure
+make
+sudo make install
+</code></pre>
+<ol>
+<li>To download and install Google's <code>thread-caching malloc</code>, <code>Tcmalloc</code>, <code>a memory allocator</code> tuned for high concurrency conditions that will give a faster performance at the expense of increased memory consumption (this is a recommended but optional dependence), run the next commands:</li>
+</ol>
+<pre><code>cd ../
+wget https://github.com/gperftools/gperftools/releases/download/gperftools-2.9.1/gperftools-2.9.1.tar.gz
+tar xzf gperftools-2.9.1.tar.gz
+cd gperftools-2.9.1/
+./configure
+make
+sudo make install
+</code></pre>
+<h3>Step 2 : Download and Install Snort from Source</h3>
+<ol>
+<li>Download and configure <code>snort</code> from <a href="https://github.com/snort3/snort3/tree/master?tab=readme-ov-file#download">github</a> :</li>
+</ol>
+<pre><code>cd..
+wget https://github.com/snort3/snort3/archive/refs/heads/master.zip
+unzip master.zip
+cd snort3-master
+./configure_cmake.sh --prefix=/usr/local --enable-tcmalloc
+</code></pre>
+<ol>
+<li>Navigate to <code>build</code> and start build :</li>
+</ol>
+<pre><code>cd build
+make
+sudo make install
+</code></pre>
+<p>This takes approximately half an hour, depending on your hardware. Snort is now installed under <code>/usr/local/</code>.</p>
+<ol>
+<li>After the installation is completed, update shared libraries by running the next command. Otherwise, you get an error when you try to run Snort:</li>
+</ol>
+<pre><code>sudo ldconfig
+</code></pre>
+<ol>
+<li>Verify Installation :</li>
+</ol>
+<pre><code>snort -V
+</code></pre>
+<p>will output similar to :</p>
+<pre><code>
+   ,,_     -*&gt; Snort++ &lt;*-
+  o&quot;  )~   Version 3.7.0.0
+   ''''    By Martin Roesch &amp; The Snort Team
+           http://snort.org/contact#team
+           Copyright (C) 2014-2025 Cisco and/or its affiliates. All rights reserved.
+           Copyright (C) 1998-2013 Sourcefire, Inc., et al.
+           Using DAQ version 3.0.18
+           Using libpcap version 1.10.4 (with TPACKET_V3)
+           Using LuaJIT version 2.1.1703358377
+           Using LZMA version 5.4.5
+           Using OpenSSL 3.0.13 30 Jan 2024
+           Using PCRE2 version 10.42 2022-12-11
+           Using ZLIB version 1.3
+</code></pre>
+<ol>
+<li>Test your installation with default config :</li>
+</ol>
+<pre><code>snort -c /usr/local/etc/snort/snort.lua
+</code></pre>
+<p>will produce output ending on :</p>
+<pre><code>Snort successfully validated the configuration (with 0 warnings).  
+o&quot;)~ Snort exiting
+</code></pre>
+<ol>
+<li>Snort Help and Quick Help :</li>
+</ol>
+<pre><code>snort --help
+snort -?
+</code></pre>
+<h2>Configurations</h2>
+<ul>
+<li><code>snort</code> is installed under <code>/etc/local</code>, if you <code>cd /etc/local</code> and try <code>find</code> :</li>
+</ul>
+<pre><code>find . -name &quot;snort&quot; 2&gt; /dev/null
+./etc/snort
+./include/snort
+./lib/snort
+./share/doc/snort
+./bin/snort
+</code></pre>
+<ul>
+<li>
+<p>All the locations are obvious.</p>
+</li>
+<li>
+<p>Vividly, <code>./etc/snort</code> is where configs live.</p>
+</li>
+<li>
+<p>You may wanna create backup copy before editing <code>/usr/local/etc/snort/snort.lua</code> :</p>
+</li>
+</ul>
+<pre><code>sudo cp /usr/local/etc/snort/snort.lua{,.bak}
+</code></pre>
+<ul>
+<li>Now create a directory for rules :</li>
+</ul>
+<pre><code>sudo mkdir -p /usr/loca/etc/snort/rules
+</code></pre>
+<ul>
+<li><code>HOME_NET</code> is one of the most used variable, set it to be your subnet, In my case : </li>
+</ul>
+<pre><code>HOME_NET = '192.168.1.0/24'
+</code></pre>
+<ul>
+<li>Another variable I found useful is <code>RULE_PATH</code>, create one as :</li>
+</ul>
+<pre><code>RULE_PATH = '/usr/local/etc/snort/rules'
+</code></pre>
+<ul>
+<li>This path should be included on <strong>ips</strong> section of the file as such :</li>
+</ul>
+<pre><code>ips = 
+{
+    -- other settings same
+    include = RULE_PATH .. &quot;/local.rules&quot;,
+    -- other settings same
+}
+</code></pre>
+<p>You may wonder path should be <code>$RULE_PATH/local.rules</code>,but <code>..</code> in <code>lua</code> concatinates.</p>
+<ul>
+<li>Now that we have specified <code>local.rules</code>,but this files does not exists yet, so create this file to add rules later :</li>
+</ul>
+<pre><code>sudo touch /usr/local/etc/snort/rules/local.rules
+</code></pre>
+<ul>
+<li>To create rules, there is different syntax for rule file, by the grace of folks on the development world, we do have <a href="https://snorpy.cyb3rs3c.net/">SNORPY TOOL</a> which makes our life easier. Let's create a rule to <strong>alert icmp ping request</strong> :</li>
+</ul>
+<p><img src="/pics/snort-rule-icmp-echo-req.png" alt="snort-rule-icmp-echo-req.png"></p>
+<ul>
+<li>Copy that one as such to place on <code>local.rules</code> :</li>
+</ul>
+<pre><code>alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Request&quot;; itype:8; icode:0; sid:10001; rev:1; ) 
+</code></pre>
+<ul>
+<li>Similarly For <strong>alert icmp ping reply</strong> would be <code>type=0 code=0</code> as :</li>
+</ul>
+<pre><code>alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Request&quot;; itype:0; icode:0; sid:10002; rev:1; ) 
+</code></pre>
+<ul>
+<li>You could add both rule using : </li>
+</ul>
+<pre><code>echo 'alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Request&quot;; itype:8; icode:0; sid:10001; rev:1; ) 
+alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Request&quot;; itype:0; icode:0; sid:10002; rev:1; ) ' | sudo tee -a /usr/local/etc/snort/rules/local.rules
+</code></pre>
+<blockquote>
+<p>Make sure that <code>sid</code> be unique for each rule, else it will conflict and won't work.</p>
+</blockquote>
+<h2>Start Detecting</h2>
+<ul>
+<li>Now that we have rules to <strong>detect icmp pings</strong>, let's start <code>snort</code> :</li>
+</ul>
+<pre><code>sudo snort -c /usr/local/etc/snort/snort.lua -i wlp4s0 -A alert_fast -s 65535 -k none
+</code></pre>
+<ul>
+<li>
+<p>To check if it is working, ping from one device to another within the network.</p>
+</li>
+<li>
+<p><strong>_Even ping was success, nothing was captured, AFTER A RESEARCH I FOUND THE INTERFACE WAS NOT IN PROMICIOUS MODE, SET IT ON PROMICIOUS MODE  :</strong>_</p>
+</li>
+</ul>
+<pre><code>sudo ip link set wlp4s0 promisc on
+</code></pre>
+<ul>
+<li>Now start and ping, it will show you detection as :</li>
+</ul>
+<pre><code>----&lt;snip&gt;----
+++ [0] wlp4s0
+02/28-22:49:41.896000 [**] [1:10001:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.22 -&gt; 192.168.1.16
+02/28-22:49:41.896154 [**] [1:10002:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.16 -&gt; 192.168.1.22
+02/28-22:49:42.910783 [**] [1:10001:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.22 -&gt; 192.168.1.16
+02/28-22:49:42.910968 [**] [1:10002:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.16 -&gt; 192.168.1.22
+----&lt;snip&gt;----
+</code></pre>
+<h2>Logging</h2>
+<ul>
+<li>One of the most important task is to log those alterts, for that specify log directory with <code>-l</code> and remove <code>-A</code> option :</li>
+</ul>
+<pre><code>sudo snort -c /usr/local/etc/snort/snort.lua -i wlp4s0 -s 65535 -k none -l /var/log/snort
+</code></pre>
+<p>Before that make sure in <code>7. configure ouptus</code> section of the file <code>snort.lua</code>, in the variable <code>alter_fast</code> be like :</p>
+<pre><code>alert_fast =
+{
+    file = true,
+    packet = false,
+    -- limit depends on your need
+    limit = 10,
+}
+</code></pre>
+<p>Also to log as <code>pcap</code>, you can edit <code>log_pcap</code> in the same section as :</p>
+<pre><code>log_pcap =
+{
+    limit = 4
+}
+</code></pre>
+<ul>
+<li>One of the most useful commands to set the options of these variables is :</li>
+</ul>
+<pre><code>snort --help-config &lt;var_name&gt;
+</code></pre>
+<ul>
+<li>So, if you wanna know what options <code>log_pcap</code> takes, you could find :</li>
+</ul>
+<pre><code>snort --help-config log_pcap
+</code></pre>
+<p>which will produces like :</p>
+<pre><code>int log_pcap.limit = 0: set maximum size in MB before rollover (0 is unlimited) { 0:maxSZ }
+</code></pre>
+<p>It means <code>limit</code> is the only option taken by <code>lop_pcap</code>, by default is set to <code>0</code> which means unlimited size. If you specify anything other, it will be the size in MB.</p>
+<ul>
+<li>You could now check <code>/var/log/snort</code> for these logs, <em>alters</em> can be viewed via text editors, <em>pcaps</em> can be viewed from <code>tshark</code> or <code>wireshark</code>,etc.</li>
+</ul>
+<hr />
+<p><strong>Snort is much more than this, which may be covered later but this is good start</strong>.</p>
+<h1>References</h1>
+<p><a href="https://www.zenarmor.com/docs/linux-tutorials/how-to-install-and-configure-snort-on-ubuntu-linux">Thanks to the writer that help me start up</a></p>
+<p><a href="https://www.snort.org/documents">These official documentation could be helpful</a></p></div>
