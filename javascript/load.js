@@ -64,3 +64,25 @@ function highlightSidebar() {
 
     });
 }
+
+
+// update start for adding copy button
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("pre").forEach(preBlock => {
+        const button = document.createElement("button");
+        button.innerText = "Copy";
+        button.classList.add("copy-btn");
+        preBlock.appendChild(button);
+
+        button.addEventListener("click", function () {
+            const code = preBlock.querySelector("code").innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                button.innerText = "Copied!";
+                setTimeout(() => button.innerText = "Copy", 2000);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+            });
+        });
+    });
+});
+// update ends for copy button
