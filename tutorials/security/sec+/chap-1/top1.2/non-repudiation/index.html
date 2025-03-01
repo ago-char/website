@@ -1,0 +1,39 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<p><strong>You can't say that you have not sent the data</strong>.</p>
+<p><img src="/pics/verify-digital-sign.png" alt="verify-digital-sign.png"></p>
+<h1>Proof of Integrity</h1>
+<h2>What is sent ?</h2>
+<ul>
+<li>
+<p>The <em>Hash</em> will determine that the data which is sent is actually the same as of in the sender side. </p>
+</li>
+<li>
+<p><em>Hash</em> is a short string of the text associate with the <em>file sent</em>.</p>
+</li>
+<li>
+<p><em>Hash</em> can only be changed if <em>file</em> itself has been modified.  Even if you modify 1 single bit here and there, <em>Hash</em> will look completely different than of previous one. This won't tell you who sent the data, however.</p>
+</li>
+</ul>
+<h1>Proof of Origin</h1>
+<h2>Who sent ?</h2>
+<ul>
+<li>
+<p>Sign the data with <em>Private Key</em>, which only the sender has access to.</p>
+</li>
+<li>
+<p>Verify with the <em>Public Key</em> i.e. the key pair of that <em>Private Key</em></p>
+</li>
+</ul>
+<p><strong>As data what is sent is matched by hash and your sign is match by private-public key, there is no way to say that you have not send the data.</strong></p>
+<p><strong>Being real, this process of attaching the DIGITAL SIGNATURE is often done automatically by the type of service you are using or may be your are required to check the box to add a level of intregity.</strong></p></div>

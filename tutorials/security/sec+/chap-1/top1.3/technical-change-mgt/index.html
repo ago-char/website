@@ -1,0 +1,59 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<ul>
+<li>Change control mechanism in POV of <em>technician.</em></li>
+</ul>
+<h1>How to make change ?</h1>
+<ul>
+<li>
+<p>Create <em>Allow/Deny List.</em></p>
+</li>
+<li>
+<p><em>Allow List</em> must pass all the security checks and be <strong>Very Restrictive</strong> in nature.</p>
+</li>
+<li>
+<p><em>Deny List</em> contails known <em>Vulns, malware, trojan carrying apps, etc.</em></p>
+</li>
+<li>
+<p>Get well documented <em>Change Control Docs</em> from the Approval Department (be very restrictive), you could be flexible on the specific change you are asked to ?</p>
+<ul>
+<li>Will you make change not related to given task if you have enough time and the change is necessary ?</li>
+<li>Will you not make change if asked change required some pre-configured file be modified ?</li>
+</ul>
+</li>
+<li>
+<p><strong>Prevent Downtime</strong> when possible</p>
+<ul>
+<li>Update when system is not running (maybe at holiday)</li>
+<li>You may ask users move into secondary system and update on the primary system</li>
+<li>You may automate the process of change if possible</li>
+<li>Always have <em>backout plan</em></li>
+<li>Send Emails/Message</li>
+</ul>
+</li>
+<li>
+<p>If it is <em>leagacy system</em>, understand the system before making any changes.</p>
+</li>
+<li>
+<p>If your program requires Dependencies to be updated, update that first.</p>
+</li>
+<li>
+<p>Change is almost Permanent, so <strong>must documentate</strong> so you could make further change in future.</p>
+<ul>
+<li>It is always good to know what was previously changed before making any other change, it helps us and the user.</li>
+</ul>
+</li>
+<li>
+<p>Track changes to file or config data for <em>Version Control</em>, you may use <code>git</code> if you are workinig with some code or program</p>
+</li>
+</ul></div>

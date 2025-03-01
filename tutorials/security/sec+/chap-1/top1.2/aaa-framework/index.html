@@ -1,0 +1,79 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>AAA for Systems</h1>
+<ol>
+<li>
+<p>How would you verify if certain system(device) is allowed on your network. </p>
+</li>
+<li>
+<p>A system certainly can not type password to verify itself.</p>
+</li>
+<li>
+<p>So, how can you truely AUTHENTICATE a device ?</p>
+</li>
+<li>
+<p>You will put a digitally signed certificate on the device.</p>
+</li>
+<li>
+<p>And other business process can rely on the certificate for access, creating rules, etc.</p>
+</li>
+</ol>
+<h2>Authentication</h2>
+<ul>
+<li>
+<p>Most organizations will have their own <strong>Certificate Authority (CA)</strong>, which will even has its own Certificate signed by <strong>Root CA</strong>.</p>
+</li>
+<li>
+<p>The organization will create a certificate for the device and digitally signs the certificate with the organization's <strong>CA</strong>.</p>
+</li>
+<li>
+<p>Now, basically, on a controlled environment, organization itself is responsible for including (putting) that cert in the device.</p>
+</li>
+<li>
+<p>Whenever, the device will want to on the network or access something on the network, this cert can be used as a factor of <em>Authorization</em>.</p>
+</li>
+<li>
+<p>Actually, the <strong>CA</strong> digital signature is used to validate the certificate.</p>
+</li>
+<li>
+<p>Pictorically,<br />
+<img src="/pics/device-authorization.png" alt="pics/device-authorization.png"></p>
+</li>
+</ul>
+<h2>Authorization</h2>
+<ul>
+<li>
+<p>Now the system has been authenticated, you should provide access to certain data, apps and resources.</p>
+</li>
+<li>
+<p>A way of doing it is to map <em>User -&gt; Data</em>, but imagine 1000s of users.</p>
+</li>
+<li>
+<p>In such situation, you will often create <strong>An Abstraction</strong> to <strong>Authorization Model</strong>, so the mapping will look like <em>Users -&gt; Group(s) -&gt; Data, Apps, Services</em> , this made scaling pretty esay.</p>
+</li>
+</ul>
+<h2>Accounting</h2>
+<ul>
+<li>
+<p>You will need to keep log of :</p>
+<ol>
+<li>Login</li>
+<li>Activities (Normal - Critical)</li>
+<li>Accessed Resources</li>
+<li>Logout</li>
+</ol>
+</li>
+<li>
+<p>Log in such a formatted way (date, time, detail, level, etc.), so that it will help analysis team in case of study.</p>
+</li>
+</ul></div>

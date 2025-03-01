@@ -1,0 +1,169 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Certificates</h1>
+<ul>
+<li>
+<p>It is a digital signature.</p>
+</li>
+<li>
+<p>It is a way of TRUST.</p>
+</li>
+<li>
+<p>Organization can manage their own Trust chain with certs.</p>
+</li>
+<li>
+<p>OS provides their own way to create certs, there are also many 3rd-party options.</p>
+</li>
+</ul>
+<h2>Components of Cert</h2>
+<p><strong>X.509</strong> is the standard format for certificates, mostly used in browsers. You can view details clicking the Lock 🔒 in your browser address bar.
+- Serial Number
+- Version
+- Signature Algorithm
+- Issuer
+- Name of the cert holder
+- Public Key
+- Extentions
+- More ....
+- 
+<img src="/temp/pics/website-cert.png" alt="website-cert.png"></p>
+<ul>
+<li>You could see sample above</li>
+</ul>
+<h1>Building Trust From Something Unknown ?</h1>
+<ul>
+<li>
+<p>Trust with 3rd-party vouch, if 3rd-party trust, we can also trust.</p>
+</li>
+<li>
+<p>Trust with Inherently trusted component like: HSM, Secure Enclave, CA, trusted software and so on.</p>
+</li>
+<li>
+<p>Maintain list of Trusted CA, if the cert has been signed by one of those, we should trust.</p>
+</li>
+<li>
+<p>This means when a website purchase cert from list of CA, they will be trusted.</p>
+</li>
+<li>
+<p>While purchasing cert, there is no much headache in generating cert, but the validation process is something complicated, so you are paying for that process.</p>
+</li>
+<li>
+<p>The CA is responsible to verify that the person who is requesting the certificate is truely the owner of the website.</p>
+</li>
+<li>
+<p>You will send <em>Certificate Signing Request (CSR)</em> which is <code>your pub key + identifying info</code> to CA, CA will validate and they will use <code>CA private key + CSR</code> to generate <code>CERT</code> and now you will use that on your website or email server or ....</p>
+</li>
+<li>
+<p>On linux -&gt; <code>/etc/ssl/certs/ca-certificates.crt</code> is the location where all the CA and their certs are stored.</p>
+</li>
+</ul>
+<h1>Private CA</h1>
+<ul>
+<li>
+<p>You can be your own CA.</p>
+</li>
+<li>
+<p>If you have internal web server running within org, you may not want to use 3rd party or external CA and pay them for cert.</p>
+</li>
+<li>
+<p>First, Install your own CA inside organization.</p>
+</li>
+<li>
+<p>Take out <code>public cert</code> of CA and install on all the devices within organization.</p>
+</li>
+<li>
+<p>So, all devices will trust this internal CA in a same way as they would trust external CA</p>
+</li>
+<li>
+<p>Windows -&gt; <em>Windows Certificate Services</em>, Open -&gt; <code>OpenCA</code>.</p>
+</li>
+<li>
+<p>Creating, Distributing, Implementing your internal CA is exactly same as in external.</p>
+</li>
+</ul>
+<h1>Wildcard (*) Certificates</h1>
+<ul>
+<li>
+<p>There is an extention to an <em>X.509</em> cert called as <em>Subject Alternative Name (SAN)</em> which wil allow sub domain and even different domain to be associated with our one cert.</p>
+</li>
+<li>
+<p>Say if *.shyam.com is the DNS name valid for the cert, you can associate with mail.shyam.cert, ftp.shyam.cert and so on.</p>
+</li>
+</ul>
+<h1>Certificate Revocation</h1>
+<ul>
+<li>
+<p>You may want to dispose your web server, but also you will like to delete or dispose the installed Cert for your web server.</p>
+</li>
+<li>
+<p>You may want to revoke the cert (renew), coz it may be your policy to revoke or maybe your cert has been compromised.</p>
+</li>
+</ul>
+<p>Either the case, there should be the policy to revoke your certificate. Most of the CA will have the feature of :</p>
+<h2>Certificate Revocation List</h2>
+<ul>
+<li>
+<p>This is the list maintained by the CA, where the certificated which are revoked are stored, for eg: if you renew your site CA, now you will be using new version of cert and the old version will move into that CRL.</p>
+</li>
+<li>
+<p>This is the extra layer of security, so even if attacker get access to your cert, they won't be able to validate coz browser will :</p>
+<ul>
+<li>connect to that site</li>
+<li>get the cert</li>
+<li>validate if the cert is in CRL</li>
+<li>if in CRL, <strong>no trust</strong></li>
+<li>else <strong>trust</strong></li>
+</ul>
+</li>
+<li>
+<p>Even if the browser trust the CA, it is not enough, the cert must be up to date.</p>
+</li>
+<li>
+<p>But this process require out browser to visit some 3rd party site to download the CRL list and then check , this is quite a headache. So :</p>
+</li>
+</ul>
+<h2>Online Certificate Status Protocol (OCSP)</h2>
+<ul>
+<li>
+<p>Protocol that will allow browser to check the status of the certificate.</p>
+</li>
+<li>
+<p>Browser will perform OCSP request, and responder within CA will provide status.</p>
+</li>
+<li>
+<p>If it is "current", <strong>trust</strong> is built, "expired" and "unknown" are not generally "trusted".</p>
+</li>
+<li>
+<p>This too require additional connection  to CA and CA may record your digital info (like how many time sites visited, ip addr of client, etc.), Hence:</p>
+</li>
+<li>
+<p>Owner of Web Server (website) will put the <em>status of cert</em> (new or not) in their web server which is actually the pre-fetched response from OCSP.</p>
+</li>
+<li>
+<p>When browser connect first SSL handshake with server, it will get <em>status message</em> which could be use for validation if it is newset one..</p>
+</li>
+<li>
+<p>Of course, browser should not trust this status easily, so the web server sends signed message by the CA, msg is already signed by CA when server has requested staples OCSP.</p>
+</li>
+</ul>
+<h2>Risks of OCSP Stapling</h2>
+<ul>
+<li>
+<p>Imagine attacker gain access to your cert and request for high time frame OCSP Stalp to impersonate your site.</p>
+</li>
+<li>
+<p>Even if you renew your site cert, as attacker site is enabled to use OSCP Stapling, the client will not ask the CA for the response, instead it trusts the response.</p>
+</li>
+</ul>
+<h2>What can you do ?</h2>
+<p><strong>Nothing, go protect your keys</strong></p></div>

@@ -72,7 +72,8 @@ code {
     background: #f4f4f4;
     padding: 2px 5px;
     border-radius: 3px;
-    color: #d63384;
+    /* color: #d63384; */
+    color: #39b4c8;
 }
 
 pre code {

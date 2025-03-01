@@ -1,0 +1,75 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Encrypting Data</h1>
+<p>While is seems simple task to deploy <em>encryption</em> on the target system or organization, it is often necessary to look over certain points before doing so :</p>
+<ul>
+<li>
+<p>Know the necessity, use encryption only if needed and in security concern files</p>
+<ul>
+<li>There is no point to use encryption on public available data</li>
+<li>Encrypt files to be travelled over non secure tunnel</li>
+</ul>
+</li>
+<li>
+<p>In organization, must of the data are structured and maybe stored on SQL database, you could apply encryption to the whole table or column based.</p>
+<ul>
+<li>Whole table if all the columns contain security concerned data.</li>
+<li>You could apply only to Licence_No. in the table of 'Name', 'Address', 'Licence_No'.</li>
+</ul>
+</li>
+<li>
+<p>You may want to sacrifice speed for perforemance and more security and vice-versa for all, choose again according to necessity.</p>
+</li>
+<li>
+<p>You may want to perform multiple level of hashing or encryption when security is prime concern for the application.</p>
+</li>
+<li>
+<p>You could encrypt full disk also depending on the OS you use</p>
+<ul>
+<li>Bitlocker - popular for "nt" systems</li>
+<li>LUKS, dm-crypt - among "linux" systems</li>
+<li>FileVault - for "mac"</li>
+<li>VeraCrypt - maybe for "all"</li>
+</ul>
+</li>
+<li>
+<p>Compromise speed, performence and security while choosing algorithm</p>
+</li>
+<li>
+<p>You would also want different data be viewed for different users:</p>
+<ul>
+<li>Say 'SSN' column be visible only for privilege users</li>
+<li>For that you will install key only on those 'privilege' system, that will auto decrypt the column, for normal users data in  'SSN' column makes no sence, they might even don't know that it is 'SSN' column coz. column_name itself is encrypted.</li>
+</ul>
+</li>
+<li>
+<p>You would like to increase N-bit in encryption depending on current technology state.</p>
+<ul>
+<li>Machine being powerful, can may be brute force up to 64 bit or around of hash.</li>
+<li>You would want to choose at least 128 bit key encryption.</li>
+<li>In future gen of AI and Robots, Qunatum Computers, you would like to increase to a lot larger bit of encryption.</li>
+</ul>
+</li>
+<li>
+<p>You probably want to increase the level of encryption, and vary the length and algorithm type for different level to hide your pattern</p>
+</li>
+<li>
+<p>You could essentially enhance security combining <em>encryption</em> with <em>Steganography</em> tools</p>
+<ul>
+<li>Image Steganography tools : <code>steghide</code>, <code>openstego</code>, <code>imagehide</code></li>
+<li>Audio Steganography tools : <code>mp3stego</code>, <code>audiostegano</code>, <code>stegoaudio</code>, <code>deepsound</code></li>
+<li>Video Steganography tools : <code>videostegano</code>, <code>stegovideo</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>GOOD LUCK ! KEEP YOUR PRIVATE KEYS PRIVATE, DON'T SHARE</strong></p></div>

@@ -1,0 +1,37 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Key Exchange</h1>
+<p>Yes, we can generate keys on our own, but how would you exchange them over the internet ? This is not quite hard and not quite easy also as internet is the most unsecure medium of exchange for the information. Unfortunately, we don't have the luxuiry to visit on site to exchange key coz in the world of internet, where every miliseconds count, we can't afford delay. So, How ?</p>
+<ul>
+<li>
+<p>You could send <code>key</code> over encrypted session ?</p>
+</li>
+<li>
+<p>Yes, but this is only for second key after the session is established </p>
+</li>
+<li>
+<p>So, for exchange <code>key</code> over unsecure medium, you may use such medium where you both <strong>end will know key but without sending key</strong>, strange ? SEE:</p>
+<ul>
+<li>'A' creates private-pub key pair and send pub key to 'B' since public key is intended for public.</li>
+<li>'B' does the same</li>
+<li>'A' now uses : <code>pub(B) + pri(A) = New_key1</code></li>
+<li>'B' now uses : <code>pub(A) + pri(B) = New_key2</code></li>
+<li>As, own pair of pub-pri key are mathematically interrelated, even with the computation of these different value will generate the <strong>same key</strong> and hence  <code>New_key1 = New_key2</code></li>
+<li>As both are the same, it can be use for encryption and decryption</li>
+</ul>
+</li>
+<li>
+<p>Math is indeed powerful</p>
+</li>
+</ul>
+<p><strong>Let's rock !!!</strong></p></div>

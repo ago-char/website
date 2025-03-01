@@ -1,0 +1,90 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Zero Trust Model</h1>
+<ul>
+<li>
+<p>Many networks do security checks very rarely once you are in the network or through the firewall, it makes authorized users esay to perform tasks, but what if someone outsider gain the access &gt;?</p>
+</li>
+<li>
+<p><strong>Zero Trust</strong> is our go-to approach to perform additional check for every <em>device, process, user, program, app</em> whenever the request for resource is received.</p>
+</li>
+<li>
+<p>Everything must be verified in the form of <strong>MFA, Encryption, System Permissions, Additional Firewall/Monitoring/Analytics, etc.</strong></p>
+</li>
+</ul>
+<h1>Applying Zero Trust Infrastructure</h1>
+<h2>Planes of Operation</h2>
+<ul>
+<li>
+<p>One of the way is to break our security device into several components and examining in each layer of splitted planes.</p>
+</li>
+<li>
+<p>Either the security device is physical, virtual or in the cloud, you could essentially split into <strong>Data Plane</strong> and <strong>Control Plane</strong>.</p>
+</li>
+<li>
+<p><strong>Data Plane</strong> processes all incomming/outgoing frames, packets at the real time. It performs NAT, trunking, forwarding.</p>
+</li>
+<li>
+<p>At the device, there is <strong>Control Place</strong> which is responsibe for actually consuming the data and passing it through the security check if it is legitimate or malicious traffic. You could write <em>rules, policies</em>, build <em>routing tables, session tables, NAT tables</em> to control data arrived at the <strong>Data Plane</strong>.</p>
+</li>
+</ul>
+<h1>Controlling Trust</h1>
+<p>You should no longer believe or trust only what the user is providing. Of course, this is the first step of validation but you might consider several factors. This is actually the collection of information gathered about the user, process, device, etc. or essentially anything that should be taken as security check. <strong>Adaptive Identity</strong> is hot topic when it comes to controlling the trust based on many factors.</p>
+<h2>Adaptive Identity</h2>
+<ul>
+<li>
+<p>Validation of source and requested resources,</p>
+</li>
+<li>
+<p>Relation to the organization, physical location, type of connection, IP address, etc.</p>
+</li>
+<li>
+<p>Make it as hard as possible, if you really want strong <strong>Zero Trust</strong> architecture.</p>
+</li>
+<li>
+<p>Once we have analyzed these many variables, you can now verify the identity and provide access or the resource requested.</p>
+</li>
+</ul>
+<p>Another way in building <strong>Zero Trust</strong> foundation is :</p>
+<h2>Threat Scope Reduction</h2>
+<ul>
+<li>Reducing threat scope is descreasing possible entry points, yes this may be somewhat difficult you authorized person, but this could prevent unwanted party being in our network or protected zone.</li>
+</ul>
+<p>Once we have all this information, we can now build :</p>
+<h2>Policy-driven Access Control</h2>
+<ul>
+<li>
+<p>Combine these all variable to create a predefined set or rules for the security check.</p>
+</li>
+<li>
+<p>You might have faced some error, if you were trying to change the password of your social media account from the newly login device. This is an example of <strong>Policy-driven Access Control</strong> where you are restricted to change password even if other variable you provided belongs to you (the real user).</p>
+</li>
+</ul>
+<p>If you are about to implement <strong>Zero Trust</strong> strictly in organization's internal, you could introduce the concept of :</p>
+<h2>Security Zones</h2>
+<ul>
+<li>
+<p>Security is more than <em>one-one relationship</em>, yes <em>User-1</em> might be authorized to access <em>Resource-1</em>, but only if he is coming from <em>Trusted Zone.</em></p>
+</li>
+<li>
+<p>Your job is to build these zones (<em>Trusted/Untrusted, Internal/External, IT/HR/ACC</em>) and apply relatively more or less security checks, create policies, internal rules based on the zones examining the <em>Full Path of Communication.</em></p>
+</li>
+<li>
+<p>You should identify the potential <strong>Policy Enforcement Point (PEP)</strong>, the point where you need to place the policy for these additional variable checks. Choose the best point to implement the rules/policies.</p>
+</li>
+<li>
+<p><strong>PEP</strong> should gather all the info and pass to <strong>Policy Engine</strong> through <strong>Policy Administrator</strong><em> which is responsible for making decision related </em><em>Grant, Deny or Revoke</em>*.</p>
+</li>
+</ul>
+<p>In a diagram, our <strong>Zero Trust Model</strong>:</p>
+<p><img src="/pics/zero-trust.png" alt="zero-trust.png"></p></div>

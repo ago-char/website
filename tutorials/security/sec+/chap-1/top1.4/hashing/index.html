@@ -1,0 +1,51 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Hash</h1>
+<ul>
+<li>
+<p>Irreversible or one way function.</p>
+</li>
+<li>
+<p>Short string representation of large data .</p>
+</li>
+<li>
+<p>Use strong Hash.</p>
+</li>
+<li>
+<p>Don't use md5 for much sensitive, <em>Hash Collision</em> was occured on 1996. i.e. same hash for 2 different docs.</p>
+</li>
+<li>
+<p>It provides <a href="https://en.wikipedia.org/wiki/Data_integrity"><em>integrity</em></a>, could also be use as <em>digital signature</em>.</p>
+</li>
+<li>
+<p>Hash can be salted, Hashes of same password is always same, so use salt so that even if the password are identical, hashes will be different.</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Rainbow_table"><em>Rainbow Table</em></a> is pre-computed hash-value table, use of salt could make <em>Rainbow Table</em> not much useful for attacket </p>
+</li>
+</ul>
+<h1>Digital signatures]</h1>
+<ul>
+<li>
+<p>Proof of Integrity.</p>
+</li>
+<li>
+<p>Proof of the source of the message.</p>
+</li>
+<li>
+<p>Creator will sign the doc/data with his private key to create digital signature.</p>
+</li>
+<li>
+<p>User will verify with the creator's public key if sign is valid.</p>
+</li>
+</ul></div>

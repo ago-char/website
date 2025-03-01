@@ -1,0 +1,73 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Public Key Infrastructure</h1>
+<ul>
+<li>
+<p>It (PKI) is very board term in cryptography.</p>
+</li>
+<li>
+<p>Commony refers to as policies and procedures, hardware and softwares, peope that is responsible for creating, distributing, managing, storing, revoking, destroying and performing other processess associated with digital cerificates for digital security.</p>
+</li>
+<li>
+<p>This seems easy but this is a big task that requrire a lot of planning</p>
+<ul>
+<li>What type of encryption be used ?</li>
+<li>Who are our partners, what they are using ?</li>
+<li>How to manage these amount of keys ?</li>
+<li>How to keep them safe and secure ?</li>
+</ul>
+</li>
+<li>
+<p>Also refers to the binding of public keys to people or device</p>
+<ul>
+<li>Generally done by CA (Certificate Authority)</li>
+<li>Way to trust people or device on the network</li>
+</ul>
+</li>
+</ul>
+<h2>Managing key pair</h2>
+<ul>
+<li>
+<p>This can be very complex way as in an organization, could include 1000s of key pair which is the object of trust.</p>
+</li>
+<li>
+<p>Key in wrong hand could do numerous damage.</p>
+</li>
+<li>
+<p>You can use 3rd party to manage and store your keys.</p>
+</li>
+<li>
+<p>You can instead, create your own <strong>Key escrow</strong>.</p>
+</li>
+</ul>
+<h3>Key Escrow</h3>
+<blockquote>
+<p>Why someone should maintain Key Escrow if it contains info that only you should be owning ?</p>
+</blockquote>
+<ul>
+<li>
+<p>Way of storing keys locally.</p>
+</li>
+<li>
+<p>This is done for :</p>
+<ul>
+<li>What if user left organization and still have the encrypted data ? <ul>
+<li>You may want to destroy his keys but after perfoming all the actions i.e. look if your partner org. is using same key pair, if anything be enc/dec by same key pair, etc....</li>
+</ul>
+</li>
+<li>What if your partner or government agency want decrypted data ?
+In above cases you can always go to your <strong>key valult</strong> and perform desired action.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Controversial, yet required.</strong></p></div>

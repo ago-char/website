@@ -1,0 +1,54 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Common Steganogaraphy Techniques</h1>
+<ul>
+<li>
+<p>Network Based (embed messages within TCP Packets)</p>
+</li>
+<li>
+<p>Use of multimedia (images, audios, videos)</p>
+</li>
+<li>
+<p>Physical steganography with special kind of printers</p>
+</li>
+<li>
+<p>Hiding info in publicly available docs, journals, etc.</p>
+</li>
+</ul>
+<h1>Tokenization</h1>
+<ul>
+<li>
+<p>Replacing sensititve data with non sensitive placeholder :</p>
+<ul>
+<li>for eg: SSN of 222-44-9988 can become 559-23-9849 and can be used as Token, often these are one-time use tokens</li>
+</ul>
+</li>
+<li>
+<p>Use different algorigthm to create Card Number Token, token will do the transaction and use per session only, so even if it will be on clear text, Malicious Actor in the middle could not be able to make purchase with this session token.</p>
+</li>
+<li>
+<p>These token and original data can't be reversed-engineered, aren't math..lly related</p>
+</li>
+</ul>
+<h1>Data Masking</h1>
+<ul>
+<li>
+<p>Hiding sensitive part of data</p>
+</li>
+<li>
+<p>For eg: in your shop bill, your last 4 of card info be visible and other as *</p>
+</li>
+<li>
+<p>Restrict who should be dealing with such info, for eg: in banks, certain employees will only have access to sensitive data, other will have a piece of data just enough for customer validation and other process</p>
+</li>
+</ul></div>
