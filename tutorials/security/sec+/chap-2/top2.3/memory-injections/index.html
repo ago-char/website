@@ -1,0 +1,62 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Memory Injections</h1>
+<ul>
+<li>
+<p>All the software to be able to run should load from disk to memory.</p>
+</li>
+<li>
+<p>Once they are in memory they will have their own process to run or inject itself on another process.</p>
+</li>
+<li>
+<p>If injected in another process, it will past from <em>process based firewall or detection</em>.</p>
+</li>
+<li>
+<p>The software/malware will have same privilege as of process.</p>
+</li>
+</ul>
+<h2>Scope of Memory based injections</h2>
+<ul>
+<li>Process</li>
+<li>DLLs</li>
+<li>Buffers</li>
+<li>Threads</li>
+<li>Memory Mgt Functions</li>
+</ul>
+<h3>DLLs</h3>
+<ul>
+<li>
+<p>Windows library containing code and data.</p>
+</li>
+<li>
+<p>Type of software or application that many different processes/apps can use.</p>
+</li>
+<li>
+<p>Attacker install DLL</p>
+</li>
+<li>
+<p>Attacker find process</p>
+</li>
+<li>
+<p>Attacker will want DLLs to run as a part of that process</p>
+</li>
+<li>
+<p>Attacker wil place path to DLL on that process</p>
+</li>
+<li>
+<p>As process is running, when it moves to the point where it needs to access or derefernce that DLL address, it will go to that location/address and load into the process</p>
+</li>
+<li>
+<p>Now Attacker could run many other apps as part of that DLL</p>
+</li>
+</ul></div>

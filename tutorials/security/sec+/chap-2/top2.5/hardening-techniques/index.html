@@ -1,0 +1,150 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>System Hardening</h1>
+<ul>
+<li>
+<p>Refers to OS Hardening (nt, *ix, osx)</p>
+</li>
+<li>
+<p><strong>Updates and Patches</strong></p>
+</li>
+<li>
+<p><strong>User Accounts</strong></p>
+<ul>
+<li>Password policy</li>
+<li>Permissions and limitations</li>
+</ul>
+</li>
+<li>
+<p><strong>Network Access</strong></p>
+<ul>
+<li>Allow only certain IP or subnet to access this device</li>
+</ul>
+</li>
+<li>
+<p><strong>Monitor and Secure</strong></p>
+<ul>
+<li>Logs</li>
+<li>Anti-virus/Anti-malware</li>
+</ul>
+</li>
+</ul>
+<h2>Data Protection</h2>
+<ul>
+<li>
+<p><strong>File Encryption</strong></p>
+<ul>
+<li>Encrypt file or file system</li>
+<li>Perform full disk encryption (encrypt every bit of data, OS in the disk)</li>
+</ul>
+</li>
+<li>
+<p><strong>Network Encryption</strong></p>
+<ul>
+<li>VPN</li>
+<li>SSL encapsulation</li>
+<li>HTTPS</li>
+<li>SSH Tunneling</li>
+</ul>
+</li>
+</ul>
+<h2>EndPoint Protection</h2>
+<ul>
+<li>
+<p>We are using a lot of end devices through our work day (phone, pc, mac etc.)</p>
+</li>
+<li>
+<p>So, we have to use multi-faced security</p>
+</li>
+<li>
+<p>Use <strong>EDR (Endpoint Detection and Response)</strong></p>
+<ul>
+<li>
+<p>Next Generation Anti-Malware Protection</p>
+</li>
+<li>
+<p>Identify and remove known malware signatures</p>
+</li>
+<li>
+<p>Behavioral Analysis to remove threat</p>
+<ul>
+<li>Watch what user is doing</li>
+<li>If something unusual happens report to management console</li>
+</ul>
+</li>
+<li>
+<p>Machine Learning</p>
+<ul>
+<li>Use of machine learning to train by feeding those behavioral data</li>
+</ul>
+</li>
+<li>
+<p>Process Monitoring</p>
+<ul>
+<li>Monitor every process and seek for any unusual activity</li>
+</ul>
+</li>
+<li>
+<p>EDR can perfrom <strong>Root Cause Analysis</strong></p>
+<ul>
+<li>If it finds something not usual it does additional study to identify the root cause, and if something seems malicious report</li>
+</ul>
+</li>
+<li>
+<p>Respond to threat</p>
+<ul>
+<li>
+<p>Addition to reporting, it could qurantine the system, remove the threat and even rollback to a previous known good configuration</p>
+</li>
+<li>
+<p>This responding is mostly automated in app itself through API calls, so no need of manual inspection and even no technician required</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Host Based Firewall</p>
+<ul>
+<li>
+<p>iptables, ufw</p>
+</li>
+<li>
+<p>Windows firewall, windows defender</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Host Based Intrusion Prevention System (<strong>HIPS</strong>)</p>
+<ul>
+<li>
+<p>It works on the basis of signature (stored on IPS), heuristics, behavioral changes.</p>
+</li>
+<li>
+<p>Can identify buffer overflow, registery updates, writing to <code>C:/Windows</code> because it has access to host.</p>
+</li>
+<li>
+<p>Can Access non encrypted data to analysis</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Open Ports </p>
+</li>
+<li>
+<p>Default Password</p>
+</li>
+<li>
+<p>Removal of unnecessary software</p>
+</li>
+</ul></div>

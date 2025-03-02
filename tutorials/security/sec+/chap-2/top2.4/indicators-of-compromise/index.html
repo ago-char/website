@@ -1,0 +1,144 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Indicators of Compromise</h1>
+<ul>
+<li>
+<p><strong>IOC</strong> i.e an event that indicates an intrusion</p>
+</li>
+<li>
+<p>Unusual network activity</p>
+</li>
+<li>
+<p>Change in hash</p>
+</li>
+<li>
+<p>Irregular international traffic</p>
+</li>
+<li>
+<p>Change in DNS data</p>
+</li>
+<li>
+<p>Uncommon Login Patterns</p>
+</li>
+<li>
+<p>Spikes of read requests to certain files (a lot more than of normal)</p>
+</li>
+<li>
+<p>Account lockout or Administratively Disabled</p>
+<ul>
+<li>May be locked so that attacker could call help desk to reset password</li>
+</ul>
+</li>
+<li>
+<p>Different login session from different devices or locations</p>
+<ul>
+<li>May not always be the case as we often carry mobile device and leave pc at home and also may be logged in on cloud</li>
+</ul>
+</li>
+<li>
+<p>Unable to connect security related website to download certain pathes or anti-walware or anti-virus program, that could be <strong>IOC</strong></p>
+<ul>
+<li>
+<p>This is usually the case because attacker once gained the access, will focus on being onto the system as long as possible</p>
+</li>
+<li>
+<p>So, his malwae will efficitively stop you from updating or visiting certain sites</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Resource Consumption</strong></p>
+<ul>
+<li>
+<p>Once attacker in the system may do certain activity that will indicate IOC</p>
+</li>
+<li>
+<p>He may be transferring files from one system to another</p>
+</li>
+<li>
+<p>May be outsourcing files to his site</p>
+</li>
+<li>
+<p>Unusual traffic of network (say : high server traffic at off day or off work period : 2 AM in the morning maybe)</p>
+</li>
+<li>
+<p>Firewall logs may have IP and timeframe logs</p>
+</li>
+<li>
+<p>When nothing should be happening, something is happening</p>
+<ul>
+<li>Maybe a single file transfer</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Resource Inaccessibility</strong></p>
+<ul>
+<li>
+<p>Suddenly you may not be able to connect to the server or access the resource that you would have in normal days.</p>
+</li>
+<li>
+<p>May be server crash when attacker is trying to do something.</p>
+</li>
+<li>
+<p>Network may be down because of unusual activity of attacker.</p>
+</li>
+<li>
+<p>Data being encrypted.</p>
+</li>
+<li>
+<p>Account lockout.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Out of Cycle Logs</strong></p>
+<ul>
+<li>
+<p>System should not be logging certain event at that period.</p>
+</li>
+<li>
+<p>You may have to policy to update or scan all PC every 1st day of the month, but you see log details of update or scan at different time and date i.e IOC.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Missing Logs</strong></p>
+<ul>
+<li>
+<p>Attacker knows his activity will be logged (auth log, file log, firewall log, proxy log, server  log and more ....).</p>
+</li>
+<li>
+<p>He will try and delete those.</p>
+</li>
+<li>
+<p>While deleting, he may delete others.</p>
+</li>
+<li>
+<p>(create log monitoring to send notification for missing and logs or suspicious logs).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Private Data Made Public</strong></p>
+<ul>
+<li>
+<p>Data Exfiltration</p>
+</li>
+<li>
+<p>Post on the internet</p>
+</li>
+</ul>
+</li>
+</ul></div>

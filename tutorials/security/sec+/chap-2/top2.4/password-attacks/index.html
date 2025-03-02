@@ -1,0 +1,45 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Password Attacks</h1>
+<ul>
+<li>
+<p>Don't store password in clear text</p>
+</li>
+<li>
+<p>Use secure + strong hashing algorithm</p>
+</li>
+<li>
+<p>Store user:hash relation</p>
+</li>
+</ul>
+<h2>Spraying Attack</h2>
+<ul>
+<li>
+<p>Trying multiple passwords will ultimately <strong>lock out</strong> account.</p>
+</li>
+<li>
+<p>So, instead of trying every combination, attacker try with few (depending upon lockout attempts) permissible passwords.</p>
+</li>
+<li>
+<p>If not found, move to next account or wait till timeout.</p>
+</li>
+<li>
+<p>Capture the Hash and perform offline attack if possible.</p>
+</li>
+<li>
+<p>Capture the part of authentication process and try to compare by generating identical capture :</p>
+<ul>
+<li>for eg: if a <em>.pcap</em> file contain some information i.e used for authentication and with all password brute forcing, if you are able to create identical scenerio i.e. the authentication part (which matters), that is the <strong>password</strong> you are looking for</li>
+</ul>
+</li>
+</ul></div>

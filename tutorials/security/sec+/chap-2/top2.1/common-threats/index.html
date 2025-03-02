@@ -1,0 +1,163 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<p>Threat Vectors/Scopes are potential entry points for the attacker to come in your organization. They are the methods used by the attacker to gain access. A lot of work goes on finding vulnerabilities (can be software/harware or even employee based) into these area and finally exploit then. As an IT person, you should protect exiting vectors and find and protect other potential vectors.</p>
+<h2>Message Based</h2>
+<ul>
+<li>
+<p>You may received <strong>phising</strong> message on your <em>email/sms</em>.</p>
+</li>
+<li>
+<p>They have story to follow having malicious link, malicious attachments.</p>
+</li>
+<li>
+<p>Don't open those link without verifying sources.</p>
+</li>
+<li>
+<p>Perform Attachment Scans before opening attachment.</p>
+</li>
+</ul>
+<h2>Image Based</h2>
+<ul>
+<li>
+<p>A lot difficult to identify compared to <strong>Message Based</strong>.</p>
+</li>
+<li>
+<p><strong>SVG</strong> image format is more than a image, it contains <strong>XML</strong> which could <em>inject HTML/JS</em>.</p>
+</li>
+</ul>
+<h2>File Based</h2>
+<ul>
+<li>
+<p>Could be hidden in Adobe PDF.</p>
+</li>
+<li>
+<p>Compressed files (ZIP/RAR, etc.)</p>
+</li>
+<li>
+<p>Microsoft Office <em>Macros</em> or <em>Add-in files</em>.</p>
+</li>
+</ul>
+<h2>Voice Based</h2>
+<ul>
+<li>
+<p>Phishing over the phone i.e <em>Vishing</em></p>
+</li>
+<li>
+<p>Have a story to follow, exact in details and speaking manner</p>
+</li>
+<li>
+<p>Large-scale phone calls (block them)</p>
+</li>
+<li>
+<p>War Dialing (unpublished phone numbers)</p>
+</li>
+<li>
+<p>Call Tampering</p>
+</li>
+</ul>
+<h2>USB Based</h2>
+<ul>
+<li>
+<p>Infect air gapped networks (no direct network connection to the network).</p>
+</li>
+<li>
+<p>May throw USB drive in parking lot, garden, or maybe in your desk.</p>
+</li>
+<li>
+<p>Can be used as <em>Keyboard</em>.</p>
+</li>
+<li>
+<p>Can run script <em>on plugging</em>.</p>
+</li>
+<li>
+<p>Can transfer your sensitive data very quick automatically.</p>
+</li>
+</ul>
+<h2>Software Based</h2>
+<ul>
+<li>
+<p>Infected Executable</p>
+</li>
+<li>
+<p>Known or Unknown vulnerabilities</p>
+</li>
+<li>
+<p>Vulnerability in server could send malicious message in client</p>
+</li>
+</ul>
+<h2>Unsupported systems</h2>
+<ul>
+<li>
+<p>Vulnerabilities on those system which is no longer support by the vendor.</p>
+</li>
+<li>
+<p>Don't run softwares on those system or isolate if you must need to run.</p>
+</li>
+<li>
+<p>Locate every devices in your org for periodic scans.</p>
+</li>
+</ul>
+<h2>Unsecure Network</h2>
+<ul>
+<li>
+<p>Outdated security protocols (WEP, WPA or even WPA2).</p>
+</li>
+<li>
+<p>Open or rouge wireless networks.</p>
+</li>
+<li>
+<p>Unsecure Wired Networks i.e where <em>802.1X</em> is not enabled.</p>
+</li>
+<li>
+<p>Bluetooth ( can be used for reconnaissance to locate devices )</p>
+</li>
+</ul>
+<h2>Open Ports</h2>
+<ul>
+<li>
+<p>A door to your computer.</p>
+</li>
+<li>
+<p>Vulnerability in app using that port .</p>
+</li>
+<li>
+<p>Misconfiguration on server using that port.</p>
+</li>
+<li>
+<p>(Create port based firewalls and app based firewalls + packet filtering)</p>
+</li>
+</ul>
+<h2>Default Credentials</h2>
+<ul>
+<li>
+<p>Most IOT devices/routers etc. have default creds</p>
+</li>
+<li>
+<p>Change them</p>
+</li>
+</ul>
+<h2>Supply Chain</h2>
+<ul>
+<li>
+<p>Your vendor may manipulate device specially for you (well someone within vendor manufacturing this who is after you).</p>
+</li>
+<li>
+<p>After manufacture, someone in the supply chain could install or modify (software/hardware).</p>
+</li>
+<li>
+<p>Supplier themself could install backdoors.</p>
+</li>
+<li>
+<p>Counterfeit network equipment maybe distributed which includes backdoors, substandard perfomance and avaibility.</p>
+</li>
+</ul></div>

@@ -1,0 +1,60 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Cryptographic Attacks</h1>
+<ul>
+<li>
+<p>Birthday Attack -&gt; <a href="https://en.wikipedia.org/wiki/Birthday_attack">Article on this attack</a></p>
+<ul>
+<li>Flaw on the cryptographic algorithm</li>
+<li>Based on collision i.e 2 different input producing identical hash</li>
+</ul>
+</li>
+<li>
+<p>Downgrading Attack -&gt; </p>
+<ul>
+<li>
+<p>Attack will place himself in the middle.</p>
+</li>
+<li>
+<p>Will ask you either to use weaker protocol of encryption or don't use at all.</p>
+</li>
+<li>
+<p>This is downgrading from statndard protocol to weaker which has potential risk.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>SSL Striping Attack -&gt; [stipping attack](https://avicoder.me/2016/02/22/SSLstrip-for-newbes</p>
+<ul>
+<li>
+<p>Again attacker in the middle will capture initial http request.</p>
+</li>
+<li>
+<p>But to server attacker will perform https with server as server asks to do so.</p>
+</li>
+<li>
+<p>But to you, It will forward that "server does not use https at all, perform all transaction at http".</p>
+</li>
+<li>
+<p>Now you are either compel to perfrom task or leave the site.</p>
+</li>
+<li>
+<p>If you continue, you will be on plain text and attacker will see everything.</p>
+</li>
+<li>
+<p>See 
+<img src="/pics/ssl-striping.png" alt="ssl-striping.png"></p>
+</li>
+</ul>
+</li>
+</ul></div>

@@ -1,0 +1,86 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Segmenting the Network</h1>
+<p>You may want to divide your network into different pieces for many reasons. This may be <strong>Physically Seperating with different switches, Logical seperation with VLANs or Virtual Seperation with VMs</strong>.</p>
+<h2>Reasons</h2>
+<h3>Performance.</h3>
+<ul>
+<li>
+<p>You may wanna seperate your high band apps in seperate network.</p>
+</li>
+<li>
+<p>Provide high bandwidth to the network.</p>
+</li>
+<li>
+<p>This won't be effected by slow throughput, or you can't compromise speed here.</p>
+</li>
+</ul>
+<h3>Security</h3>
+<ul>
+<li>
+<p>You may want to restrict certain netwrok being accessed directly by end users.</p>
+</li>
+<li>
+<p>Such as : Databases may not be directly available to users but only app level network and users will ask app level network to access database on their behalf.</p>
+</li>
+</ul>
+<h3>Compliance</h3>
+<ul>
+<li>
+<p>You can refer this to as <strong>high level security</strong>.</p>
+</li>
+<li>
+<p>includes implementing adequate security controls and measures to safeguard data against unauthorized access, cyber-attacks, and breaches.</p>
+</li>
+<li>
+<p><strong>broad framework for managing and implementing risk management governance for government agencies and business stakeholders</strong>.</p>
+</li>
+<li>
+<p>For eg :</p>
+</li>
+</ul>
+<h1>ACLs (Access Control Lists)</h1>
+<ul>
+<li>
+<p>Creating Allow/Deny List based on :</p>
+<ul>
+<li>IP (src or dest)</li>
+<li>MAC (src or dest)</li>
+<li>DNS (src or dest)</li>
+<li>Port</li>
+<li>admin or normal user</li>
+<li>Application</li>
+<li>Service</li>
+<li>Time</li>
+<li>Certificate</li>
+</ul>
+</li>
+<li>
+<p><em>Be careful !</em> Don't lock yourself out while creating these ACL, which may prevent you from editing these lists in future</p>
+</li>
+</ul>
+<h2>ACLs in Windows</h2>
+<ul>
+<li>
+<p>Apply in combo with <em>hash</em></p>
+</li>
+<li>
+<p>Apply with <em>certificate</em></p>
+</li>
+<li>
+<p>Apply on the basis of <em>path</em> i.e. only apps from path : <em>C:/myapp</em> will run or only app from path <em>D:/maliciousapp</em> won't run</p>
+</li>
+<li>
+<p>Apply on the basis of <em>private</em> or <em>public</em> <strong>network zones</strong></p>
+</li>
+</ul></div>

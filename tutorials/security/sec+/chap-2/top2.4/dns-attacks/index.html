@@ -1,0 +1,56 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>DNS Poisoning</h1>
+<h2>Modifying DNS Server</h2>
+<ul>
+<li>
+<p>Well only possible if attacker has gain access to DNS server computer.</p>
+</li>
+<li>
+<p>Attacker will modify and probably redirect to his own set up computer.</p>
+</li>
+</ul>
+<h2>Modifying Host File</h2>
+<ul>
+<li>First of all if browser doesnot have cache, it will look up into <code>/etc/hosts</code> file to resolve DNS name and if attacker modifies info in that file, whenever user requested particular web page they will be presented as attacker webpage.html</li>
+</ul>
+<h2>Domain Hijacking</h2>
+<ul>
+<li>
+<p>Gaining Access to Domain Resgistrar and modifying records to point to attacker IP.</p>
+</li>
+<li>
+<p>This can be sophisticated because, records in DNS servers will auto be modified because once you update in registrarer, server will trust that registrar and will update record.</p>
+</li>
+</ul>
+<h2>URL Hijacking / Typosquatting / Brandjacking</h2>
+<ul>
+<li>
+<p>Attacker will have similar domain name as to of particular target organization.</p>
+</li>
+<li>
+<p>Now what he could do is to redirect the traffic to different website where he will earn Ads revenue from.</p>
+</li>
+<li>
+<p>Attacker could also redirect traffic to competitor of the target.</p>
+</li>
+<li>
+<p>Attacker could even sell the domain name to the competitor.</p>
+</li>
+<li>
+<p>Attacker may perform auto download or drive-by download.</p>
+</li>
+<li>
+<p>Attacker my present a phishing site.</p>
+</li>
+</ul></div>

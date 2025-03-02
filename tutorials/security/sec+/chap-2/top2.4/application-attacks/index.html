@@ -1,0 +1,74 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Application Attacks</h1>
+<ul>
+<li>
+<p>Injection Attack</p>
+</li>
+<li>
+<p>Buffer Overflow</p>
+</li>
+<li>
+<p>Replay Attack</p>
+</li>
+<li>
+<p>Directory Traversal </p>
+</li>
+<li>
+<p>Privilege Escalation</p>
+<ul>
+<li>Horizontal privilege escalation</li>
+<li>Bug of app could allow this</li>
+<li>(use antivirus/antimalware/update)</li>
+<li>(OS uses DEP -&gt; Data Execution Prevention i.e only data in exeutable area can run)</li>
+<li>(OS also uses ASLR -&gt; Address Space Layout Randomization i.e prevent a buffer overrun at a known memory address)</li>
+</ul>
+</li>
+<li>
+<p>Cross Site Requests</p>
+<ul>
+<li>
+<p>Once you are logged in, you browser will trust the server and so do the server.</p>
+</li>
+<li>
+<p>Say you are logged into facebook.com, now you have established trust to the server and your browser trust the request on your behalf</p>
+</li>
+<li>
+<p>Now, what an attacker could do is create a malicious code to post on facebook from your facebook on their behalf.</p>
+</li>
+<li>
+<p>They may email you some software or link, and if you click them the request is already made and as all happens on you-&gt;browser-&gt;server trust chain, and will ultimately be posted.</p>
+</li>
+<li>
+<p>(Obviously, facebook will not allow direct access)</p>
+</li>
+<li>
+<p>(Almost all web servers/websites have built in system to mitigate this attack.)</p>
+<ul>
+<li>
+<p>They will ask for the token for particular transaction</p>
+</li>
+<li>
+<p>Even if you are trusted but obviously attacker does not have your token, unless they manage to gain access to your browser info, they can't create a code to make the request coz token is unknown</p>
+</li>
+<li>
+<p>In the above example, the transaction is to post on facebook, before the use of tokenization technology, attacker will simply be able to write script or software or inject url to make the request, Now that the <strong>token is required</strong>, it is not that easy to perform task.</p>
+</li>
+<li>
+<p>They could still manage to write code using brute force techniques, but that is hell of a strugle, upon these many unvalid request, browser may even block you</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div>

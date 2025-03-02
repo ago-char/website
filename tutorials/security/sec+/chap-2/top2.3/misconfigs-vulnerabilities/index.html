@@ -1,0 +1,81 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Unsecure Public Info</h1>
+<ul>
+<li>
+<p>Don't post everything online.</p>
+</li>
+<li>
+<p>Open (not protected with key or password) repos in web holding sensitive data could leak tons of info in attacker's <em>reconnience</em>.</p>
+</li>
+</ul>
+<h1>Unsecure Admin Accounts</h1>
+<ul>
+<li>
+<p>Admins keeping passwordless login to <em>root</em> account.</p>
+</li>
+<li>
+<p>Guessable passwords.</p>
+</li>
+<li>
+<p>(Disable direct login, use elevated options such as <strong>su</strong> or <strong>sudo</strong> or <strong>Run as Admin</strong>).</p>
+</li>
+<li>
+<p>Ideally you should have very few account with <em>admin</em> access.</p>
+</li>
+</ul>
+<h1>Insecure Protocols</h1>
+<ul>
+<li>
+<p>All traffic are in clear text.</p>
+</li>
+<li>
+<p>Telnet, FTP, SMTP, IMAP, POP3.</p>
+</li>
+<li>
+<p>Perform packet capture to see if you are using encrypted protocol or not.</p>
+</li>
+</ul>
+<h1>Default Settings</h1>
+<ul>
+<li>
+<p>Every system will have default login when you first enter into them.</p>
+</li>
+<li>
+<p>Most system will ask you to change the password, <strong>Change them</strong>.</p>
+</li>
+<li>
+<p><code>Mirai Botnet</code> could find these IOT devices.</p>
+</li>
+</ul>
+<h1>Insecure Ports</h1>
+<ul>
+<li>
+<p>You may open port for some service on system.</p>
+</li>
+<li>
+<p>Limit access to localhost or the hosts which you are intend to.</p>
+</li>
+<li>
+<p>Use port based firewalls.</p>
+</li>
+<li>
+<p>Open ports only on encrypted protocol.</p>
+</li>
+<li>
+<p>Use strong password or key based auth.</p>
+</li>
+<li>
+<p>Perform periodic audit and check.</p>
+</li>
+</ul></div>

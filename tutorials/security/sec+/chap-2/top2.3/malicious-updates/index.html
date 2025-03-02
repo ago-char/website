@@ -1,0 +1,50 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Malicious Updates</h1>
+<ul>
+<li>
+<p>Verify the source</p>
+</li>
+<li>
+<p>Check the Hash</p>
+</li>
+<li>
+<p>Download from developer's site directly</p>
+</li>
+<li>
+<p>Enabe signature check in OS (well enabled by default but don't disable), You may have seen "This is app from Microsoft" or "This is app from Unknwon vendor" if you have not disabled this feature</p>
+</li>
+<li>
+<p>Avoid popup updates or do extra research on such popups:</p>
+</li>
+</ul>
+<h2>Trusted Process of Update</h2>
+<ul>
+<li>
+<p>Your trusted process will be performing updates automatically under the hood.</p>
+</li>
+<li>
+<p>It verifies the source and update from real developer site.</p>
+</li>
+<li>
+<p>Sometimes this automated process could download malicious software if :</p>
+<ul>
+<li>There is malicious software in vendor site</li>
+<li>This may happen if vendor itself has been attacked</li>
+<li>This may also happen if vendor update chain has been compromised (someone on the update chain is threat actor and push malicious update)</li>
+</ul>
+</li>
+<li>
+<p>You may want to disable this automated update but this will put you in over headache of manually verifying and downloading and updating.</p>
+</li>
+</ul></div>

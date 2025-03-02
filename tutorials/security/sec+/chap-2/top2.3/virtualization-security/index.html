@@ -1,0 +1,60 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Virtualization Vulnerabilities</h1>
+<ul>
+<li>
+<p>Self contained system with its own OS, memory, storage, CPU, etc.</p>
+</li>
+<li>
+<p>Runs at the top of Hypervisor software.</p>
+</li>
+</ul>
+<h2>VM Escape</h2>
+<ul>
+<li>
+<p>Simply means jumping from one VM to another within a single Hypervisor.</p>
+</li>
+<li>
+<p>There could be 100s of VM in one hypervisor.</p>
+</li>
+<li>
+<p>In general your <em>Hypervisor</em> provider or software itself should prevent VM Escape.</p>
+</li>
+<li>
+<p>But bug inside <em>Hypervisor</em> could potentially lead to <strong>VM Escape</strong> and there have been some instances of this.</p>
+</li>
+<li>
+<p>Update if any vulnerabilities found.</p>
+</li>
+</ul>
+<h2>Resource Reuse</h2>
+<ul>
+<li>
+<p>Your <em>hypervisor</em> software is responsible to manage resources  for all of the VM running on that particular <em>hypervisor</em>.</p>
+</li>
+<li>
+<p>Say you have 3 VMs, each allocated with 2GB of RAM, but in reality you have only 4GB on your host OS which the host and the hyperviosr will be sharing.</p>
+</li>
+<li>
+<p>As 6GB is avl to hypervisor, it uses memory sharing concept i.e to use only when needed.</p>
+</li>
+<li>
+<p>There could be the case where 2 VM tries to access the same memory location, and if you <em>hypervisor</em> <strong>ALLOW IT</strong>, it is the <strong>BUG</strong>.</p>
+</li>
+<li>
+<p>This will eventually lead to data leak or even admin access to another VM.</p>
+</li>
+<li>
+<p>For eg: VM2 may be able to read what VM1 writes.</p>
+</li>
+</ul></div>

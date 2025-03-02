@@ -1,0 +1,79 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Denial of Service</h1>
+<ul>
+<li>
+<p>Attacker overloading the server, so that no one can gain access. For eg: </p>
+<ul>
+<li>you may have 10 Ip address for dynamic purpose and if all requested by attacker with DHCP attack, he will have it all and other won't be able to access</li>
+<li>Server may have implemented 'N' user policy and attacker logging in with all 'N' no. of users could prevent other legitimate user from accessing service.</li>
+</ul>
+</li>
+<li>
+<p>DoS can be perform taking advantage of existing vulnerability.</p>
+</li>
+<li>
+<p>This may  be planned by your competitor.</p>
+</li>
+<li>
+<p>This may be a distraction as attacker is keeping you on illusion and attacking other system hardly.</p>
+</li>
+<li>
+<p>Removal of Power is a funny example of DoS, as this is not software based.</p>
+</li>
+</ul>
+<h2>You may be the cause of DoS</h2>
+<ul>
+<li>
+<p>Downloading a large file without bandwidth bound i.e. the file will take the entire bandwidth and you will not be able to perform regular activity normally.</p>
+</li>
+<li>
+<p>You may connect 2 switches together and form a loop if you are not using STP.</p>
+</li>
+</ul>
+<h1>Distrubuted DoS (DDoS)</h1>
+<ul>
+<li>
+<p>There will be series or collection of computer to perform DDoS</p>
+</li>
+<li>
+<p>They are often been compromised for this purpose</p>
+</li>
+<li>
+<p>A central device (attacker) will compromise many devices around the world and the infected devices i.e commonly referred as <em>botnets</em> perfoms anything they receive</p>
+</li>
+<li>
+<p>Attacker will send DDoS request to <em>botnets</em> and they will do exactly the same</p>
+</li>
+<li>
+<p>They tend to send exact high amount of information from very few request and data :</p>
+<ul>
+<li>For eg: replies of DNS, NTP, ICMP are in very large mount as compared to the requested data size</li>
+<li>They may spoof target ip and request in behalf of target IP and the requested data, instead of own end will be sent to target automatically by the requested server</li>
+<li>Obviously this type of attack can be more easy if there is vulnerable target</li>
+<li>If the target is configured not to receive what they never asked for, this won't be success</li>
+</ul>
+</li>
+</ul>
+<h2>Solutions</h2>
+<ul>
+<li>
+<p>Configuration should be updated.</p>
+</li>
+<li>
+<p>Up to date servers be used.</p>
+</li>
+<li>
+<p>Stateful firewalls be used i.e defing the firewall rules according to state for eg: receive ACK only if SYN is sent, etc.</p>
+</li>
+</ul></div>
