@@ -1,0 +1,23 @@
+#!/bin/python3
+import markdown
+import sys
+import argparse
+
+
+def argument_parser() -> argparse.Namespace:
+    """
+    add the necessary arguments to the parser and return the parsed arguments
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-md', '--mdfile', help="Input MD file", type=str, required=True)
+    parser.add_argument('-html', '--htmlfile', help="Output HTML file", type=str, required=True)
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = argument_parser()
+    markdown.markdownFromFile(input=args.mdfile, extensions=['fenced_code'], output=args.htmlfile)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,33 @@
+#!/bin/bash
+if [[ "$UID" -eq 0 && $# -eq 0 ]]; then
+pv=$(pvs | awk 'NR > 1 {print $1}')
+lv=$(lvs | awk 'NR > 1 {print $1}')
+vg_of_lvs=$(lvs | awk 'NR > 1 {print $2}')
+vg_of_pvs=$(pvs | awk 'NR > 1 {print $2}')
+
+
+echo -e "Physical \tLogical"
+echo -e "........\t......."
+pv_count=0
+
+for pv_vol_grp in $vg_of_pvs; do   
+	pv_count=$((pv_count + 1))
+
+    echo $pv | awk -v num=$pv_count '{printf "%s", $num}'
+    echo -n $'\t'
+
+    lv_count=0
+    for lv_vol_grp in $vg_of_lvs; do
+        lv_count=$((lv_count + 1))
+
+		if [[ $lv_vol_grp == "$pv_vol_grp" ]]; then
+            echo $lv | awk -v num=$lv_count '{printf "%s", $num}'
+            echo -n " "
+        fi
+    done
+    echo
+done
+# if end
+else
+	echo "Either you are not root or you passed extra unrequired args";
+fi

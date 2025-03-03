@@ -1,0 +1,161 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Useful Network Appliances</h1>
+<h2>Jump Server</h2>
+<p><img src="/pics/jump-server.png" alt="jump-server.png"></p>
+<ul>
+<li>
+<p>If require to talk to outside network's server,  you may not directly  have access to that server, you will talk to jump server which sits between outside server and your netwrok, once you connect to jump server, then you can rdp or ssh to the actual server only from that jump server.</p>
+</li>
+<li>
+<p>Jump Servers are hardened and limited access and can be accessed with SSH, Tunnel or VPNs or RDP, etc.</p>
+</li>
+</ul>
+<h2>Porxy Server</h2>
+<p><img src="/pics/proxy-server.png" alt="proxy-server.png"></p>
+<ul>
+<li>
+<p>Sits between you and internet or another server where all requests are forwarded to proxy server.</p>
+</li>
+<li>
+<p>Proxy server than  forwards the request to intended server, analyze it if it is malicious or not, may perform filtering like (url filtering), caching, also some access control and etc. and finally forward the reply to you.</p>
+</li>
+<li>
+<p>There is <em>regular proxy</em> whcih should be explicitly mentioned in end users, but also <em>transparent proxy</em> of which user has no idea about, but data are being transferred back and forth between that proxy and client/user.</p>
+</li>
+</ul>
+<h3>Application  Proxy</h3>
+<ul>
+<li>
+<p>could be NAT proxy used on routers to convert ip addresses.</p>
+</li>
+<li>
+<p>application level proxy only understands a single or a single set of protocols, for ex : a proxy could only understand ftp and other may understand http, https and ftp too.</p>
+</li>
+</ul>
+<h3>Forward Proxy</h3>
+<p><img src="/pics/forward-proxy.png" alt="forward-proxy.png"></p>
+<ul>
+<li>
+<p>Sits between you and internet for <strong>outgoing traffic.</strong></p>
+</li>
+<li>
+<p>Your request will be forwarded to that proxy, which will sent to the internet and receives the reply, if it is legitamate enough to forward you after analyzing, you will get the reply.</p>
+</li>
+</ul>
+<h3>Reverse Proxy</h3>
+<p><img src="/pics/reverse-proxy.png" alt="reverse-proxy.png"></p>
+<ul>
+<li>
+<p>Sits between you and internet for <strong>incomming trafffic</strong>.</p>
+</li>
+<li>
+<p>Suppose, you have web server, instead of making it internet facing, you could place <em>reverse proxy</em> where users from the internet will request to your web site.</p>
+</li>
+<li>
+<p>Those requests are now evaluated, droped, rejected or forwarded to your server and then the server will provide the response.</p>
+</li>
+<li>
+<p>This provides additional security to your web server because those malicious requests aer handled by proxy instead of your web server.</p>
+</li>
+<li>
+<p>That proxy server can also act as caching, so that it will reduce communication for same requests between you and your proxy.</p>
+</li>
+</ul>
+<h3>Open Proxy</h3>
+<p><img src="/pics/open-proxy.png" alt="open-proxy.png"></p>
+<ul>
+<li>
+<p>Available freely on the internet for any one to use.</p>
+</li>
+<li>
+<p>Commonly used to circumvent (avoid, get around, bypass) the existing security controls.</p>
+</li>
+<li>
+<p>You might find your internal proxy too slow or has a lot of ACLs and now you configure, to use external one for better result.</p>
+</li>
+<li>
+<p>But these are managed by some third parties, which we may not have any idea about. They might be configured on such a way that they will do the same task but also send some malicious traffic to you or <strong>may collect your information for sale or advertisements or else.</strong></p>
+</li>
+<li>
+<p>You should not use those proxies, unless you know what exactly you are trying to achieve from that.</p>
+</li>
+<li>
+<p>On many of the companies, these known bad/good open proxies are blocked in order to enhance security.</p>
+</li>
+</ul>
+<h2>Load Balancer</h2>
+<p><img src="/pics/load-balancer.png" alt="load-balancer.png"></p>
+<ul>
+<li>
+<p>Device connected to servers (identical servers).</p>
+</li>
+<li>
+<p>This will manage load across servers.</p>
+</li>
+<li>
+<p>Instead of sending all the traffic to one server, it will send to multiple servers.</p>
+</li>
+<li>
+<p><strong>TCP offload</strong> : Instead of creating multiple tcp connection to server multiple clients, it will connect to one tcp connection for each server and offload or track packets for each clients in single connection.</p>
+</li>
+<li>
+<p><strong>SSL offload</strong> : Instead of servers doing all the encryption or decryption, for incomming traffic load balancer will perform that decryption and will communicate to servers <strong>in the clear text</strong>, for outgoing traffic server will again send <strong>in clear</strong> but now will be encrypted by the load balancer. It helps servers' load to reduce.</p>
+</li>
+<li>
+<p>There is often <strong>purpose build hardward</strong> inside the load balancer to provide efficient encryption and decryption processes.</p>
+</li>
+<li>
+<p>Load balancers can also acts as proxies to filter, cache, content control, content switching, and so on just like proxy. It may also perform <strong>QoS, Prioritization</strong>, etc.</p>
+</li>
+</ul>
+<h3>Active/Active Load Balancer</h3>
+<p><img src="/pics/active-active-load-balancer.png" alt="active-active-load-balancer.png"></p>
+<ul>
+<li>All the server connected to load balancers are active and the load will be distributed to all the active devices by the load balancer.</li>
+</ul>
+<h3>Active/Passive Load Balancer</h3>
+<p><img src="/pics/active-passive-load-balancer.png" alt="active-passive-load-balancer.png"></p>
+<ul>
+<li>
+<p>Some of the servers connected to load balancers will be active and some will be in passive or standby state. </p>
+</li>
+<li>
+<p>Load will again be distributed to active ones.</p>
+</li>
+<li>
+<p>If active one fails, or are out of service; load balancer will automatically reconize and now the passive ones at standby position will be ready to server. That failure server will be maked as "no longer available" until they are fixed or become availabe, that will too be recongnized by the balancer.</p>
+</li>
+</ul>
+<h2>Sensors and Collectors</h2>
+<p><img src="/pics/sensors-collectors.png" alt="sensors-collectors.png"></p>
+<ul>
+<li>
+<p>Many of the devices, you already using like switches, routers, firewalls may have built in sensors and collectors to them.</p>
+</li>
+<li>
+<p>If these devices found any unusual or even usual traffic that will be logged for later analysis.</p>
+</li>
+<li>
+<p>IDS and IPS will generates different data, firewall logs, auth logs, web server access logs, database, email logs etc. all are useful data sensed by these devices.</p>
+</li>
+<li>
+<p>More often, in companies, they may place such device which sole purpose is to sense the activity and log or collect them.</p>
+</li>
+<li>
+<p>All these logs are usually sent to 'proprietary consoles', SIEM consoles, syslog servers, etc. centrally for central analysis and detection.</p>
+</li>
+<li>
+<p>These event captures may not only be sent periodically, but also in <strong>real time</strong> in security concerned areas for instant threat control.</p>
+</li>
+</ul></div>

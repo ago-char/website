@@ -30,11 +30,11 @@
 <p>Why do I use <code>Server:22</code>, instead of <code>Host:2222</code>, fairly simple enough i.e. the destination is already modified by <code>DNAT</code> rule.</p>
 <p><strong>Everything should work right ?</strong>
 Let's see wirecapture after <code>Client</code> tries to connect <code>Host:2222</code> in our <code>Host</code>. </p>
-<p><img src="/temp/pics/blog-host.png" alt="blog-host.png"></p>
+<p><img src="/pics/blog-host.png" alt="blog-host.png"></p>
 <p>Seems like it was even unable to complete initial tcp connection. <strong><em>Why is it retransmitting</em></strong> ? For that to be answered, first, look at the <code>Client</code> :</p>
-<p><img src="/temp/pics/blog-client.png" alt="blog-client.png"></p>
+<p><img src="/pics/blog-client.png" alt="blog-client.png"></p>
 <p>This was the reason. <code>Client</code> was doing that retransmission. This is usual when you could not complete the <strong>TCP Handshake</strong>. One more thing is present here, <strong><em>What are those RST messages ?</em></strong> Again to answer those, let's see, what <code>Server</code> did :</p>
-<p><img src="/temp/pics/blog-server.png" alt="blog-server.png"></p>
+<p><img src="/pics/blog-server.png" alt="blog-server.png"></p>
 <p>Having look at the capture, the <code>Server:22</code> was greeted with new connection. This is actually done by the forwarding mechanism we set for <code>Host:22</code>. So, it sends usual syn, ack. As our <code>Host:22</code> sends that new conn request, actuall <code>Client</code> had no idea about that. But now <code>Server:22</code> is sending syn,ack which is user for <code>Server</code>, but for <code>Client</code>, it is not. When <code>Client</code> receives : syn, ack for the request it did not actually initiated, <code>Client</code> simply close the connection with <em><strong>RST</strong></em> message. For each retransmission, there is <em><strong>RST</strong></em>.</p>
 <h3>Actual Problem</h3>
 <blockquote>
@@ -53,12 +53,12 @@ Let's see wirecapture after <code>Client</code> tries to connect <code>Host:2222
 <pre><code>sudo iptables -A FORWARD -p tcp -s 192.168.1.74 --sport 22 -j ACCEPT
 </code></pre>
 <p>Now see what our <code>Host</code> is transmitting :</p>
-<p><img src="/temp/pics/blog-host2.png" alt="blog-host2.png"></p>
+<p><img src="/pics/blog-host2.png" alt="blog-host2.png"></p>
 <p><strong>AWESOME !!</strong> This is desired as connection is taken from <code>Client</code> and then forwarded using DNAT and SNAT to the srever, back when <code>Server</code> replies, Host will un-DNAT and un-SNAT to show as if the replies are actually from the host and not from the server (client sees the replies comes from host) :
 What client sees is that as it has requested for service to <code>Host:2222</code>, it is actually getting one.</p>
-<p><img src="/temp/pics/blog-client2.png" alt="blog-client2.png"></p>
+<p><img src="/pics/blog-client2.png" alt="blog-client2.png"></p>
 <p>But, what server has actually send is you could see different ip address i.e. of <code>Host:22</code>.</p>
-<p><img src="/temp/pics/blog-server2.png" alt="blog-server2.png"></p>
+<p><img src="/pics/blog-server2.png" alt="blog-server2.png"></p>
 <p><strong>This was simply the magic of SNAT and DNAT.</strong></p>
 <h1>Recommendations</h1>
 <p>I do recommend you to study :</p>

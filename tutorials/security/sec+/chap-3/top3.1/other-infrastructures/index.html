@@ -1,0 +1,200 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Cloud Vs  On-Premises</h1>
+<ul>
+<li>Both comes with certain advantages and certain disadvantages.</li>
+</ul>
+<h1>Centralized Vs Decentralized</h1>
+<ul>
+<li>
+<p>Most organizations are physically decentralized meaning that they might have :</p>
+<ul>
+<li>Different location of services</li>
+<li>Many cloud providers</li>
+<li>Different OS running on different place</li>
+</ul>
+</li>
+<li>
+<p>It becomes hard to mange them, because it requires security. And there should be the way for merging and managing them centrally.</p>
+</li>
+<li>
+<p>As, the security can be centralized using centralized console, where :</p>
+<ul>
+<li>You can manage all the networks, individual devices, etc.</li>
+<li>Log and Analysis.</li>
+<li>Notify and Alerting System.</li>
+<li>System Status, Maintenance/patching, etc.</li>
+</ul>
+</li>
+<li>
+<p>But this is <strong>NOT PERFECT</strong>, as this comes with the cost of :</p>
+<ul>
+<li>Single point of failure</li>
+<li>As org. grows, the information is overloaded</li>
+<li>Hard to manage</li>
+</ul>
+</li>
+<li>
+<p>You may want different <strong>decentralized management zone</strong> and for centralized zone, you should be able to access those <strong>decentralized zones</strong> in able to monitor the activity for each zone. This will certainly help. But as said, <strong><em>security is not perfect</em></strong>.</p>
+</li>
+</ul>
+<h1>Virtualization</h1>
+<p><img src="/pics/virtualization.png" alt="virtualization.png"></p>
+<ul>
+<li>
+<p>It alllow us to run different OS on our Host infrastructure.</p>
+</li>
+<li>
+<p>You could create and tear them down completely and isolate from Host when needed.</p>
+</li>
+<li>
+<p>But this has a problem, that for each VM, it requires specific OS even if the App running inside them is for same OS i.e App A, B and C all may be intended to windows but they need to be isolated. So for each App, you will spin up a new VM and this is obviously a headache.</p>
+</li>
+</ul>
+<h1>Containers</h1>
+<ul>
+<li>Containers solves the problem of 
+<a href="/temp/files/#Virtualization">#Virtualization</a>
+ i.e. spinning same OS each time for different Apps to be run inside the VM by the following architecture :</li>
+</ul>
+<p><img src="/pics/containers.png" alt="containers.png"></p>
+<ul>
+<li>
+<p>Here, there is one OS on top our infrastructure (hardware), and we install docker (daemon) for container management. This maintains relation between theose Apps and our host OS.</p>
+</li>
+<li>
+<p>This way we were able to achive same isolation regardless of spinning up same  OS many times.</p>
+</li>
+<li>
+<p>For security prespective, while using 
+<a href="/temp/files/#Virtualization">#Virtualization</a>
+, you should have been worry about security of host, hypervisor, each os, each app. Now you should not worry about OS security each time, just focus on your host and app security.</p>
+</li>
+</ul>
+<h1>IOT Devices</h1>
+<ul>
+<li>
+<p>We may use different automation devices in out home or in org.</p>
+</li>
+<li>
+<p>They may be :</p>
+<ul>
+<li>Sensors (door lock, heating or colling devices)</li>
+<li>Wearable (watches, health monitors)</li>
+<li>Facility Automation (Tempereture, Air Quality, Lightiing)</li>
+</ul>
+</li>
+<li>
+<p>They are connected to our network.</p>
+</li>
+<li>
+<p>The problem is vendors are very good at manufacturing these devices and they will certainly enhance our usuage and efficiency but <strong>They may not be security Professionals</strong>.</p>
+</li>
+<li>
+<p>There has been incidients that they stop providing support, stop providing patch version as they are <strong>task-driven</strong> not <strong>security-driven</strong>.</p>
+</li>
+</ul>
+<h1>SCADA / ICS</h1>
+<p><img src="/pics/SCADA.png" alt="SCADA.png"></p>
+<ul>
+<li>
+<p>SCADA (<strong>Supervisory Control and Data Acquisition System</strong>) is mostly used in large-scale industries. This is often referred as <strong>Industrial Control Systems (ICS)</strong>.</p>
+</li>
+<li>
+<p>This will take input manually or via sensors on <em>Programmable Logic Controller (PLC)</em> or <em>Remote Terminal Unit (RTU)</em> which then sends data to our server.</p>
+</li>
+<li>
+<p>We now on <em>Human Machine Interface (HMI)</em> or <em>SCADA Dashboard</em> can view and filter the stats.</p>
+</li>
+<li>
+<p>If you work in organization where there are tons of machinary, you will connect them in the given architecture using SCADA to manage and technicians will control all those machinery from central control room rather than physically visiting to every equipment installed. You can refer example to of :</p>
+<ul>
+<li>Power Control Room</li>
+<li>Oil or Water Supply</li>
+<li>Even Traffic Control in Cities</li>
+<li>Vehicle Monitoring</li>
+</ul>
+</li>
+<li>
+<p>This system must be segmented from outside, this is applied to almost all of the organization who have SCADA. <strong>This tends to be the most secure system</strong> guarded because you can't imagine someoue outsider gaining access to <strong>Water Flow Control System</strong> for a big Amazon River. This will effect number of days or may arise national issues too.</p>
+</li>
+</ul>
+<h1>Real Time Operating System (RTOS)</h1>
+<ul>
+<li>
+<p>If you are using Windows, Linux or other OS, these are <strong>Non-Deterministic</strong> OS i.e. one process can't interfare another in normal uses.</p>
+</li>
+<li>
+<p>But in some situation we need <strong>Deterministic</strong> OS, where we may have to focus entirely on one task or process. For eg :</p>
+</li>
+<li>
+<p>If you are driving <em>AutoDrive</em> in your Car, and the system need to pull the break, the system at that point in time does not have luxuriy but to focus on one task i.e to <em>break in</em> and make you safe.</p>
+</li>
+<li>
+<p>As in example you notice that they are too sensitive. These sensitive systems are used everywhere like militry, flight or others.</p>
+</li>
+<li>
+<p>As we can't have a single security fault out there and actually in most case it is not easy to install anitivirus or firewall out in those system, we at least need to have similar kind of security posture.</p>
+</li>
+<li>
+<p>And this is often accomplished via not giving access to OS as they are self contained sy stems. <strong>It is not that easy task to get into OS of those RTOS</strong>. Those are very restrictive. You could take example of simple location tracking chip of few mm (milimeter), there is not certain way to access that chip OS, as you will do with your Windows or Linux OS.</p>
+</li>
+</ul>
+<h1>Embedded Systems</h1>
+<ul>
+<li>
+<p>There are hardware and software binded together to perform specific function or to operate as a part of a very large system.</p>
+</li>
+<li>
+<p>For eg : Your watch has specifc function.</p>
+</li>
+<li>
+<p>Being specifc function (sole purpose) means those systems are very unlike to have <strong>centralised app store</strong> where you will download and upload those functions or apps. They are as it is having single purpose and they do that very well.</p>
+</li>
+<li>
+<p>Common Examples :</p>
+<ul>
+<li>Traffic Light Controllers</li>
+<li>Digital Watches</li>
+<li>Medical Imaging Systems</li>
+</ul>
+</li>
+</ul>
+<h1>High Availability</h1>
+<ul>
+<li>
+<p>One concern most security professionals have is to maintain <strong>UPTIME + AVAILABILITY</strong> of their equipments.</p>
+</li>
+<li>
+<p>One of the way to achieve this is <strong>High Availability (HA)</strong>. Thing to be noted is <em>Redundany is not always availability</em> because you can have redundant system but you may need time to install that system in Availiability Zone.</p>
+</li>
+<li>
+<p>Even if one part of system failes, the system should constantly running, this is one step ahead of simply having Redundancy.</p>
+</li>
+<li>
+<p>You can do this by following principle of <em>primary-secondary</em> i.e. if <em>primary</em> system fails for some reasons, <em>secondary</em> system will immediately will work in effect.</p>
+</li>
+<li>
+<p>You could also make both the system running, so here both are primary and even one fails another will continue to work without even notice.</p>
+</li>
+<li>
+<p>But is comes with the cost, for eg :</p>
+<ul>
+<li>If we have 2 redundent servers running at the same time, it means the cost for equipment is 2X.</li>
+<li>Along with it comes the cost of network, cost of power, cost of space.</li>
+</ul>
+</li>
+<li>
+<p>So, due to high costing, you will eventually come at the point where you have to make business decision <em>whether to buy another system or take the risk of that downtime</em></p>
+</li>
+</ul></div>

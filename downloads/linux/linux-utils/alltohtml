@@ -1,0 +1,23 @@
+#!/bin/bash
+if [[ $# -ne 1 ]] || [[ "$1" == "help" ]] || ( [[ "$1" != "help" ]] && [[ "$1" != "local" ]] && [[ "$1" != "website" ]] && [[ "$1" != "blog" ]] ); then
+    echo "$1"
+    echo "Usuage $0 <help|local|website|blog>"
+    echo "help       show help screen"
+    echo "local      frameworkwebroot be run without any options for local store html"
+    echo "website    frameworkwebroot be run with --forwebsite option, don't override"
+    echo "blog       frameworkwebroot be run with --forwebsite --blog option, don't override"
+    exit
+fi
+
+for file in *; do
+    if grep -E '.*.md$' <<< "$file" &>/dev/null; then
+        bn=$(basename "$file" .md)
+        if [[ "$1" == "local" ]]; then
+            frameworkforwebroot -md "$file" -html "${bn}.html"        
+        elif [[ "$1" == "website" ]]; then
+            frameworkforwebroot -md "$file" -html "${bn}.html" --forwebsite 
+        elif [[ "$1" == "blog" ]]; then
+            frameworkforwebroot -md "$file" -html "${bn}.html" --forwebsite --blog
+        fi
+    fi
+done

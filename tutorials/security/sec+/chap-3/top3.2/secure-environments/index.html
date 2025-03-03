@@ -1,0 +1,103 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Device placement</h1>
+<ul>
+<li>
+<p>Place your network devices according to the architecture of your topology.</p>
+</li>
+<li>
+<p>We are more precisely talking about firewalls and where they will sit in the network.</p>
+</li>
+<li>
+<p>You may want to put your database behind the firewalls, but you may not want peers devices each other be seperated by firewall.</p>
+</li>
+<li>
+<p>As you grow larger, you will protect many zones with firewalls.</p>
+</li>
+<li>
+<p>The device placement may be different as per requirements, but typical can be :</p>
+</li>
+</ul>
+<p><img src="/pics/device-placement.png" alt="device-placement.png"></p>
+<ul>
+<li>Firewalls are not only devices that heps maintain security, we might use :<ul>
+<li>Honeypots</li>
+<li>Jump Servers</li>
+<li>Load Balancers</li>
+<li>Sensors</li>
+</ul>
+</li>
+</ul>
+<h1>Security Zones</h1>
+<ul>
+<li>
+<p>They are kind of non techinical zones seperated by logic, meaning they are not the zones simply based on IP Address but are more related to usuage and access.</p>
+</li>
+<li>
+<p>You might configure the zones as :</p>
+<ul>
+<li>Trusted, Untrusted</li>
+<li>Internal, External</li>
+<li>Inside, Internet, Servers,  Databases, Screened</li>
+</ul>
+</li>
+<li>
+<p>And you will perform security posture on the base of zones.</p>
+</li>
+<li>
+<p>Example be like :</p>
+</li>
+</ul>
+<p><img src="/pics/zones-example.png" alt="zones-example.png"></p>
+<ul>
+<li>As devices grows, you may want to seperate on more different zones to get the precise security rules.</li>
+</ul>
+<h1>Attack Surface</h1>
+<ul>
+<li>
+<p>Refers to the entry point for attacker, that can be :</p>
+<ul>
+<li>Application Code</li>
+<li>Open Ports</li>
+<li>Authentication Process</li>
+<li>Human Error</li>
+</ul>
+</li>
+<li>
+<p>You may want to :</p>
+<ul>
+<li>Review code</li>
+<li>Close unwanted ports, port based firewall rules</li>
+<li>Patch Auth Process</li>
+<li>Monitor and log your traffic
+to reduce attack surface.</li>
+</ul>
+</li>
+</ul>
+<h1>Connectivity</h1>
+<ul>
+<li>
+<p>It is a part of Attack Surface.</p>
+</li>
+<li>
+<p>Our internal devices are (may be) somehow connected to eachother.</p>
+</li>
+<li>
+<p>So, you should consider :</p>
+<ul>
+<li>Physically securing cables (don't leave open cable ports, nice wiring)</li>
+<li>Application Level Encryption (SSH, HTTPS)</li>
+<li>Network Level Encryption (VPN, IPsec tunnels)</li>
+</ul>
+</li>
+</ul></div>

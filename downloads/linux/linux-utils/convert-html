@@ -1,0 +1,7 @@
+if [[ $# -ne 2 ]]; then
+    echo "Usuage : $0 <mdfile> <htmlfile>"
+    exit
+fi
+
+makdown-img-format -md $1 -html $2
+sed -i '1i<link rel="stylesheet" href="/home/maharaja/Templates/md-style.css">' $2

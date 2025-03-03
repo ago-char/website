@@ -1,0 +1,205 @@
+#!/bin/python3
+import markdown
+import sys
+import shutil
+import argparse
+import re
+import os
+
+WEBROOT = f'/home/{os.environ['USER']}/mount/webroot'
+IMGFOL = 'temp/pics'
+DOCFOL = 'temp/files'
+HTMLFOL = 'temp/htmls'
+
+imgpattern = r'\!\[\[(.*.)\]\]'
+filepattern = r'(?<!\!)\[\[(.*.)\]\]'
+# filepattern = r'(?<!\!)\[\[(.*?)\]\]'
+# filepattern = r'(?<!!)\[\[(.*.)\]\]'
+
+
+
+
+
+def argument_parser() -> argparse.Namespace:
+    """
+    add the necessary arguments to the parser and return the parsed arguments
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-md', '--mdfile', help="Input MD file", type=str, required=True)
+    parser.add_argument('-html', '--htmlfile', help="Output HTML file", type=str, required=True)
+    parser.add_argument('--forwebsite', help="Specify this option if you want the file to be included on webroot, this will not be applicable for local use (image and file path will be absloute to webroot not local)", action="store_true")
+    parser.add_argument('--blog', help="use the templete for blog instead. This is applicable only when --forwebsite is specified.", action="store_true")
+    parser.add_argument('--override', help="Override output file if exists. By default it will try to append numbers if file exists. This will override the default behaviour.", action="store_true")
+    args = parser.parse_args()
+    return args
+
+def readFile(file: str, mode: str='r'):
+    with open(file, mode) as md:
+        content = md.read()
+    return content
+
+
+def writeFile(file: str, content: str, mode: str='w'):
+    with open(file, mode) as md:
+        md.write(content)
+
+
+def copy(srcfile, dest: str, override=False):
+    if not os.path.isfile(srcfile):
+        print(f"{srcfile} does not exist.")
+        return None
+
+    if os.path.isdir(dest):
+        dest = os.path.join(dest, os.path.basename(srcfile))
+
+    newfile = dest
+    n = 0
+    while os.path.exists(newfile) and not override:
+        n += 1
+        newfile = f"{dest}{n}"
+
+    try:
+        shutil.copy2(srcfile, newfile)  # Efficient file copy
+        return newfile
+    except Exception as e:
+        print(f"Exception : {e.__class__.__name__} : {str(e)}")
+
+
+def getMatches(content: str, pattern):
+    return re.findall(pattern, content)
+    # return re.findall(pattern, content, re.DOTALL)
+
+
+def replaceWith(content, replace_str, original_pattern):
+    replaced_content = re.sub(original_pattern, replace_str, content)
+    return replaced_content
+
+# from functools import lru_cache
+# @lru_cache(maxsize=512)
+def pathFinder(target: str, root: str=os.environ['HOME']):
+    for dirpath, _, filenames in os.walk(root):
+        if target in filenames:
+            return os.path.join(dirpath, target)
+    return None
+
+
+def replacer(content: str, matches: list, isImg=False, forWebRoot=False, isBlogPost=False, overrideONcopy=False):
+    replaced_content = content
+    # exactpattern = None
+    for match in matches:
+        # file_path = pathFinder(match, scope="home")
+        file_path = pathFinder(match)
+        if isImg:
+            if file_path == None:
+                if forWebRoot:
+                    replace_txt = fr'\n<img src="/{IMGFOL}/{match}" alt="{match}">\n'
+                else:
+                    replace_txt = fr'\n<img src="{match}" alt="{match}">\n'
+            else:
+                # if isLocalOnly:
+                if forWebRoot:
+                    if isBlogPost:
+                        copied_path = copy(file_path, f'{WEBROOT}/{IMGFOL}/blog-{os.path.basename(file_path)}', overrideONcopy)
+                    else:
+                        copied_path = copy(file_path, f'{WEBROOT}/{IMGFOL}', overrideONcopy)
+                    basename = os.path.basename(copied_path)
+                    replace_txt = fr'\n<img src="/{IMGFOL}/{basename}" alt="{basename}">\n'
+                else:
+                    replace_txt = fr'\n<img src="{file_path}" alt="{os.path.basename(file_path)}">\n'
+                    
+            replaced_content = replaceWith(replaced_content, replace_txt, fr'\!\[\[{match}\]\]')
+        else:
+            # print(match, file_path)
+            # print(content)
+            if file_path == None:
+                if forWebRoot:
+                    replace_txt=fr'\n<a href="/{DOCFOL}/{match}">{match}</a>\n'              
+                else:
+                    replace_txt=fr'\n<a href="{match}">{match}</a>\n'
+            else:
+                # if isLocalOnly:
+                if forWebRoot:
+                    if isBlogPost:
+                        copied_path = copy(file_path, f'{WEBROOT}/{DOCFOL}/blog-{os.path.basename(file_path)}', overrideONcopy)
+                    else:
+                        copied_path = copy(file_path, f'{WEBROOT}/{DOCFOL}', overrideONcopy)
+                    basename = os.path.basename(copied_path)
+                    replace_txt=fr'\n<a href="/{DOCFOL}/{basename}">{basename}</a>\n'
+                else:
+                    replace_txt=fr'\n<a href="{file_path}">{os.path.basename(file_path)}</a>\n'
+            replaced_content = replaceWith(replaced_content, replace_txt, fr'\[\[{re.escape(match)}\]\]') # re.escape is use to discard the meaning of any special characters present on that {match}
+                
+            # print(replace_txt)
+    return replaced_content
+
+
+
+
+# def finalHTML(middle_file: str, args: argparse.ArgumentParser)->str:
+def finalHTML(middle_file_content: str, args: argparse.ArgumentParser)->str:
+    """
+    default write to 'output.md'
+    you can specify your content and outfile. If outfile exists it will be overwritten
+    will return the name of file written
+    """
+    TEMPLETE_DIR = f'/etc/templetes/web-inc-files'
+    if args.forwebsite:
+        if args.blog:
+            start_file = f'{TEMPLETE_DIR}/blog-start.txt'
+            end_file = f'{TEMPLETE_DIR}/blog-end.txt'
+        else:
+            start_file = f'{TEMPLETE_DIR}/tut-start.txt'
+            end_file = f'{TEMPLETE_DIR}/tut-end.txt'
+    else:
+        start_file = f'{TEMPLETE_DIR}/local.txt'
+        end_file = None
+
+
+    outfile = args.htmlfile
+
+    with open(outfile, 'w') as final_file:
+        with open(start_file, 'r') as sf:
+            initial_content = sf.read()
+            final_file.write(initial_content)
+
+            final_file.write(middle_file_content)
+
+            if end_file != None:
+                with open(end_file) as ef:
+                    final_content = ef.read()
+                    final_file.write(final_content)
+    return outfile
+
+
+
+
+def generate_html(args):
+    md_filename = args.mdfile
+    OGcontent = readFile(md_filename)
+    img_matches = getMatches(OGcontent, imgpattern)
+    file_matches = getMatches(OGcontent, filepattern)
+
+    replaced_content = replacer(OGcontent, img_matches, True, args.forwebsite, args.blog, args.override)
+    replaced_content = replacer(replaced_content, file_matches, False, args.forwebsite, args.blog, args.override)
+
+    replaced_html = markdown.markdown(replaced_content, extensions=['fenced_code'])
+    final_html = finalHTML(replaced_html, args)
+
+
+    import pathlib
+    if args.forwebsite:
+        if args.blog:
+            copy(os.path.abspath(final_html),f'{WEBROOT}/{HTMLFOL}/blog-{final_html}', args.override)
+        else:
+            copy(os.path.abspath(final_html),f'{WEBROOT}/{HTMLFOL}', args.override)
+        pathlib.Path.unlink(final_html)        
+
+
+
+def main():
+    args = argument_parser()
+    generate_html(args)
+
+if __name__ == "__main__":
+    main()
+

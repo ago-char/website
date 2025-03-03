@@ -1,0 +1,12 @@
+if [[ $# -eq 0 ]]; then
+	int="wlp4s0"
+elif [[ $# -ne 1 ]]; then
+	echo "Usuage: $0 <interface_name>"
+	exit
+else
+	int="$1"
+fi
+
+ip -oneline add show "$int" | awk '{print $4}'
+
+

@@ -1,0 +1,228 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Things to be considered while building Infrastructure</h1>
+<h2>Availability</h2>
+<ul>
+<li>
+<p>Often we see the success of company depends on Availability. It describes what % of time your system is avilable in last X time.</p>
+</li>
+<li>
+<p>In the realm of security, you define <strong>Availability to only right people</strong>.</p>
+</li>
+<li>
+<p>So, org spends fortune to make sure it is available for right people all the time, blocking unauthorized systems or else.</p>
+</li>
+</ul>
+<h2>Resilience</h2>
+<ul>
+<li>
+<p>Even you spend millions building <em>HA</em> (
+<a href="/temp/files/3-Other Infrastructure Concepts#High Availability|High Availability">3-Other Infrastructure Concepts#High Availability|High Availability</a>
+) enviornment, something might happen.</p>
+</li>
+<li>
+<p>Can you maintain availability and can recover from that ? And how quickly you can do that ?</p>
+</li>
+<li>
+<p>This might condier several aspects :</p>
+<ul>
+<li>Identify root cause</li>
+<li>If it is hardware, repair or reinstall (this have different process)</li>
+<li>If it is software, you may have to patch it (go to change control)</li>
+</ul>
+</li>
+<li>
+<p>Commonly referred to as <em>Mean Time to Repair (MTTR)</em></p>
+<ul>
+<li>How much time it will take to reinstall that is no longer available with something which is available.</li>
+</ul>
+</li>
+</ul>
+<h2>Cost</h2>
+<ul>
+<li>
+<p>Even cost is not only factor to consider while installing new technology or replacing old one or else, it is always the first question asked. </p>
+</li>
+<li>
+<p>Depends on :</p>
+<ul>
+<li>Price of technology</li>
+<li>Whether redundent or not</li>
+<li>Cost of installation and maintainence</li>
+<li>Cost of depreciation and Tax</li>
+<li>Cost of replace (if something went wrong)</li>
+</ul>
+</li>
+</ul>
+<h2>Responsiveness</h2>
+<ul>
+<li>
+<p>In addition to making our system available, we tend to have good responsive rate.</p>
+</li>
+<li>
+<p>We humans, take it high factor. Imagine your website loading at 1 minute, no one will visit you next time.</p>
+</li>
+<li>
+<p>There are several factors for responsiveness.</p>
+<ul>
+<li>Hardware or Software Quality</li>
+<li>Taks running on background</li>
+<li>Tasks to be accomplished for the requested transaction</li>
+</ul>
+</li>
+<li>
+<p>You will want to find and often keep record to improve Responsiveness.</p>
+</li>
+</ul>
+<h2>Scalability</h2>
+<ul>
+<li>
+<p>How quickly you can increase or decrease the availability of your app ?</p>
+</li>
+<li>
+<p>Often referred to as Elasticity.</p>
+</li>
+<li>
+<p>You may increase your facility whenever there is high load and vice-versa.</p>
+</li>
+<li>
+<p>Cloud Service Providers often use load balancer for this.</p>
+</li>
+<li>
+<p>One way to achive is to create redundant systems and only deploy when needed.</p>
+</li>
+<li>
+<p>Or to create similar instance of apps and scale accordingly.</p>
+</li>
+<li>
+<p>Securiy should not be limited to base configurations, they should be extened as apps and servers are extended.</p>
+</li>
+<li>
+<p>You might wanna deploy more security tools when you are increasing facility and vice-versa.</p>
+</li>
+</ul>
+<h2>Ease of Deployment</h2>
+<ul>
+<li>
+<p>While deploying your application for the public or end users there are several things being deployed alongwith your application as such :</p>
+<ul>
+<li>webserver</li>
+<li>database server</li>
+<li>caching server</li>
+<li>filtering devices like firewall</li>
+<li>redundant systems </li>
+</ul>
+</li>
+<li>
+<p>So, you have to consider :</p>
+<ul>
+<li>Hardware resources</li>
+<li>Your budget compared to cloud budgets or on primise budget </li>
+<li>Change control</li>
+</ul>
+</li>
+<li>
+<p>In cloud you may write script to automate this and deploy and turn down on demand.</p>
+</li>
+<li>
+<p>So, you must consider while managing and creating deployment project :</p>
+<ul>
+<li>When to deploy ?</li>
+<li>Where to deploy ?</li>
+<li>How to deploy ?</li>
+<li>Who will be deploying ?</li>
+</ul>
+</li>
+<li>
+<p>All of these consideration should be taken account, else you may fail budget wise or else delay the time of deployment.</p>
+</li>
+</ul>
+<h2>Risk Transference</h2>
+<ul>
+<li>
+<p>One way to minimize your risk is to transfer to third party.</p>
+</li>
+<li>
+<p>While you are partnering with third party like cloud, security providers, harware providers, supply chain, etc. you will like to legally discuss about the responsibility if something went wrong from their side to cause you financial and privacy loss ?</p>
+</li>
+<li>
+<p>You may want to legally claim subsidies from these third party if their failure make you in loss ...</p>
+</li>
+<li>
+<p>You will also wanna perform <em>Cybersecurity Insurance</em>, so that if ransomware or something damage your system / financial loss, you may be able to recover.</p>
+</li>
+</ul>
+<h2>Ease of Recovery</h2>
+<ul>
+<li>
+<p>It describes when something went wrong, how quickly you will be able to recover from that particular issue ?</p>
+</li>
+<li>
+<p>You should always account the process for recovey when the system were working fine.</p>
+</li>
+<li>
+<p>Say you system crash by some unknown reson. And you have everything posted on your private cloud. You could now fetch everything after reloading your OS.</p>
+</li>
+<li>
+<p>But, the most easy way would have been if you had backup image. You should be able to restore in much quicker time than of fetching from cloud.</p>
+</li>
+<li>
+<p>So, you must plan recovery when you were planning deployment.</p>
+</li>
+</ul>
+<h2>Patch Availability</h2>
+<ul>
+<li>
+<p>When there is patch or update available for your system, you should update it.</p>
+</li>
+<li>
+<p>Yes there is change control and testing to be considered.</p>
+</li>
+<li>
+<p>You may be taking risk of minor change vs. keeping system as it because you may not want change control to occur for something that is not concern about security change.</p>
+</li>
+<li>
+<p>If there are the cases where you can't patch then you may wanna add more layer of security for those systems.</p>
+</li>
+</ul>
+<h2>Patch Inavailability</h2>
+<ul>
+<li>If vendor has stop providing patch or maybe in embedded system where it is not easy to connect to internet, you may want to give them more security as you can't update them.</li>
+</ul>
+<h2>Power</h2>
+<ul>
+<li>
+<p>Power is the backbone of technology.</p>
+</li>
+<li>
+<p>We may tend to forget this but nothing can work without power.</p>
+</li>
+<li>
+<p>You may want to hire skilled technician for power monitoring.</p>
+</li>
+<li>
+<p>If electricity is not 24/7 in your area, you should consider UPS/Generator in such case or it is always good to have a backup.</p>
+</li>
+</ul>
+<h1>Compute</h1>
+<ul>
+<li>
+<p>It deals with the processing power of equiment.</p>
+</li>
+<li>
+<p>It is more than the CPU.</p>
+</li>
+<li>
+<p>Your disk, memory, RAM, cache memory all are responsible for compute.  </p>
+</li>
+</ul></div>

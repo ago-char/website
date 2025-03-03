@@ -1,0 +1,74 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Firewalls and Types</h1>
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Firewall_(computing)">Firewalls</a> are used to control the flow of traffic between endpoints.</p>
+</li>
+<li>
+<p>Firewalls have different access control mechanisms.</p>
+</li>
+<li>
+<p>Since firewall is watching all traffic watching through it, it is a perfect place to provide additional security controls like <a href="https://en.wikipedia.org/wiki/Antivirus_software">Antivirus</a> or <a href="https://www.techtarget.com/searchsecurity/definition/antimalware">Anti-Malware</a>.</p>
+</li>
+</ul>
+<h2>Network-based Firewalls</h2>
+<p>Read basics : <a href="https://www.barracuda.com/support/glossary/network-firewall">Network Firewall</a></p>
+<ul>
+<li>Traditionally, these firewalls were (still are) configured to work on <a href="https://en.wikipedia.org/wiki/OSI_model#Layer_4:_Transport_layer">OSI Layer4 - Transport Layer</a> i.e. rules were configured on <strong>TCP port or UDP port</strong>.</li>
+<li>Modern Firewalls (<em>Next Generations Firewalls</em>) are more advanced that can work at <a href="https://en.wikipedia.org/wiki/OSI_model#Layer_7:_Application_layer">Application Layer</a> which provides more control and easy to configure on protocol basis like : SSH traffic, HTTP traffic, etc.</li>
+<li>These firewalls may have additional capacity of encrypting traffic (VPN), routing (NAT) and so on.</li>
+</ul>
+<h2>Next Generation Firewall</h2>
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Next-generation_firewall">NGFWs</a> works at Application Layer of OSI Model.</p>
+</li>
+<li>
+<p>They are capable of advanced decoding and analyzing.</p>
+</li>
+<li>
+<p>Since they work on Application and can dedode various IP frames and packets, they are able to control traffic flow on the basis of specific protocol and Application.</p>
+</li>
+<li>
+<p>For eg: if old firewalls or port based firewall were able to block connection at 443 port, NGFWs are capable of <em>blocking youtube</em> but <em>allowing twitter</em> and likely so.</p>
+</li>
+<li>
+<p>Expanding, the capability to filter URLs, also work as <strong>Intrusion Prevention System</strong>.</p>
+</li>
+</ul>
+<h2>Web Application Firewall</h2>
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Web_application_firewall">Web Application Firewall</a> is a specific form of <a href="https://en.wikipedia.org/wiki/Application_firewall" title="Application firewall">application firewall</a> that filters, monitors, and blocks <a href="https://en.wikipedia.org/wiki/HTTP" title="HTTP">HTTP</a> <a href="https://en.wikipedia.org/wiki/Network_traffic" title="Network traffic">traffic</a> to and from a <a href="https://en.wikipedia.org/wiki/Web_application" title="Web application">web service</a>.</p>
+</li>
+<li>
+<p>They applies rules to HTTP/s conversations.</p>
+</li>
+<li>
+<p>Often rules are written on the basis of <strong>input</strong>, because it is the method which most attackers target to exploit website or web app.</p>
+</li>
+<li>
+<p>This type of firewall may not deployed by all type of organizations, but for some organizations like : <strong><a href="https://en.wikipedia.org/wiki/Payment_Card_Industry_Data_Security_Standard">Payment Card Industry Data Security Standard (PCI DSS)</a></strong>, this seems mandetory.</p>
+</li>
+<li>
+<p>I just mean to say, someone may not likely interest in exploiting blog post, attackers are more lured to sensitive information and money, it does not mean you should not protect anything outside the scope.</p>
+</li>
+<li>
+<p>For eg: if old firewalls or port based firewall were able to block connection at 443 port, NGFWs are capable of <em>blocking youtube</em> but <em>allowing twitter</em> and now web app firewall can block or allow traffic on the basis of certain input, request and etc.</p>
+</li>
+<li>
+<p>You can see how these firewall are able to record (potential) certain type of request :</p>
+</li>
+</ul>
+<p><img src="/pics/web-based-fw-log.png" alt="web-based-fw-log.png"></p></div>

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Check if a search term was provided
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 <search-term>"
+    exit 1
+fi
+
+# Assign the search term to a variable
+SEARCH_TERM="$@"
+
+# Search for the song on YouTube and get the first result URL
+VIDEO_URL=$(yt-dlp "ytsearch:$SEARCH_TERM" --no-wait --get-id --no-playlist 2> /dev/null | head -n 1)
+
+# Check if the video URL was found
+if [ -z "$VIDEO_URL" ]; then
+    echo "No results found for ."
+    exit 1
+fi
+
+# Construct the full URL for the video
+PLAY_URL="https://www.youtube.com/watch?v=$VIDEO_URL"
+SEARCH_URL="https://www.youtube.com/results?search_query=$SEARCH_TERM"
+
+# Search 
+brave -incognito "$SEARCH_URL"
+# Play the video using brave
+brave -incognito "$PLAY_URL"
+
+

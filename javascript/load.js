@@ -5,6 +5,24 @@
 // }
 var nav_loaded = false
 var  sidebar_loaded = false
+var surror = false 
+// function includeHTML(file, elementId) {
+//     fetch(file)
+//         .then(response => response.text())
+//         .then(data => {
+//             document.getElementById(elementId).innerHTML = data;
+//             // callback();
+//             if (!nav_loaded || true){
+//                 highlightCurrentPage()
+//                 loaded = true
+//             }
+//             if (!sidebar_loaded || true){
+//                 highlightSidebar()
+//             }
+//         });
+// }
+
+
 function includeHTML(file, elementId) {
     fetch(file)
         .then(response => response.text())
@@ -87,3 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 // update ends for copy button
+
+
+

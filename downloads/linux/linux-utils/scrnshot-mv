@@ -1,0 +1,49 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+	echo 'Usuage: $0 <move_path>'
+	# echo '<rename_naem> : Rename current ScreenShot to this filename'
+	echo '<move_path> : Move the renamed ScreenShot to this path, path cannot include image name'
+	exit
+fi
+
+move_path="$1"
+if [[ ! -d "$move_path" ]]; then
+	echo "Path '$move_path' doesn't exist, Wanna create one ? y/n :"
+	read -n 1 ans
+	if [[ $ans == "y" ]]; then
+		mkdir -v "$move_path"
+	else
+		echo "You choose not to create one, Aborting..."
+		exit
+	fi
+fi
+
+ss_path="$HOME/Pictures/Screenshots"
+total_ss=$(ls "$ss_path"/Screen* | wc --line 2>/dev/null)
+
+if [[ $total_ss -ge 1 ]]; then
+	# ls -t filters by time and head -1 will give the image at first line that will be latest image 
+	latest_ss=$(ls -t "$ss_path"/Screen* | head -1)
+	echo "Viewing the latest Screenshot Image, Close the image and press 'y' to move, 'n' to 'keep', 'd' to delete, y/n/d ? "
+	# eog is utility to view image in ubuntu 
+	eog "$latest_ss"
+	read -n 1 reply
+	echo
+
+	if [[ $reply == "y" ]]; then
+		read -p "Name to move under: " newname
+		if [[ "$newname" == "" ]]; then
+			newname="$latest_ss"
+		fi
+		mv -v "$latest_ss" "$move_path/$newname" && echo 'Move Done.'
+	elif [[ $reply == "n" ]]; then
+		echo "Image Kept as same name : $latest_ss"
+	elif [[ $reply == "d" ]]; then
+		rm "$latest_ss" && echo "Image Deleted, deleted filename : $latest_ss"
+	else
+		echo "Invalid Option, Default is to keep the image as same name : $latest_ss"
+	fi
+else
+	echo "No screenshot found."
+fi

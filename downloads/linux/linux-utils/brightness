@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $# -ne 1 ]]; then
+    echo "Usuage : $0 <brightness_level>"
+    exit
+fi
+
+# xrandr -q | grep " connected" will give output like this:
+#eDP connected primary 1920x1080+1920+0 (normal left inverted right x axis y axis) 344mm x 193mm
+#HDMI-1-0 connected 1920x1080+0+97 (normal left inverted right x axis y axis) 527mm x 296mm
+
+# here seconnd i.e HDMI-1-0 is the device where extrenal monitor is connected
+
+# now use that device name to control the brightness level where first arg given to the script is the level of brightness
+brightness_level="$1"
+device_name=$(xrandr -q | grep " connected" | grep ^HDMI | awk '{print $1}')
+xrandr --output "$device_name" --brightness "$brightness_level"

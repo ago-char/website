@@ -1,0 +1,41 @@
+function pv_lv_relation () {
+
+    pv=$(sudo pvs | awk 'NR > 1 {print $1}')
+    lv=$(sudo lvs | awk 'NR > 1 {print $1}')
+    vg_of_lvs=$(sudo lvs | awk 'NR > 1 {print $2}')
+    vg_of_pvs=$(sudo pvs | awk 'NR > 1 {print $2}')
+
+    declare -A pv_lv
+
+    # echo -e "Physical \tLogical"
+    # echo -e "........\t......."
+    pv_count=0
+
+    for pv_vol_grp in $vg_of_pvs; do   
+        pv_count=$((pv_count + 1))
+
+       curr_pv=$(echo $pv | awk -v num=$pv_count '{printf "%s", $num}')
+       echo $curr_pv
+        # echo -n $'\t'
+
+        lv_count=0
+        for lv_vol_grp in $vg_of_lvs; do
+            lv_count=$((lv_count + 1))
+
+            if [[ $lv_vol_grp == "$pv_vol_grp" ]]; then
+                curr_lv=$(echo $lv | awk -v num=$lv_count '{printf "%s", $num}')
+                # pv_lv["$curr_pv"]+="$curr_lv"
+                echo $curr_lv
+                # echo -n " "
+            fi
+        done
+        echo
+    done
+
+    # echo "${pv_av["/dev/sda1"]}"
+}
+
+pv_lv_relation
+
+# ouput:
+

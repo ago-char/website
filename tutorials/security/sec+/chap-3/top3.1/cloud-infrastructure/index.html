@@ -1,0 +1,219 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Cloud Security</h1>
+<p>Refer to this video of professor messer : <a href="https://www.youtube.com/watch?v=8qpQ8Q6xxiU&amp;list=PLG49S3nxzAnl4QDVqK-hOnoqcSKEIDDuv&amp;index=58">cloud infrastructure</a> 
+- Your could may be running as IasS, PaaS, SaaS, etc.
+- As cloud grows, the question arises <em>who handles security ?</em></p>
+<h2>Security Metrix</h2>
+<ul>
+<li>
+<p>If you are working with public cloud provider, they may provide a <strong>responsibility metrix</strong>.</p>
+</li>
+<li>
+<p>It is overall description of <em>who is responsible for what ?</em>, this may include for eg :</p>
+<ul>
+<li>You may be responsible for your cloud account</li>
+<li>Cloud service provider may be responsible for updates in your account</li>
+</ul>
+</li>
+<li>
+<p>Every cloud service provider may have different matrix and they may have well documented, or inform you before you persure their facility.</p>
+</li>
+<li>
+<p>Matrix may look similar to this :</p>
+</li>
+</ul>
+<p><img src="/pics/cloud-matrix.png" alt="cloud-matrix.png"></p>
+<ul>
+<li>You can easily see that <em>what is customer responsible for ?</em> and <em>what the provider is responsible for ?</em>. You may want to implement security on where you are responsible.</li>
+</ul>
+<h2>Hybrid Cloud</h2>
+<ul>
+<li>
+<p>The is the situation where you use more that one cloud (private/public) for your flexibility.</p>
+</li>
+<li>
+<p>But with this flexibility, you may have to pay the price of additional responsibility, complexity and security.</p>
+</li>
+<li>
+<p>These cloud may not talk to eachother. So, configuration and procedure of one cloud may not match to another. Also, merging your facility could be very difficult.</p>
+</li>
+<li>
+<p>Firewall, server settings, logs writing may differ. And you may come into situation where you have to share and transfer data back and fourth from one provider to another. (This adds more risk of data security) So :</p>
+<ul>
+<li>You may have to hire different experts for executing or even as security prespective.</li>
+</ul>
+</li>
+</ul>
+<h2>Third Party Vendor in the Cloud</h2>
+<ul>
+<li>
+<p>You may be working with the cloud service provider, but you also may have to work with third party service provider for the cloud.</p>
+</li>
+<li>
+<p>They are like plug-ins in your browser.</p>
+</li>
+<li>
+<p>While persuing the service of third party, you should have a policy to include them in :</p>
+<ul>
+<li>Risk Assessment policy</li>
+<li>Incident Response policy</li>
+</ul>
+</li>
+<li></li>
+<li>
+<p>You should also constantly monitoring the process and the avilability.</p>
+</li>
+<li>
+<p>This is because for eg :</p>
+<ul>
+<li>
+<p>You put your server in your cloud.</p>
+</li>
+<li>
+<p>But, you may wanna give firewall protection to the server with some third party provider who obviously partner with the cloud service provider.</p>
+</li>
+<li>
+<p>You should be monitoring <em>availability</em> because, you can not expect a second without firewall, this could open security hole.</p>
+</li>
+<li>
+<p>You may monitor process because you of course should be looking at latest version of software, data privacy and so on.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>So, this is actually the chain between <strong>you, your cloud provider, and your third party provider</strong>. You should put everyone as part of process.</p>
+</li>
+</ul>
+<h2>Infrastructure as code</h2>
+<ul>
+<li>
+<p>Most cloud base system works as <strong>infrastructure as code</strong>.</p>
+</li>
+<li>
+<p>This is require for configuring and defining the service you would like to choose and take.</p>
+</li>
+<li>
+<p>You may write these code which is mostly in a text and your cloud service provider will deploy the service you wanted (server, network, database, application) on the basis of the code you provided.</p>
+</li>
+<li>
+<p>This is easy because any time you wanna rebuild, the code defines your topology and infrastructure, this should be safeguard coz this may leak your configuration and open additional security hole in your cloud.</p>
+</li>
+<li>
+<p>Example :</p>
+</li>
+</ul>
+<p><img src="/pics/infrastructure-code.png" alt="infrastructure-code.png"></p>
+<h2>Serverless Architecture</h2>
+<ul>
+<li>
+<p>When you think of server, you think of running some machine, configuring them to do certain task and you wil have to manage those each configuration.</p>
+</li>
+<li>
+<p>But, cloud do also provide <em>Serverless Architecture</em>, where you do not have to worry what the backend or server is doing.</p>
+</li>
+<li>
+<p>This is actually the deployment part that is done by the cloud itself.</p>
+</li>
+<li>
+<p>You are just uploading your application or code.</p>
+</li>
+<li>
+<p>This is done by <strong>Function as a Service (FaaS)</strong>.</p>
+</li>
+<li>
+<p>For eg : you write an application for sales department.</p>
+</li>
+<li>
+<p>This may have image to process, customer details to process, sales data to process.</p>
+</li>
+<li>
+<p>If you go with traditional architecture, you may have to run server for each of the process or at least run a big server to process these all. And they are running at once.</p>
+</li>
+<li>
+<p>But in morden cloud way, when you want to accomplish certain task, your service provider will do all of the background task at run time.</p>
+</li>
+<li>
+<p>For eg : you want to provide details of items sold with the image of item. Now you just ask for the data and the service provider :</p>
+<ul>
+<li>Boot up function or create a function to fetch image</li>
+<li>Another function for getting customer details</li>
+<li>Another function for fetching price details and  so on.</li>
+<li>Like this, functions are containerized and referred to your Application.</li>
+<li>Hence, function will automatically created and deployed at run time.</li>
+<li>This will help reduce <em>run time</em> and <strong>reduce your cloud cost</strong>, also provide efficiency and scability.</li>
+</ul>
+</li>
+<li>
+<p>See the following From <a href="https://en.wikipedia.org/wiki/Serverless_computing">Wikipedia</a>
+     &gt; <strong>Serverless computing</strong> is "a cloud service category in which the customer can use different cloud capabilities types without the customer having to provision, deploy and manage either hardware or software resources, other than providing customer application code or providing customer data. Serverless computing represents a form of virtualized computing." according to <a href="https://en.wikipedia.org/wiki/International_Organization_for_Standardization" title="International Organization for Standardization">ISO</a>/IEC 22123-2. 
+<a href="/temp/files/1">1</a>
+(https://en.wikipedia.org/wiki/Serverless_computing#cite_note-:1-1) Serverless computing is a broad ecosystem that includes the cloud provider, <a href="https://en.wikipedia.org/wiki/Function_as_a_service" title="Function as a service">Function as a Service</a>, managed services, tools, frameworks, engineers, stakeholders, and other interconnected elements, according to Sheen Brisals</p>
+</li>
+<li>
+<p>Your application developer is responsible for writing functions for these smaller part of application and upload. Rest of the task related deploying, hardware, structure, etc. is handled in the cloud itself.</p>
+</li>
+</ul>
+<h2>Monolithic Applications</h2>
+<ul>
+<li>
+<p>One big application which does every thing i.e.</p>
+<ul>
+<li>User Interface</li>
+<li>Business Logic</li>
+<li>Data Input and Output</li>
+</ul>
+</li>
+<li>
+<p>This will certainly increase the problem in :</p>
+<ul>
+<li>Scalability (Deploy whole of application)</li>
+<li>Security (Secure all the part of application with one logic)</li>
+<li>Change control (each time when you update, you will have to reinstall all the code)</li>
+</ul>
+</li>
+<li>
+<p>Pictorically, </p>
+</li>
+</ul>
+<p><img src="/pics/monolithic-app.png" alt="monolithic-app.png"></p>
+<h2>Microservices and API</h2>
+<p>AS 
+<a href="/temp/files/#Monolithic Applications">#Monolithic Applications</a>
+ have certain drawbacks related to flexibility, scability or security, cloud server providers found solution in form of <em>Microservices and API.</em> You can see the model in the following picture :</p>
+<p><img src="/pics/micro-services.png" alt="micro-services.png"></p>
+<ul>
+<li>
+<p>As you can see, now every business logic is divided.</p>
+</li>
+<li>
+<p>User will be provided as client management console.</p>
+</li>
+<li>
+<p>Whenever certain tasks or functions are asked to be executed by client, it will make API call which will trigger certain microservice behind the scene.</p>
+</li>
+<li>
+<p>While one service is performing, other services can simply sit down or perfrom the tasks asked. This certainly enhance efficiency.</p>
+</li>
+<li>
+<p>So, now :</p>
+<ul>
+<li>Security</li>
+<li>Change Control</li>
+<li>Management</li>
+</ul>
+</li>
+<li>
+<p>These all are done at <em>microservice</em> level, so if you wanna apply security you can do it in pieces. For eg : when micro service is fetching image from bg, the security related backend be only applied. This certains helps in managing app and security.</p>
+</li>
+</ul></div>
