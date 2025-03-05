@@ -1,0 +1,144 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Backups</h1>
+<p>Keeping backups for data is extremely important for any organization as it is the only plan for recovery or disaster. But several variables should be considered before perfoming backups :</p>
+<h2>Total Amount of Data</h2>
+<ul>
+<li>
+<p>You should know what amout of data should be backup i.e. if it is all the data in disk or array, specific files, or filesystem or directory.</p>
+</li>
+<li>
+<p>This result in how much storage capacity (will it be on GBs or TBs or more) to be bought and so on.</p>
+</li>
+</ul>
+<h2>Backup Media</h2>
+<ul>
+<li>You should also choose backup media if to be SSD, HDD or else depending on your data type or requirement or budget.</li>
+</ul>
+<h2>Frequency of Performing backup</h2>
+<ul>
+<li>
+<p>You should understand how often you should keep backup.</p>
+</li>
+<li>
+<p>If you are non tech individual and data in your device does not change much, you could have long duration. It changes, when you are techhie.</p>
+</li>
+<li>
+<p>But if you are company, where data flows in real time, you should perform backup maybe every day, every hour, etc.</p>
+</li>
+</ul>
+<h2>Type of Backup</h2>
+<h3>Snapshots</h3>
+<ul>
+<li>With the advent of VM, it has been common to use snapshots as backups where only the updated part of the backup will be stored. This will save storage as only that information to revert changes will be stored.</li>
+</ul>
+<p><img src="/pics/snapshots-backup.png" alt="snapshots-backup.png"></p>
+<ul>
+<li>As seen, if you wanna revert back to <em>Monday Backup</em>, you are just a click away but behind the scene, those additional block added will be reverted.</li>
+</ul>
+<h3>Replication</h3>
+<ul>
+<li>
+<p>Unlike snapshots, everything on original or primary system will be copied to redundant or backup.</p>
+</li>
+<li>
+<p>This often happens on real time, once you write data in primary system, it will be automatically copied over backup in matter of seconds or minutes.</p>
+</li>
+<li>
+<p>This is extremely useful while creating <strong>"hot site"</strong>.</p>
+</li>
+</ul>
+<h3>Journaling</h3>
+<ul>
+<li>
+<p>Journaling is a special kind of backup.</p>
+</li>
+<li>
+<p>What if power cuts between writing data from application to block ?</p>
+</li>
+<li>
+<p>After you turn on power or power comes, the data may only be written few blocks, but in many cases the data will be corrupted and you may have to flush entire database which will certainly be data loss.</p>
+</li>
+<li>
+<p>Your company can't afford data loss.</p>
+</li>
+<li>
+<p>So, many databases, filesystems, OS implicitly have methods of journaling.</p>
+</li>
+<li>
+<p>First the data will be written in journal file, only then after that it will be written in the disk. </p>
+</li>
+<li>
+<p>If journal is corrupted, it does not affect the database, as it has never be written.</p>
+</li>
+<li>
+<p>But what if power cuts between writing in disk ?</p>
+</li>
+<li>
+<p>You can now, resume from where left or delete corrupted part and then wirte from journal again.</p>
+</li>
+<li>
+<p>You can see those journal files in database, bind9 server, etc.</p>
+</li>
+</ul>
+<h2>Storage Location</h2>
+<ul>
+<li>
+<p>Storage location is significant in designing backup plan.</p>
+</li>
+<li>
+<p>It might be on site or off site or in cloud.</p>
+</li>
+<li>
+<p>It depends on amount or type of data you are trying to backup.</p>
+</li>
+<li>
+<p>If it is shared, you may want to backup in cloud, if it is private you may want on-site, if it is in bluk, you may wanna transfer in different site.</p>
+</li>
+</ul>
+<h2>Backup Software</h2>
+<ul>
+<li>
+<p>You should choose faster, smooth and easier to use software.</p>
+</li>
+<li>
+<p>For eg : if you are individual and performing less amout to data you can use simple <code>cp</code> command, but again if you have multiple files, it will  be slow using <code>cp</code>, you may try <code>rsync</code>.</p>
+</li>
+<li>
+<p>OS, themselves will have the facility to backup and restore to some extent, but if you are entreprise and wanna have more control on how and what you backup, you should try other third party softwarers like : Veeam Backup and Replication.</p>
+</li>
+</ul>
+<h1>Encryption</h1>
+<ul>
+<li>
+<p>Either you are transporting your data in physical storage to different data center or even keeping in your own or pushing to cloud or given to third party, there is always risk of data stolen.</p>
+</li>
+<li>
+<p>Even if someone were able to access, they should not be getting anything out of it. </p>
+</li>
+<li>
+<p>So, you are responsible for <strong>encryption of your data</strong>.</p>
+</li>
+<li>
+<p>But then, you should keeps your keys safe and implement access control.</p>
+</li>
+</ul>
+<h1>Recovery Testing</h1>
+<ul>
+<li>
+<p>Even if you perform backup, you should test that if you are able to recover if something happens.</p>
+</li>
+<li>
+<p>After backup, you should test everything runs as before.</p>
+</li>
+</ul></div>

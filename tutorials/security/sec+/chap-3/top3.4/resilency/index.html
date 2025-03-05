@@ -1,0 +1,225 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Resilency</h1>
+<p>It simply refers to the ability to recover quickly from any type of disaster i.e. in an organization could be system failure, power outage, physical disasters etc. But we are tech kiddies, we talk tech. There are several methods on providing resilience :</p>
+<h2>High Availability</h2>
+<ul>
+<li>
+<p>One concern most security professionals have is to maintain <strong>UPTIME + AVAILABILITY</strong> of their equipments.</p>
+</li>
+<li>
+<p>One of the way to achieve this is <strong>High Availability (HA)</strong>. Thing to be noted is <em>Redundany is not always availability</em> because you can have redundant system but you may need time to install that system in Availiability Zone.</p>
+</li>
+<li>
+<p>Even if one part of system failes, the system should constantly running, this is one step ahead of simply having Redundancy.</p>
+</li>
+<li>
+<p>You can do this by following principle of <em>primary-secondary</em> i.e. if <em>primary</em> system fails for some reasons, <em>secondary</em> system will immediately will work in effect.</p>
+</li>
+<li>
+<p>You could also make both the system running, so here both are primary and even one fails another will continue to work without even notice.</p>
+</li>
+<li>
+<p>But is comes with the cost, for eg :</p>
+<ul>
+<li>If we have 2 redundent servers running at the same time, it means the cost for equipment is 2X.</li>
+<li>Along with it comes the cost of network, cost of power, cost of space.</li>
+</ul>
+</li>
+<li>
+<p>So, due to high costing, you will eventually come at the point where you have to make business decision <em>whether to buy another system or take the risk of that downtime</em>.</p>
+</li>
+</ul>
+<h2>Server Clusters</h2>
+<ul>
+<li>Another way to provide resilience is that admins be building computer clusters :</li>
+</ul>
+<p><img src="/pics/server-cluster.png" alt="server-cluster.png"></p>
+<ul>
+<li>
+<p>Server clustering involves grouping multiple servers into a single cluster to enhance reliability, performance, and scalability. </p>
+</li>
+<li>
+<p>They share single ip address.</p>
+</li>
+<li>
+<p>They typically sits in a rack connected with ethernet.</p>
+</li>
+<li>
+<p>As they are computers, but unlike personal computers having storage device for each one, they will be connected to what called <strong>storage array</strong> to use <em>shared storage</em>.</p>
+</li>
+<li>
+<p>As, they have single ip address what client will see is not all of those computers, but <strong>a single server</strong>.</p>
+</li>
+<li>
+<p>With client connected, the figure might be :</p>
+</li>
+</ul>
+<p><img src="/pics/server-cluster-with-client.png" alt="server-cluster-with-client.png"></p>
+<ul>
+<li>
+<p>As they use shared storage, it doesnot matter for client which computer they may be connected to because for client what they want is service which cluster is providing.</p>
+</li>
+<li>
+<p>More often, each node in cluster will be using similar or same OS to maintain identical configurations. But for load balancing and other purpose, all the nodes be used instead of single one ?</p>
+</li>
+<li>
+<p><strong>How to decide which to be use ?</strong></p>
+</li>
+<li>
+<p>Well, there will be <strong>job script</strong> or <strong>scheduler</strong> placed on the cluster that will define which  node to use. Even if all nodes are busy, <strong>scheduler</strong> will know when the nodes will be idle and then perform the requested task.</p>
+</li>
+<li>
+<p>You can easily add or remove nodes on <strong>cluster</strong> and even on <strong>storage array</strong> even on runtime.</p>
+</li>
+</ul>
+<h2>Load Balancer</h2>
+<p><img src="/pics/load-balancer.png" alt="load-balancer.png"></p>
+<ul>
+<li>
+<p>Device connected to servers (identical servers).</p>
+</li>
+<li>
+<p>This will manage load across servers.</p>
+</li>
+<li>
+<p>Instead of sending all the traffic to one server, it will send to multiple servers.</p>
+</li>
+<li>
+<p><strong>TCP offload</strong> : Instead of creating multiple tcp connection to server multiple clients, it will connect to one tcp connection for each server and offload or track packets for each clients in single connection.</p>
+</li>
+<li>
+<p><strong>SSL offload</strong> : Instead of servers doing all the encryption or decryption, for incomming traffic load balancer will perform that decryption and will communicate to servers <strong>in the clear text</strong>, for outgoing traffic server will again send <strong>in clear</strong> but now will be encrypted by the load balancer. It helps servers' load to reduce.</p>
+</li>
+<li>
+<p>There is often <strong>purpose build hardward</strong> inside the load balancer to provide efficient encryption and decryption processes.</p>
+</li>
+<li>
+<p>Load balancers can also acts as proxies to filter, cache, content control, content switching, and so on just like proxy. It may also perform <strong>QoS, Prioritization</strong>, etc.</p>
+</li>
+</ul>
+<h3>Active/Active Load Balancer</h3>
+<p><img src="/pics/active-active-load-balancer.png" alt="active-active-load-balancer.png"></p>
+<ul>
+<li>All the server connected to load balancers are active and the load will be distributed to all the active devices by the load balancer.</li>
+</ul>
+<h3>Active/Passive Load Balancer</h3>
+<p><img src="/pics/active-passive-load-balancer.png" alt="active-passive-load-balancer.png"></p>
+<ul>
+<li>
+<p>Some of the servers connected to load balancers will be active and some will be in passive or standby state. </p>
+</li>
+<li>
+<p>Load will again be distributed to active ones.</p>
+</li>
+<li>
+<p>If active one fails, or are out of service; load balancer will automatically reconize and now the passive ones at standby position will be ready to server. That failure server will be maked as "no longer available" until they are fixed or become availabe, that will too be recongnized by the balancer.</p>
+</li>
+</ul>
+<h2>Site Resiliency</h2>
+<ul>
+<li>
+<p>Well the above mentioned methods are quite technical, <strong>but what if physical disaster or problem occurs on data center or site ?</strong></p>
+</li>
+<li>
+<p>Well, you should have different sites according to necessity and your company.</p>
+</li>
+</ul>
+<h3>Hot Site</h3>
+<ul>
+<li>
+<p>This is exact replica of your original site.</p>
+</li>
+<li>
+<p>This means, while build your original site, you will buy every item in two, 2 racks, 2 pcs, 2 sound jumpers, etc.</p>
+</li>
+<li>
+<p>Automated update mechanism to sync from main site.</p>
+</li>
+<li>
+<p>Whenever outage occurs or disaster happens, you will just move to this site until of course main site is fixed.</p>
+</li>
+<li>
+<p>Well, this is costy and only suitable for high profit making companies for fortune 500s.</p>
+</li>
+</ul>
+<h3>Cold Site</h3>
+<ul>
+<li>
+<p>There will be site or vacent space available to build your site but nothing will be pre available.</p>
+</li>
+<li>
+<p>No hardwares, no employees, nothing.</p>
+</li>
+<li>
+<p>Bring your data, person with you and build from beginning again.</p>
+</li>
+<li>
+<p>Well, it is not for those 500s because they can't even think of 1s downtime.</p>
+</li>
+</ul>
+<h3>Warm Site</h3>
+<ul>
+<li>
+<p>This comes somewhere between hot and warm site.</p>
+</li>
+<li>
+<p>Maybe important data are sync, some hardwares are there or may be initialization of those storage array or computer cluster.</p>
+</li>
+<li>
+<p>But you still have to bring, if not all, then most of your data and hardwares.</p>
+</li>
+</ul>
+<h2>Geographic Dispersion</h2>
+<ul>
+<li>
+<p>For the companies, who can't even imagime 1s of downtime coz it will lost their brand value or even millions of dollar revenue, they will need to build exact replica of the site in different geographic location.</p>
+</li>
+<li>
+<p><strong>But Why ?</strong>, This is because to encounter physical disaster or natural disaster i.e. <em>what if flood floods siteA, or what if siteA is damaged by fire ?</em></p>
+</li>
+<li>
+<p>Sites should be physically seperated means if one data center is in <em>koshi provience</em>, another be in <em>bagmati</em>, so even if earthquake hit or something unusual happens here may not disturb there.</p>
+</li>
+<li>
+<p>It comes with challenge of shifting all resources geographically too far i.e. employees may have their own problem, transportration and so on. But as <strong>money is the core, everything can be bought</strong>.</p>
+</li>
+<li>
+<p>Well, you could use Cloud, couldn't you ? But will have its own pros and cons.</p>
+</li>
+</ul>
+<h2>Cloud Diversity</h2>
+<ul>
+<li>Cloud should be itself maintaing their way of redundency and resilience, but you should make your own estimate, use multiple clouds and sync them.</li>
+</ul>
+<h2>OS Diversity</h2>
+<ul>
+<li>
+<p>You may patch known or existing vulnerabilities but there still are unknown.</p>
+</li>
+<li>
+<p>For this matter, you may not want to use same OS for all the purpose.</p>
+</li>
+<li>
+<p>Maybe for server, you will be using Linux and Windows, and for users/employees you will be using Windows and MAC.</p>
+</li>
+</ul>
+<h2>Continuity of Operation Planning (COOP)</h2>
+<ul>
+<li>
+<p>Well, sometimes technology fail. See <a href="https://en.wikipedia.org/wiki/2024_CrowdStrike-related_IT_outages">latest crowdstrike outage</a>.</p>
+</li>
+<li>
+<p>You must have your own manual and offline way to proceed your sales if possible.</p>
+</li>
+</ul></div>

@@ -1,0 +1,83 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Data at Rest</h1>
+<ul>
+<li>
+<p>Refers to data that are not moving or stored in SSD, HDD, etc.</p>
+</li>
+<li>
+<p>To ensure security we would often perform <em>whole disk encryption</em>, or <em>encrypt certain database</em> or <em>certain file or file system depending on OS</em>.</p>
+</li>
+<li>
+<p>We can also apply <em>permissions</em> based on <em>users/groups</em>, also limit the physical access and ensure different <em>authentication mechanisms</em>.</p>
+</li>
+</ul>
+<h1>Data at Transit</h1>
+<ul>
+<li>
+<p>Refers to data that is moving through network or internet.</p>
+</li>
+<li>
+<p>Data, to reach its destination may traverse many switches, routers, firewalls, etc.</p>
+</li>
+<li>
+<p>If data is in plain and someone was able to wiretap the conversation, there is no more we could do to protect the data.</p>
+</li>
+<li>
+<p>So, first if something sensitive info to be traverse the network, we should use <em>encrypted protocol</em> or <em>encryption</em> if protocol implicitly does not support.</p>
+</li>
+<li>
+<p>Other forms of protection could be the use of <em>VPNs</em>, also <em>firewalls</em> to restrict or allow.</p>
+</li>
+</ul>
+<h1>Data in Use</h1>
+<ul>
+<li>
+<p>When considered securing data, data in use is often underlooked, still is one of the important aspect of protection.</p>
+</li>
+<li>
+<p>This is because, when applications are using data they are often <strong>decrypted and loaded on RAM, CPU registers and Cache</strong>, so attackers are continually targeting data in plain.</p>
+</li>
+<li>
+<p>One way of protecting active data is to use <a href="https://www.zdnet.com/article/best-enterprise-identity-access-management-software/">identity management tools</a> to spot anomalies in user behavior and ensure that nobody is committing identify theft in order to access company information. Most identity management tools offer protection through features like <a href="https://www.jetico.com/how-enable-single-sign">single sign-on</a>, <a href="https://www.jetico.com/blog/which-following-safest-authentication-method-sfa-or-mfa#MFA">two-factor authentication</a>, and access management.</p>
+</li>
+</ul>
+<h1>Data Sovereignty</h1>
+<ul>
+<li>
+<p>Data if recides on particular country or group of contries, <em>law applies to data according to these groups or countries</em>.</p>
+</li>
+<li>
+<p>The data may be subject to wiretap or monitoring or <em>you may have to provide what they need</em>, etc. Also law may <em>prohibit moving data out of the certain teritory</em>.</p>
+</li>
+<li>
+<p>For eg: if you are collecting data of users at EUROPE, you should store them inside EUROPE.</p>
+</li>
+</ul>
+<h1>GeoLocations</h1>
+<ul>
+<li>
+<p>Geolacation of data also plays role in protection and access of data.</p>
+</li>
+<li>
+<p>For eg : <em>certain facilities or websites of tv channels</em> are not available for certain countries.</p>
+</li>
+<li>
+<p>They identify location on the basis of 802.11, LTE, mobile providers, IP, GPS, etc.</p>
+</li>
+<li>
+<p>For local use : <em>if data being accessed within company premisis, then allow, else deny</em>.</p>
+</li>
+</ul>
+<h1>Read Also</h1>
+<p><a href="https://www.techtarget.com/searchsecurity/feature/Best-practices-to-secure-data-at-rest-in-use-and-in-motion">how to protect all states of data</a></p></div>

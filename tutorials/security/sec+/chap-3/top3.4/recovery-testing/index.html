@@ -1,0 +1,64 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Recovery Testing</h1>
+<p>You may have defined your way for resilience and plan your capacity, but you also need to test if they will work if something were to happen.</p>
+<blockquote>
+<p>It's not "if" happens, it's often "when" happens</p>
+</blockquote>
+<ul>
+<li>
+<p>Testing should be done in confined manner.</p>
+</li>
+<li>
+<p>None of testing activity should affect any kind of production activities.</p>
+</li>
+<li>
+<p>Often, extra time or off day training is organized for this.</p>
+</li>
+</ul>
+<h2>Tabletop Exercise</h2>
+<ul>
+<li>
+<p>It is almost impossible to shilf every employee, infrastructure to shift in testing environment specially in large organizations.</p>
+</li>
+<li>
+<p>As, it is hard to create exact recovery state, <a href="https://uwpd.wisc.edu/content/uploads/2014/01/What_is_a_tabletop_exercise.pdf">tabletop exercise</a>, is nice approach for at least giving all the stakeholders idea and knowledge about it.</p>
+</li>
+<li>
+<p>In the exercise, it is assumed that situation has arrived, individuals will be tasked to perform in specific time and analysis the result.</p>
+</li>
+<li>
+<p><strong>The best way of perfoming this exercise, is to <em>talk through</em> it or organize virtual presentation class.</strong></p>
+</li>
+</ul>
+<h2>Simulation</h2>
+<ul>
+<li>
+<p>You should simulate the exact training cross check.</p>
+</li>
+<li>
+<p>You may have provide training on phising, so to cross check, org should conduct this program of sending phising campaign invisible to employees and evaluate the result.</p>
+</li>
+<li>
+<p>If to check the system can recover from <em>fail over</em>, you should perform exercise like turning off the original server and check if it could re catch the secondary one. This should be done in testing, outside the production environment.</p>
+</li>
+</ul>
+<h2>Parallel Processing</h2>
+<ul>
+<li>
+<p>This may not be the best way but using multiple core or multiple cpus for parallel processing also handels recovery in certain way.</p>
+</li>
+<li>
+<p>If a core of cpu fails, still some other cores will be able to perform intended task, even slowness occur, <em>something is better than nothing</em>.</p>
+</li>
+</ul></div>

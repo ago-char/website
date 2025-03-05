@@ -1,0 +1,93 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Protecting The DATA</h1>
+<h2>Geographic Restrictions</h2>
+<p>One of the way to protect data is to apply geographic restrictions on that data on the basis of where the data is located and also where the user is located.</p>
+<h3>Network Location</h3>
+<ul>
+<li>Identify based on IP Subnet i.e if you are inside the private network or accessing through public or remote location.</li>
+</ul>
+<h3>GeoLocation</h3>
+<ul>
+<li>
+<p>GPS co ordinates can be used to identify user's location which are very accurate.</p>
+</li>
+<li>
+<p>You can also use <strong>802.11 Wireless (wifi) databases</strong>, to identify Wifi the user might using, which is less accurate but can predict area if you know the scope.</p>
+</li>
+<li>
+<p>IP Address, are also means but not reliable, but if you have enough resources like how ISP distribute IP Address, you may be able to determine the scope of location.</p>
+</li>
+</ul>
+<h3>GeoFencing</h3>
+<ul>
+<li>
+<p>Once you have identified geolocation and network location or may be have certain idea where user might be, you can now apply certain rules and policies regarding geofancing.</p>
+</li>
+<li>
+<p>For eg : if user is watching netflix from Europe, you may wanna restrict certain Asian content, or recommend Europe Cinemas, etc.</p>
+</li>
+<li>
+<p>You may wanna grant user access to data if he is inside one of your corporate building on any branch, but not from home.</p>
+</li>
+</ul>
+<h2>Segmentation</h2>
+<ul>
+<li>
+<p><strong><em>If you work in a type of organization, where everything is stored on single database, you might wanna request to change the structure.</em></strong></p>
+</li>
+<li>
+<p>For eg : if info regarding username, passwords, personal information, credit cards of user are all at single location, and if attacker was able to gain access to that database, he can transfer and make public the data in one go. But if it was to be <strong>segmented</strong>, it would be hard for him to collect data.</p>
+</li>
+<li>
+<p>Segmentation, also helps in applying certain rules or security mechanisms for certain type of data. For eg : <em>usernames be in plain</em>, but <em>SSN be encrypted or masked</em>.</p>
+</li>
+</ul>
+<h2>Encryption</h2>
+<ul>
+<li>Encrypt data in use, transit or rest.</li>
+</ul>
+<h2>Hashing</h2>
+<ul>
+<li>
+<p>Associate hash with the type of data you're sending.</p>
+</li>
+<li>
+<p>Hashing is mostly used in <em>downloading binaries</em> or <em>source</em> from internet. The vender will post it's hash, after downloading, you will want to calculate hash, if matches you are good to go, else, you may be wiretapped and downloading may have been breached.</p>
+</li>
+</ul>
+<h2>Obfuscation</h2>
+<ul>
+<li>
+<p>Hiding piece of info into another un useful info like secret data in image, etc.</p>
+</li>
+<li>
+<p>Developer may write code to interpret simple string like <em>"hey bob"</em>, differently.</p>
+</li>
+</ul>
+<h2>Masking</h2>
+<ul>
+<li>A type of obfuscation where sensitive part of data is made invisible, or encrypted or replaced by something. For eg : <code>AAA~~~~~~~~~</code> i.e <em>AAA</em> might be replaced or as it is, others are hidden from the lottery ticket.</li>
+</ul>
+<h2>Tokenization</h2>
+<ul>
+<li>
+<p>Replace sensitive data with non-sensitive placeholder.</p>
+</li>
+<li>
+<p>Create token for certain credit card transaction.</p>
+</li>
+<li>
+<p>If attacker intrecept the connection, and try to make pursace, he won't be able to do so as it is only <em>ONE TIME USE</em>.</p>
+</li>
+</ul></div>
