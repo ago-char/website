@@ -1,0 +1,453 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<!-- <div class="sidebar" id="sidebar"></div> -->
+<div class="content">
+<h1>rules to transfer to snort from iptables or to keep in iptables</h1>
+<p><strong>PRE-KNOWLEDGE-REQUIRED</strong> : I believe you have studied <a href="http://doctorg.pastcast.com:5500/tutorials/linux-networking/iptables/">iptables basics</a>, <a href="http://doctorg.pastcast.com:5500/blogs/posts/iptablesFwDesign_ndMakingPersistence/">making iptables fw and persistence</a>, <a href="http://doctorg.pastcast.com:5500/tutorials/intrusion-detection-prevention/snort/">IDS using snort</a>, <a href="http://doctorg.pastcast.com:5500/blogs/posts/snort-ips-feature-with-nfq/">IPS with snort</a>.</p>
+<p>Well, after knowing how to work with Snort and iptables for detecting, preventing and logging potential intrusion that may occur in host, it was quite a task to move or keep rules from iptables to snort.</p>
+<p>After research for some time, I find that, not all iptables rules are easy to transfer or rewirte in snort. So, I decided to rewrite only those related to TCP server running on my host. This will be easy and also help me understand better on how to begin. Also, there were some rules that were redundant unnecessarily in iptables, so I could now edit and maintain them too.</p>
+<p>As you may have seen <a href="http://doctorg.pastcast.com:5500/blogs/posts/iptablesFwDesign_ndMakingPersistence/">my approach to fw design here</a>, I will not describe every point in here; but I will be exploring on what adjustments I made. They were not absolute necessary but they were easy to make and understand at the first place to start with.</p>
+<h2>Changes made for ICMP</h2>
+<ul>
+<li>Previously, ICMP pings are handled by iptables, now given to <code>nfq</code> which means given to <code>snort</code> in <strong>in_icmp_packets</strong> custom chain :</li>
+</ul>
+<pre><code>$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 8/0 -j NFQUEUE --queue-num 0
+$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 0/0 -j NFQUEUE --queue-num 0
+</code></pre>
+<p>Look at snort rules for this : </p>
+<pre><code>drop icmp any any -&gt; $MY_IP any ( msg:&quot;Ping Attempted to Server&quot;; itype:8; icode:0; sid:10001; rev:1; )
+alert icmp any any -&gt; $MY_IP any ( msg:&quot;ICMP Echo Reply&quot;; itype:0; icode:0; sid:10003; rev:1; )
+</code></pre>
+<p>I am <em>blocking ping req to me</em>, <em>allowing and logging ping done by me</em>.</p>
+<ul>
+<li>Also, after dropping and logging attempted udp scan type of icmp message in <strong>out_icmp_packets</strong> custom chain, others are handled by <code>snort</code> : </li>
+</ul>
+<pre><code>$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 3/3 -j LOG --log-prefix &quot;Attempted udp scan on closed port:&quot; 
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 3/3 -j DROP
+$IPTABLES -A out_icmp_packets -p ICMP -j NFQUEUE --queue-num 0
+</code></pre>
+<p>Look at snort rules for this :</p>
+<pre><code>alert icmp $MY_IP any -&gt; any any ( msg:&quot;ICMP Echo Request&quot;; itype:8; icode:0; sid:10002; rev:1; )
+</code></pre>
+<h2>Changes made for TCP</h2>
+<ul>
+<li>Previously, all the packets on certain destination ports or server are managed by <strong>in_tcp_packets</strong> which will have sent them in <strong>allowed chain</strong> for further inspection like the following : </li>
+</ul>
+<pre><code>$IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_IP&quot; --dport 80 -j allowed
+</code></pre>
+<p>where <strong>allowed</strong> chain is like : </p>
+<pre><code>$IPTABLES -A allowed -p TCP --syn -j ACCEPT
+$IPTABLES -A allowed -p TCP -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A allowed -p TCP -j DROP
+</code></pre>
+<p>There is not so much of problem with this approach, but as seen that last 2 lines for <strong>allowed</strong> chain are redundent (they are in INPUT chain also), which is not required on kernel level IP filtering. Also, I don't like variable naming, so I change <code>INTERNAL_IP</code> to be <code>INTERNAL_SUBNET</code>.</p>
+<ul>
+<li>Now, the rules on iptables looks very simpler as in <strong>in_tcp_packets</strong> :</li>
+</ul>
+<pre><code>$IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; -j allowed 
+</code></pre>
+<p>The <strong>allowed</strong> chain is truncuated to :</p>
+<pre><code># snort will handle
+$IPTABLES -A allowed -p TCP --syn -j NFQUEUE --queue-num 0
+</code></pre>
+<p>As of now <code>snort</code> will handle those servers, but see only those with new connection is given to servers, others will be dropped because of default policy.</p>
+<pre><code>drop tcp any any -&gt; $MY_IP 80 ( msg:&quot;Nagios XI Attempted&quot;; sid:10004; rev:1; )
+alert tcp $HOME_NET any -&gt; $MY_IP 53 ( msg:&quot;Internal DNS Server&quot;; sid:9999; rev:1; )
+alert tcp any any -&gt; $MY_IP 8080 ( msg:&quot;Web Server Accessed&quot;; sid:10005; rev:1; )
+alert tcp any any -&gt; $MY_IP 25 ( msg:&quot;SMTP Traffic&quot;; sid: 10006; rev:1; )
+alert tcp any any -&gt; $MY_IP 587 ( msg:&quot;SMTP Submission Server gets Mail&quot;; sid: 10007; rev:1; )
+alert tcp any any -&gt; $MY_IP 143 ( msg:&quot;Dovecot Server For Thunderbird&quot;; sid: 10008; rev:1; )
+</code></pre>
+<p><strong>The Following Lines are Mandetory to Block Traffic in <code>snort</code> :</strong></p>
+<pre><code># block all the traffic from the ports that is not mentioned above (in alerts) which is ![ports] 
+block tcp any any -&gt; $MY_IP ![80,53,8080,25,587,143] ( msg:&quot;Unknown Server Attempted&quot;; sid: 1009; rev:1; )
+</code></pre>
+<p>This is because, in snort you don't have rule to implicitly block or drop traffic. You need to maintain list for each protocol, allow them first and then use <code>![port list]</code> to block them which seems quite monotonous but <strong>as security is concerned, this much of manual work is needed.</strong></p>
+<h2>Testing Phase</h2>
+<h3>Port <code>8080</code> where Server was running</h3>
+<ul>
+<li>I guess everything was correct so now, let's test our Web server at 8080, From another computer I tried : </li>
+</ul>
+<pre><code>wget doctorg.pastcast.com:8080
+</code></pre>
+<p>As guessed and expected, I see the <code>snort</code> alerts :</p>
+<pre><code>sudo tail -fn0 /var/log/snort/alert_fast.txt 
+03/16-13:04:07.241678 [**] [1:10005:1] &quot;Web Server Accessed&quot; [**] [Priority: 0] {TCP} 192.168.1.16:33730 -&gt; 192.168.1.80:8080
+03/16-13:04:10.819904 [**] [1:10005:1] &quot;Web Server Accessed&quot; [**] [Priority: 0] {TCP} 192.168.1.16:33738 -&gt; 192.168.1.80:8080
+03/16-13:04:12.203639 [**] [1:10005:1] &quot;Web Server Accessed&quot; [**] [Priority: 0] {TCP} 192.168.1.16:33752 -&gt; 192.168.1.80:8080
+</code></pre>
+<h3>Port <code>9999</code> where Server <code>nc</code> server was running but was not allowed by iptables or snort</h3>
+<ul>
+<li>Connect to port 9999 from another computer : </li>
+</ul>
+<pre><code>nc doctorg.pastcast.com 9999
+</code></pre>
+<p>The log was also as expected and another computer was not able to connect.</p>
+<pre><code>03/16-13:13:07.640105 [block] [**] [1:1009:1] &quot;Unknown Server Attempted&quot; [**] [Priority: 0] {TCP} 192.168.1.16:34874 -&gt; 192.168.1.80:9999
+</code></pre>
+<h3>Port <code>8888</code> where nothing was  running</h3>
+<ul>
+<li>Connect to port 8888 from another computer :</li>
+</ul>
+<pre><code>nc doctorg.pastcast.com 8888
+</code></pre>
+<p>The log was expected because of block rule in snort even if no server was running.</p>
+<pre><code>03/16-13:15:45.212013 [block] [**] [1:1009:1] &quot;Unknown Server Attempted&quot; [**] [Priority: 0] {TCP} 192.168.1.16:42684 -&gt; 192.168.1.80:8888
+</code></pre>
+<h2>I failed on PING</h2>
+<ul>
+<li>When I ping from my server computer to other computer, see as per rules I was able to ping as such : </li>
+</ul>
+<pre><code>ping -c3 192.168.1.16
+PING 192.168.1.16 (192.168.1.16) 56(84) bytes of data.
+64 bytes from 192.168.1.16: icmp_seq=1 ttl=64 time=4.20 ms
+From 192.168.1.254: icmp_seq=2 Redirect Host(New nexthop: 192.168.1.16)
+64 bytes from 192.168.1.16: icmp_seq=2 ttl=64 time=4.28 ms
+From 192.168.1.254: icmp_seq=3 Redirect Host(New nexthop: 192.168.1.16)
+64 bytes from 192.168.1.16: icmp_seq=3 ttl=64 time=4.68 ms
+
+--- 192.168.1.16 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2002ms
+rtt min/avg/max/mdev = 4.199/4.386/4.678/0.209 ms
+</code></pre>
+<p>But the <strong>alerts I was not satisfied</strong> :</p>
+<pre><code>03/16-13:18:53.303494 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.16
+03/16-13:18:54.304662 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.16
+03/16-13:18:55.305237 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.16
+</code></pre>
+<p>I mean why not alrets for <em>ICMP Echo Reply</em> as in rule :</p>
+<pre><code>$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 0/0 -j NFQUEUE --queue-num 0
+</code></pre>
+<p>Also in <code>snort</code> :</p>
+<pre><code>alert icmp any any -&gt; $MY_IP any ( msg:&quot;ICMP Echo Reply&quot;; itype:0; icode:0; sid:10003; rev:1; )
+</code></pre>
+<p><strong>It was one of the bad day of debugging, I searched and searched but could not find, BUT SUDDENLY NEXT DAY :</strong></p>
+<pre><code>$IPTABLES -A INPUT -p ALL -i &quot;$INTERFACE&quot; -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre>
+<p>This guy at input chain was allowing all the traffic of all protocols which are already part of established or related connection, so <em>ICMP Echo Reply</em> was not reaching <code>snort</code> for further inspection. For my Doubt, I changed the rule to be :</p>
+<pre><code>$IPTABLES -A INPUT ! -p ICMP -i &quot;$INTERFACE&quot; -m state --state ESTABLISHED,RELATED -j ACCEPT
+</code></pre>
+<p>Now I restarted my firewall and snort and ping again to get the log :</p>
+<pre><code>03/16-13:25:26.992660 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.16
+03/16-13:25:26.996900 [**] [1:10003:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.16 -&gt; 192.168.1.80
+03/16-13:25:27.994235 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.16
+03/16-13:25:27.998455 [**] [1:10003:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.16 -&gt; 192.168.1.80
+03/16-13:25:28.995601 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.16
+03/16-13:25:28.999285 [**] [1:10003:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.16 -&gt; 192.168.1.80
+</code></pre>
+<p><strong>Happy!!</strong></p>
+<h2>I failed again on <strong>DNS Nightmare</strong></h2>
+<ul>
+<li>On virtualbox Windows PC, After I deployed <code>iptables</code>, <code>snort</code>, I open firefox and try to browse <code>google.com</code> but I was denied.</li>
+</ul>
+<p><img src="/pics/blog-cannotBrowse.png" alt="blog-cannotBrowse.png"></p>
+<ul>
+<li>Now, from host PC, internet was working fine. Maybe DNS issue. So that I find IP address for <code>google.com</code> and try to ping from Virtualbox as it comes : </li>
+</ul>
+<p><img src="/pics/blog-pingSuccessonVbox.png" alt="blog-pingSuccessonVbox.png"></p>
+<ul>
+<li>Next, to confirm, I try to lookup for local dns server and getting ip address of some host at local domain turns into failure :</li>
+</ul>
+<p><img src="/pics/blog-dns-resolution-failed.png" alt="blog-dns-resolution-failed.png"></p>
+<ul>
+<li>It is almost confirmed, So I check my <code>snort</code>, but there was rule :</li>
+</ul>
+<pre><code>alert tcp $HOME_NET any -&gt; $MY_IP 53 ( msg:&quot;Internal DNS Server&quot;; sid:9999; rev:1; )
+</code></pre>
+<ul>
+<li><strong>This rule gave me NIGHTMARE</strong>. <em><strong>There is already rule for DNS but can't get Response as confirmed by Wireshark :</strong></em></li>
+</ul>
+<p><img src="/pics/blog-no-dns-response.png" alt="blog-no-dns-response.png"></p>
+<ul>
+<li>Also DNS Server was listening :</li>
+</ul>
+<pre><code>tcp   LISTEN 0      10                               192.168.1.80:53         0.0.0.0:*
+</code></pre>
+<ul>
+<li><strong>After, hours of FUSTRATION, I realize that it also <em>listens on UDP</em>. And there was not rule for <em>DNS in UDP</em></strong>. 
+<strong><em>MAYBE I GOT THAT</em></strong>.</li>
+</ul>
+<pre><code>udp   UNCONN 0      0                                192.168.1.80:53         0.0.0.0:*
+</code></pre>
+<ul>
+<li>For slight, I thought there was already a rule :</li>
+</ul>
+<pre><code>$IPTABLES -A in_udp_packets -p UDP --sport 53 -j ACCEPT # for dns response from server
+</code></pre>
+<ul>
+<li>But it was for response as specified by <code>--sport</code>. For clients, you should specified destination port as <code>--dport</code>. Now another rule :</li>
+</ul>
+<pre><code>$IPTABLES -A in_udp_packets -p UDP --dport 53 -j ACCEPT # for dns response to clients
+</code></pre>
+<p><strong>AFTER THIS RULE and RESTART of IPTABLES <em>IT WORKS</em>!!</strong></p>
+<p><img src="/pics/blog-dns-it-works-finally.png" alt="blog-dns-it-works-finally.png"></p>
+<h1>For Readers :</h1>
+<ul>
+<li>This is my snort rules :</li>
+</ul>
+<pre><code># ----------------
+# |icmp protocols|
+# ----------------
+
+drop icmp any any -&gt; $MY_IP any ( msg:&quot;Ping Attempted to Server&quot;; itype:8; icode:0; sid:10001; rev:1; ) 
+alert icmp any any -&gt; $MY_IP any ( msg:&quot;ICMP Echo Reply&quot;; itype:0; icode:0; sid:10003; rev:1; )
+alert icmp $MY_IP any -&gt; any any ( msg:&quot;ICMP Echo Request&quot;; itype:8; icode:0; sid:10002; rev:1; )
+#alert icmp any any -&gt; $MY_IP any ( msg:&quot;ICMP Echo Reply&quot;; itype:0; icode:0; sid:10003; rev:1; ) 
+
+# ---------------
+# |tcp protocols|
+# ---------------
+
+drop tcp any any -&gt; $MY_IP 80 ( msg:&quot;Nagios XI Attempted&quot;; sid:10004; rev:1; ) 
+alert tcp $HOME_NET any -&gt; $MY_IP 53 ( msg:&quot;Internal DNS Server&quot;; sid:9999; rev:1; )
+alert tcp any any -&gt; $MY_IP 8080 ( msg:&quot;Web Server Accessed&quot;; sid:10005; rev:1; )
+alert tcp any any -&gt; $MY_IP 25 ( msg:&quot;SMTP Traffic&quot;; sid: 10006; rev:1; )
+alert tcp any any -&gt; $MY_IP 587 ( msg:&quot;SMTP Submission Server gets Mail&quot;; sid: 10007; rev:1; )
+alert tcp any any -&gt; $MY_IP 143 ( msg:&quot;Dovecot Server For Thunderbird&quot;; sid: 10008; rev:1; )
+
+# block all the traffic from the ports that is not mentioned above (in alerts) which is ![ports] 
+block tcp any any -&gt; $MY_IP ![80,53,8080,25,587,143] ( msg:&quot;Unknown Server Attempted&quot;; sid: 1009; rev:1; )
+
+# ---------------
+# |udp protocols|
+# ---------------
+
+</code></pre>
+<ul>
+<li>Those <code>udp protocols</code> are homework for you. As I have already added UDP server to <code>iptables</code> while solving DNS issue, you may instead pass that rule to <code>nfq</code> and then <code>snort</code> will handle that. Don't forget to add :</li>
+</ul>
+<pre><code>block udp any any -&gt; $MY_IP ![53] ( msg:&quot;Unknown UDP Server Attempted&quot;; sid: 10099; rev:1; )
+</code></pre>
+<p>rule like above, if you add any rule on udp block. <strong>If you forget, your system will be vulnerable to port based attacks.</strong></p>
+<ul>
+<li>My Final <code>iptables</code> :</li>
+</ul>
+<pre><code>#!/bin/bash
+if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+    echo &quot;Run as Root&quot;
+    exit
+fi
+
+# define variables to use
+INTERFACE=&quot;wlp4s0&quot;
+ETH_INTERFACE=&quot;enp3s0&quot;
+LOOPBACK=&quot;lo&quot;
+INTERNAL_SUBNET=$(ip -oneline -4 add show &quot;$INTERFACE&quot; | awk '{print $4}') #ip/cidr format
+OWN_IP_ADDR=$(cut -d '/' -f 1 &lt;&lt;&lt; &quot;$INTERNAL_SUBNET&quot;)
+
+
+# load command for iptable
+IPTABLES=$(which iptables)
+
+
+
+# enable ip forwarding if needed
+# echo 'net.ipv4.ip_forward=1' &gt; /etc/sysctl.conf &amp;&amp; sysctl -p
+
+
+# create 'allowed' chain that you will work on
+$IPTABLES -N allowed
+
+
+#
+# create seperate chains for TCP, UDP, ICMP traffic (these are main traffic)
+#
+
+
+$IPTABLES -N in_tcp_packets
+$IPTABLES -N out_tcp_packets
+
+$IPTABLES -N in_udp_packets
+$IPTABLES -N out_udp_packets
+
+$IPTABLES -N in_icmp_packets
+$IPTABLES -N out_icmp_packets
+
+
+# create bad_tcp_packets table to store known_bads for tcp protocol
+$IPTABLES -N bad_tcp_packets 
+
+
+#
+# bad_tcp_packets chain
+#
+
+# packet part of new conversation but having both syn and ack set is bad tcp packet
+$IPTABLES -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset # well you want to just DROP, if you are more concerned about your host discovery
+# log and drop packet which is part of new conversation but syn is not set
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG --log-prefix &quot;New not syn:&quot;
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+
+
+#
+# allowed chain
+#
+
+$IPTABLES -A allowed -p TCP --syn -j NFQUEUE --queue-num 0
+
+
+# -------------
+# | tcp chain |
+# -------------
+
+# write your rules for incomming tcp packets here
+# $IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; --dport 80 -j allowed  # allow web server from internal network
+# $IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; --dport 25 -j allowed  # allow smtp traffic for internal network
+# $IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; --dport 587 -j allowed # allow submission server of smtp for internal
+# $IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; --dport 143 -j allowed # allow imap dovecot to retrieve messages
+# $IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; --dport 8080 -j allowed
+$IPTABLES -A in_tcp_packets -p TCP -s &quot;$INTERNAL_SUBNET&quot; -j allowed # snort will handle
+
+# write your rules for outgoing tcp packets here
+
+
+# -------------
+# | udp chain |
+# -------------
+
+# write your rules for incomming udp packets here, (rules if you have any server or you are expecting data from any server (known server is only recommended for strong security))
+
+$IPTABLES -A in_udp_packets -p UDP --sport 53 -j ACCEPT # for dns response from server
+$IPTABLES -A in_udp_packets -p UDP --dport 53 -j ACCEPT # for dns query from clients
+$IPTABLES -A in_udp_packets -p UDP --sport 67 -j ACCEPT # for dhcp response from server
+$IPTABLES -A in_udp_packets -p UDP -i &quot;$INTERFACE&quot; --sport 68 --dport 67 -j ACCEPT # for dhcp request from my clients
+
+
+# write rules for controlling outgoing udp packets
+
+# --------------
+# | icmp chain |
+# --------------
+
+# for incomming icmp
+$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 3/3 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 11 -j ACCEPT
+$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 8/0 -j NFQUEUE --queue-num 0
+$IPTABLES -A in_icmp_packets -p ICMP -i &quot;$INTERFACE&quot; --icmp-type 0/0 -j NFQUEUE --queue-num 0
+
+# for outgoing icmp 
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 3/3 -j LOG --log-prefix &quot;Attempted udp scan on closed port:&quot; # on udp close port system will auto send type 3, code 3 message, so log any scan made
+$IPTABLES -A out_icmp_packets -p ICMP --icmp-type 3/3 -j DROP
+$IPTABLES -A out_icmp_packets -p ICMP -j NFQUEUE --queue-num 0
+$IPTABLES -A out_icmp_packets -p ICMP -j DROP
+
+# ---------------
+# | INPUT chain |
+# ---------------
+$IPTABLES -P INPUT DROP
+
+
+# input chain rules
+
+# Bad TCP Drop already
+$IPTABLES -A INPUT -p tcp -j bad_tcp_packets
+
+# accept everything from loopback, own interface as source
+$IPTABLES -A INPUT -p ALL -i &quot;$LOOPBACK&quot; -j ACCEPT
+$IPTABLES -A INPUT -p ALL -i &quot;$INTERFACE&quot; -s &quot;$OWN_IP_ADDR&quot;  -j ACCEPT
+
+# everything if already conn established or part of communication
+$IPTABLES -A INPUT ! -p ICMP -i &quot;$INTERFACE&quot; -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# protocol specific rules
+$IPTABLES -A INPUT -p TCP -i &quot;$INTERFACE&quot; -j in_tcp_packets
+$IPTABLES -A INPUT -p UDP -i &quot;$INTERFACE&quot; -j in_udp_packets
+$IPTABLES -A INPUT -p ICMP -i &quot;$INTERFACE&quot; -j in_icmp_packets
+
+# log weidro packets i.e packets not matching any of above description
+$IPTABLES -A INPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 7 --log-prefix &quot;IPT INPUT packet died: &quot;
+
+
+# -----------------
+# | FORWARD chain |
+# -----------------
+$IPTABLES -P FORWARD DROP
+
+
+# reject and log bad tcp
+$IPTABLES -A FORWARD -p tcp -j bad_tcp_packets
+
+
+# Accept the packets we really wanna forward
+$IPTABLES -A FORWARD -i &quot;$INTERFACE&quot; -j ACCEPT
+$IPTABLES -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+
+# Again log weidro packets not matching any of those rules
+$IPTABLES -A FORWARD -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 7 --log-prefix &quot;IPT FORWARD packet died: &quot;
+
+
+
+# ----------------
+# | OUTPUT chain |
+# ----------------
+$IPTABLES -P OUTPUT DROP
+
+
+# reject bad tcp already
+$IPTABLES -A OUTPUT -p tcp -j bad_tcp_packets
+
+
+# outgoing rules
+$IPTABLES -A OUTPUT -p ALL -o &quot;$LOOPBACK&quot; -j ACCEPT # allow all from loopback
+# icmp generated other than of loopback are to be further inspected
+$IPTABLES -A OUTPUT -p ICMP -o &quot;$INTERFACE&quot; -j out_icmp_packets 
+$IPTABLES -A OUTPUT -p ICMP -o &quot;$ETH_INTERFACE&quot; -j out_icmp_packets 
+
+$IPTABLES -A OUTPUT -p ALL -o &quot;$INTERFACE&quot; -j ACCEPT # allow everything except ICMP
+
+# log weidro packets, not matching above rules
+$IPTABLES -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 7 --log-prefix &quot;IPT OUTPUT packet died: &quot;
+
+</code></pre>
+<h1>Pro Tip</h1>
+<ul>
+<li>
+<p>Run above script to apply firewall for the first time.</p>
+</li>
+<li>
+<p>Run below script as <code>sudo</code> to destroy firewall :</p>
+</li>
+</ul>
+<pre><code>#!/bin/bash
+if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+    echo &quot;Run as Root&quot;
+    exit
+fi
+
+
+IPTABLES=$(which iptables)
+$IPTABLES -F
+$IPTABLES -X
+
+$IPTABLES -P INPUT ACCEPT
+$IPTABLES -P OUTPUT ACCEPT
+$IPTABLES -P FORWARD ACCEPT
+</code></pre>
+<ul>
+<li>Edit firwall file and run following script to reload firewall :</li>
+</ul>
+<pre><code>#!/bin/bash
+if 
+&lt;a href=&quot;/temp/files/ $UID -ne 0 &quot;&gt; $UID -ne 0 &lt;/a&gt;
+; then
+    echo &quot;Run as Root&quot;
+    exit
+fi
+
+destroy-firewall 2&gt; /dev/null
+my-firewall &amp;&amp; systemctl restart firewall.service
+</code></pre>
+<ul>
+<li>If you wonder where is <code>firewall.service</code>, you must read :  <a href="http://doctorg.pastcast.com:5500/blogs/posts/iptablesFwDesign_ndMakingPersistence/">making iptables fw and persistence</a> which is already mentioned at beginning for this guide.</li>
+</ul></div>

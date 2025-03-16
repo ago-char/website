@@ -1,0 +1,327 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/others-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>How to create systemd service</h1>
+<p>Man Pages : <a href="https://www.man7.org/linux//man-pages/man5/systemd.service.5.html">systemd.service</a>, <a href="https://www.man7.org/linux//man-pages/man5/systemd.unit.5.html">systemd.unit</a></p>
+<p><code>systemd</code> is the default init system in many modern Linux distributions, including Ubuntu, Debian, Fedora, and Arch. It manages system and service startup, provides logging, and handles dependencies.</p>
+<p>To create a custom <code>systemd</code> service, you need to create a <strong>service unit file</strong>. This file defines how a service should start, stop, and restart.</p>
+<hr />
+<h2><strong>1. General Overview</strong></h2>
+<p>A systemd service is defined using a <code>.service</code> file, typically located in:</p>
+<ul>
+<li><strong>System-wide services</strong>: <code>/etc/systemd/system/</code></li>
+<li><strong>User-specific services</strong>: <code>~/.config/systemd/user/</code></li>
+</ul>
+<p>A typical <code>.service</code> file follows this structure:</p>
+<pre><code>[Unit]
+Description=Your Service Description
+After=network.target
+
+[Service]
+ExecStart=/path/to/your/script-or-binary
+Restart=always
+User=your_user
+Group=your_group
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<ul>
+<li><strong>Enable the service</strong>: <code>sudo systemctl enable myservice.service</code></li>
+<li><strong>Start the service</strong>: <code>sudo systemctl start myservice.service</code></li>
+<li><strong>Check the status</strong>: <code>sudo systemctl status myservice.service</code></li>
+<li><strong>Stop the service</strong>: <code>sudo systemctl stop myservice.service</code></li>
+<li><strong>Disable the service</strong>: <code>sudo systemctl disable myservice.service</code></li>
+</ul>
+<hr />
+<h2><strong>2. Detailed Breakdown of Sections</strong></h2>
+<p>Each <code>.service</code> file is divided into three main sections: <strong>[Unit]</strong>, <strong>[Service]</strong>, and <strong>[Install]</strong>.</p>
+<h3><strong>[Unit] Section</strong></h3>
+<p>Defines metadata and dependencies.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Description=</code></td>
+<td>A short description of the service.</td>
+</tr>
+<tr>
+<td><code>Documentation=</code></td>
+<td>Links to documentation (man pages, URLs).</td>
+</tr>
+<tr>
+<td><code>After=</code></td>
+<td>Specifies services that should start before this one. Example: <code>After=network.target</code> ensures the network is available before starting the service.</td>
+</tr>
+<tr>
+<td><code>Before=</code></td>
+<td>Ensures this service starts before another.</td>
+</tr>
+<tr>
+<td><code>Requires=</code></td>
+<td>Specifies hard dependencies. If a required service fails, this service also stops.</td>
+</tr>
+<tr>
+<td><code>Wants=</code></td>
+<td>Specifies weaker dependencies (preferred but not mandatory).</td>
+</tr>
+<tr>
+<td><code>Conflicts=</code></td>
+<td>Specifies services that cannot run together.</td>
+</tr>
+</tbody>
+</table>
+<h4><strong>Example</strong></h4>
+<pre><code>[Unit]
+Description=My Custom Service
+After=network.target
+Requires=mysql.service
+</code></pre>
+<ul>
+<li>The service waits for the network to be up before starting.</li>
+<li>If <code>mysql.service</code> is not running, this service will not start.</li>
+</ul>
+<hr />
+<h3><strong>[Service] Section</strong></h3>
+<p>Defines how the service runs.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ExecStart=</code></td>
+<td>The command to start the service. (Mandatory)</td>
+</tr>
+<tr>
+<td><code>ExecStop=</code></td>
+<td>Command to stop the service.</td>
+</tr>
+<tr>
+<td><code>ExecReload=</code></td>
+<td>Command to reload the service without stopping it.</td>
+</tr>
+<tr>
+<td><code>Restart=</code></td>
+<td>Defines when the service should restart (<code>always</code>, <code>on-failure</code>, <code>on-abnormal</code>, <code>on-success</code>, etc.).</td>
+</tr>
+<tr>
+<td><code>RestartSec=</code></td>
+<td>Defines the delay before restarting (e.g., <code>RestartSec=5s</code>).</td>
+</tr>
+<tr>
+<td><code>User=</code></td>
+<td>Specifies which user runs the service.</td>
+</tr>
+<tr>
+<td><code>Group=</code></td>
+<td>Specifies which group runs the service.</td>
+</tr>
+<tr>
+<td><code>WorkingDirectory=</code></td>
+<td>Sets the working directory.</td>
+</tr>
+<tr>
+<td><code>Environment=</code></td>
+<td>Defines environment variables.</td>
+</tr>
+<tr>
+<td><code>TimeoutStartSec=</code></td>
+<td>Time to wait before considering the service failed.</td>
+</tr>
+<tr>
+<td><code>TimeoutStopSec=</code></td>
+<td>Time to wait before forcefully stopping the service.</td>
+</tr>
+</tbody>
+</table>
+<h4><strong>Example</strong></h4>
+<pre><code>[Service]
+ExecStart=/usr/bin/python3 /home/user/myscript.py
+Restart=on-failure
+User=myuser
+Group=mygroup
+Environment=&quot;ENV_VAR=value&quot;
+WorkingDirectory=/home/user
+TimeoutStartSec=10
+</code></pre>
+<ul>
+<li>Runs a Python script as <code>myuser</code> in <code>/home/user</code>.</li>
+<li>Restarts on failure.</li>
+<li>Sets environment variables.</li>
+</ul>
+<hr />
+<h3><strong>[Install] Section</strong></h3>
+<p>Defines when the service should start.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WantedBy=</code></td>
+<td>Defines target run-levels (like old SysV <code>rcX.d</code> directories).</td>
+</tr>
+<tr>
+<td><code>RequiredBy=</code></td>
+<td>Similar to <code>WantedBy</code>, but enforces strict dependency.</td>
+</tr>
+</tbody>
+</table>
+<p>Common targets:</p>
+<ul>
+<li><code>multi-user.target</code> → Equivalent to runlevel 3 (normal operations).</li>
+<li><code>graphical.target</code> → Equivalent to runlevel 5 (GUI mode).</li>
+<li><code>default.target</code> → Default system target.</li>
+</ul>
+<h4><strong>Example</strong></h4>
+<pre><code>[Install]
+WantedBy=multi-user.target
+</code></pre>
+<ul>
+<li>This ensures the service starts at boot.</li>
+</ul>
+<hr />
+<h2><strong>3. Creating and Running the Service</strong></h2>
+<h3><strong>Step 1: Create a Service File</strong></h3>
+<pre><code>sudo nano /etc/systemd/system/mycustom.service
+</code></pre>
+<p>Paste the following:</p>
+<pre><code>[Unit]
+Description=My Custom Script Service
+After=network.target
+
+[Service]
+ExecStart=/home/user/myscript.sh
+Restart=always
+User=user
+Group=user
+WorkingDirectory=/home/user
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<h3><strong>Step 2: Reload systemd and Enable the Service</strong></h3>
+<pre><code>sudo systemctl daemon-reload
+sudo systemctl enable mycustom.service
+sudo systemctl start mycustom.service
+</code></pre>
+<h3><strong>Step 3: Check Service Status</strong></h3>
+<pre><code>sudo systemctl status mycustom.service
+</code></pre>
+<h3><strong>Step 4: Stop and Disable</strong></h3>
+<pre><code>sudo systemctl stop mycustom.service
+sudo systemctl disable mycustom.service
+</code></pre>
+<hr />
+<h2><strong>4. Most Used Commands</strong></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>systemctl start &lt;service&gt;</code></td>
+<td>Starts the service.</td>
+</tr>
+<tr>
+<td><code>systemctl stop &lt;service&gt;</code></td>
+<td>Stops the service.</td>
+</tr>
+<tr>
+<td><code>systemctl restart &lt;service&gt;</code></td>
+<td>Restarts the service.</td>
+</tr>
+<tr>
+<td><code>systemctl reload &lt;service&gt;</code></td>
+<td>Reloads the service without stopping it.</td>
+</tr>
+<tr>
+<td><code>systemctl enable &lt;service&gt;</code></td>
+<td>Enables service at boot.</td>
+</tr>
+<tr>
+<td><code>systemctl disable &lt;service&gt;</code></td>
+<td>Disables service at boot.</td>
+</tr>
+<tr>
+<td><code>systemctl status &lt;service&gt;</code></td>
+<td>Shows service status.</td>
+</tr>
+<tr>
+<td><code>systemctl list-units --type=service</code></td>
+<td>Lists all active services.</td>
+</tr>
+<tr>
+<td><code>journalctl -u &lt;service&gt;</code></td>
+<td>Views service logs.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2><strong>5. Example: Running a Python Script as a Service</strong></h2>
+<p>If you have a Python script (<code>/home/user/myscript.py</code>):</p>
+<pre><code>[Unit]
+Description=Python Script Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/user/myscript.py
+Restart=on-failure
+User=user
+Group=user
+WorkingDirectory=/home/user
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>Enable and start it:</p>
+<pre><code>sudo systemctl daemon-reload
+sudo systemctl enable mypython.service
+sudo systemctl start mypython.service
+sudo systemctl status mypython.service
+</code></pre>
+<hr />
+<h2><strong>6. Logs and Debugging</strong></h2>
+<p>If your service fails, check logs:</p>
+<pre><code>journalctl -u myservice.service --no-pager --reverse
+</code></pre>
+<p>For live updates:</p>
+<pre><code>journalctl -u myservice.service -f
+</code></pre>
+<p>Check systemd logs:</p>
+<pre><code>sudo systemctl list-units --failed
+</code></pre>
+<hr />
+<h2><strong>Conclusion</strong></h2>
+<p>Now you understand how to:</p>
+<ol>
+<li><strong>Create</strong> a systemd service file.</li>
+<li><strong>Define each section</strong> (<code>[Unit]</code>, <code>[Service]</code>, <code>[Install]</code>).</li>
+<li><strong>Use most common options</strong> (<code>ExecStart</code>, <code>Restart</code>, <code>User</code>, <code>WantedBy</code>).</li>
+<li><strong>Manage and debug services</strong>.</li>
+</ol>
+<p>What SAY public ? 🚀</p></div>

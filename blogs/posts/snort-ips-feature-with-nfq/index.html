@@ -1,0 +1,122 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<!-- <div class="sidebar" id="sidebar"></div> -->
+<div class="content">
+<h1>Prevent Intrusion with Snort</h1>
+<p>You can use 
+<a href="/tutorials/intrusion-detection-prevention/snort">IDS with Snort</a>
+ , but if you like to extend your Snort even to prevent Intrusion, you would be using <a href="https://home.regit.org/netfilter-en/using-nfqueue-and-libnetfilter_queue/">NFQUEUE</a>. </p>
+<h2><strong>REQUIRED</strong> : <code>snort3</code>, we assume you know how to use and configure snort in basic manner</h2>
+<h2>Step 1 : Write iptables with NFQUEUE target</h2>
+<pre><code class="language-sh"># first set the policy to drop
+sudo iptables -P INPUT DROP
+sudo iptables -P OUTPUT DROP
+sudo iptables -P FORWARD DROP
+
+# not iptables to use nfqueue as target
+sudo iptables -A INPUT -j NFQUEUE --queue-num 0
+sudo iptables -A OUTPUT -j NFQUEUE --queue-num 0
+sudo iptables -A FORWARD -j NFQUEUE --queue-num 0
+</code></pre>
+<p><code>NFQUEUE</code> does its work in its own way. If you have not stared <code>snort</code> or any other applications that will make use of <code>nfqueue</code> target then this iptables will/may fail or your internet activity might be very slow as  <code>nfqueue</code> is not being processed.</p>
+<h2>Step 2 : Checking Configs for Snort</h2>
+<p><code>snort3</code> if installed from source, will have its config files at the location : <code>/usr/local/etc/snort/snort.lua</code>. Make sure it contains following lines (it makes snort to work in <em>inline</em> mode using <em>nfq</em>) at the first section (<em>1. configure defaults</em>) of the config file :</p>
+<pre><code>daq = {
+    modules = {
+        { 
+            name = &quot;nfq&quot;, 
+            mode = &quot;inline&quot;, 
+            variables = { 
+                { variable = &quot;queue=0&quot; } 
+            } 
+        }
+    }
+}
+</code></pre>
+<p>Next in the section (<em>7. configure outputs</em>), you should have file that will store logs in text, also another file that will store pcap data i.e. can be viewed using wireshark like application. So make sure, that section has :</p>
+<pre><code>alert_fast = {
+    file = true,
+    packet = false,
+    limit = 10,
+}
+log_pcap = {
+    limit = 4
+}
+</code></pre>
+<h2>Step 3 : Write Rules to allow or block traffic</h2>
+<p>Rules for <code>snort</code> are located at many different files, but what we are interested is to write own required rules, so we will write those rules on <code>usr/local/etc/snort/rules/local.rules</code> file :</p>
+<pre><code>drop icmp any any -&gt; 192.168.1.80 any ( msg:&quot;Ping Attempted to Server&quot;; itype:8; icode:0; sid:10001; rev:1; )
+alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Request&quot;; itype:8; icode:0; sid:10002; rev:1; )
+alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Reply&quot;; itype:0; icode:0; sid:10003; rev:1; )
+</code></pre>
+<p>While writing rules, make sure that your <em>sid</em> is different else it will conflict. These rules indicate <strong><em>ping request to server 192.168.1.80 will be blocked</em>; <em>echo request and reply to any host on subnet will be logged, but allowed</em></strong>.</p>
+<h2>Step 4 : Start Snort to use NFQUEUE</h2>
+<p>You can use <code>snort</code> in several ways, here we are using it to be IPS. So that we should start it to be able to monitor, log and prevent intrustion or packet pass through the host or network. Now start <code>snort</code> on one terminal as :</p>
+<pre><code>sudo snort -c /usr/local/etc/snort/snort.lua -l /var/log/snort -Q --daq nfq --daq-var queue=0
+</code></pre>
+<p>Here we have specified the log directory to be <code>/var/log/snort</code> where <code>alert_fast.txt</code> will be stored, also <code>log.pcap.&lt;some_num&gt;</code> eg : <code>log.pcap.1741664564</code> will be kept. Each time you start <code>snort</code> as mentioned, another pcap will be created, but log text file will be appended at location <code>/var/log/snort/alert_fast.txt</code>.  With <code>-Q</code> it is working to be run in inline mode as IPS, <code>nfq</code> is specified as daq, and the <code>queue</code> value is <code>0</code> which should be same as in the iptables.</p>
+<h2>Step 5 : Testing the Setup</h2>
+<p>As in one terminal <code>snort</code> is running, in another, you could use :</p>
+<pre><code>sudo tail -fn0 /var/log/snort/alert_fast.txt
+</code></pre>
+<p>to see any new messages of blocking or allowing traffic is produced or not.</p>
+<p>To have real test I ping from some other host to our <code>192.168.1.80</code> which failed and the log was :</p>
+<pre><code>03/10-15:38:56.719864 [drop] [**] [1:10001:1] &quot;Ping Attempted to Server&quot; [**] [Priority: 0] {ICMP} 192.168.1.22 -&gt; 192.168.1.80
+03/10-15:38:58.880806 [drop] [**] [1:10001:1] &quot;Ping Attempted to Server&quot; [**] [Priority: 0] {ICMP} 192.168.1.22 -&gt; 192.168.1.80
+</code></pre>
+<p>Nice and cool, as in syslog format. It is dropped.</p>
+<p>Now let's see if ping to other hosts originiting from <code>192.168.1.80</code> will be allowed or not.</p>
+<pre><code>03/10-15:39:03.697286 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.22
+03/10-15:39:03.700940 [**] [1:10003:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.22 -&gt; 192.168.1.80
+03/10-15:39:04.699153 [**] [1:10002:1] &quot;ICMP Echo Request&quot; [**] [Priority: 0] {ICMP} 192.168.1.80 -&gt; 192.168.1.22
+03/10-15:39:04.703056 [**] [1:10003:1] &quot;ICMP Echo Reply&quot; [**] [Priority: 0] {ICMP} 192.168.1.22 -&gt; 192.168.1.80
+</code></pre>
+<p>They are allowed and logged.</p>
+<h2>Step 6 : OPTIONAL, Making it permanent</h2>
+<p>Each time for monitoring, starting <code>snort</code>, <code>tail</code>ing that log file, etc. is very tedious task and is too much manual. You should be able to automate the process, one way is to create a <code>systemd.service</code>, so I create one server at <code>/etc/systemd/sytem</code> where name applies to <code>snort-ips.service</code>. This is nothing but file which have contents :</p>
+<pre><code>[Unit]
+Description=IPS with Snort
+After=firewall.service
+
+[Service]
+ExecStart=snort -c /usr/local/etc/snort/snort.lua -l /var/log/snort -Q --daq nfq --daq-var queue=0
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>Please visit 
+<a href="/temp/files/1-Creating Systemd Service">1-Creating Systemd Service</a>
+ to know how to create service. But here, this serrvice will only start if <code>firewall.service</code> is started. This is simple because our <code>snort</code> depends on <code>iptables nfqueue</code>. My <code>firewall.server</code> is responsibe for saving all <code>iptables</code> rules we created before and making it persistent even on restart or reboot. For that it will rely on <code>netfilter-persistent</code> or <code>iptables-persistent</code>. I will not describe but you can see how <code>firewall.service</code> looks like :</p>
+<pre><code>[Unit]
+Description=save iptables rules
+#Before=network-pre.target
+#Wants=network-pre.target
+After=netfilter-persistent.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c &quot;netfilter-persistent save&quot;
+ExecStop=/bin/sh -c &quot;netfilter-persistent save&quot;
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>You see those lines commented, which simply means that, <code>firewall.service</code> must start before <code>network-pre.target</code> sevice, which deals with bringing network interface being UP. This is important because if your firewall runs only after network interface is up, that tiny delay in start could leverage attackers to attack on that period and bypass your firewall. <strong>But why is that commented ?</strong></p>
+<p>Those are commented because, this service will start after <code>netfilter-persistent.service</code> is started, which will only start after <code>network-pre.target</code>, so that it is not necessary to explicitly mention.</p>
+<blockquote>
+<p>Please be noted, on every restart of <code>snort-ips.service</code>, new pcap will be created but log text file will be same which will be helpful for examining. <em><strong>For further support, you can use <code>splunk</code> to forward your files or you can transmit your logs to other server for analysis. THIS IS JUST THE BEGINNING.</strong></em></p>
+</blockquote>
+<h1>LIMITATIONS</h1>
+<p>Any IPS, only for single host is always challenging because in organization, yes you could sync these files among many hosts but will have different version of OS running. This is extremely hard to do. The most intellegient approach is to use centralized IPS System, but for that the communcation must be passed through that IPS host.</p>
+<p>Here, in our setup even if the rule is :</p>
+<pre><code>alert icmp any any -&gt; $HOME_NET any ( msg:&quot;ICMP Echo Request&quot;; itype:8; icode:0; sid:10002; rev:1; )
+</code></pre>
+<p>will alert ping request from any host to any host in <code>192.168.1.0/24</code> subnet. But when I ping from <code>192.168.1.16</code> to <code>192.168.1.22</code>, it will not log because, yes it may be listening but it has no access to those system's firewall to block or allow the traffic.</p>
+<p>In ethernet based network, you may ask switches to pass all the traffic to IPS System and then after analysis it will be IPS decision to allow or block from there on. The same approach could be hard in wireless network because all traffic are in the air. <strong>Rather ou should provide a way to centralized server to access your traffic flow in order to prevent or allow the traffic passing from or to your network interface, <em>which this setup apparent failed. But still OK for home setup or fewer hosts setup.</em></strong></p></div>
