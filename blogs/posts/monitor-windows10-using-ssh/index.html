@@ -1,0 +1,162 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<title>Monitoring Windows 10 PC with NagiosXI using SSH</title>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<p>Guide -&gt; <a href="https://assets.nagios.com/downloads/nagiosxi/docs/Monitoring_Hosts_Using_SSH.pdf">monitoring using ssh</a></p>
+<h1>How to monitor Remote Windows Host using NagiosXI</h1>
+<p>If you have not set up your monitoring server, go ahead and <a href="https://assets.nagios.com/downloads/nagiosxi/docs/Installing-Nagios-XI-Manually-on-Linux.pdf">Set it Up</a> quickly bro. You may be also interested on <a href="https://www.youtube.com/watch?v=wXpcpLrGfA0&amp;list=PLN-ryIrpC_mCd40_9NgA5Sm4ufIYb7mBr&amp;index=2">How it actually works ?</a>. As of now, you should know with some <a href="http://doctorg.pastcast.com/nagiosxi/admin/?xiwindow=monitoringplugins.php">monitoring plugins</a> settings and <a href="https://www.youtube.com/watch?v=Ilju9K4p-gk&amp;list=PLN-ryIrpC_mCd40_9NgA5Sm4ufIYb7mBr&amp;index=8">uploading or installing them</a>, we are able to monitor nearly anything or everything.</p>
+<h2>Step 1 : Finding Suitable Configuration Wizard</h2>
+<ul>
+<li>Here, our objective is to monitor Windows Host in the network, so in the configuration wizard : </li>
+</ul>
+<p><img src="/pics/blog-nagios-config-wizard.png" alt="blog-nagios-config-wizard.png"></p>
+<ul>
+<li>There is section for windows, Among many ways (I have not tried, but according to community), I found <strong>Windows SSH</strong> is one of the good way for at least starting monitoring any windows host. Select That :</li>
+</ul>
+<p><img src="/pics/blog-nagios-windows-monitoring-using-ssh.png" alt="blog-nagios-windows-monitoring-using-ssh.png"></p>
+<h2>Step 2 : Set up <strong>Windows SSH</strong> Wizard</h2>
+<ul>
+<li>Provide appropriate IP Address, and SSH username. This is important for further Setup also.</li>
+</ul>
+<p><img src="/pics/blog-win-monitoring-basic-options.png" alt="blog-win-monitoring-basic-options.png"></p>
+<ul>
+<li>I won't guide you through entire process, but following is the overview of what can you monitor using this module :</li>
+</ul>
+<p><img src="/pics/blog-win-monitoring-options-nagios.png" alt="blog-win-monitoring-options-nagios.png"></p>
+<p>This is quite comprehensive, because it allows you to monitor all kind of processes, services running on the remote windows system. It allows you to check your disk, memory and CPU usuage with different warning levels. This will help in alerting when disk is going to full and manage as an administrator.</p>
+<h2>Step 3 : Set up SSH Server on Windows</h2>
+<ul>
+<li>
+<p>This whole setup is based on SSH, so you must have ssh server runing on your remote windows server.</p>
+</li>
+<li>
+<p>Setting up Windows server is not hard task but <strong>nagios requires <em>publickey logn</em></strong>. This has whole lot of thing to do with your installation, permissions and so on in the server side. So better follow <a href="https://stackoverflow.com/questions/16212816/setting-up-openssh-for-windows-using-public-key-authentication/50502015#50502015">this guide</a>. <strong>Thank me later.</strong></p>
+</li>
+<li>
+<p><strong>Nagios Requires User <code>nagios</code> to login remote host passwordlessly</strong>. The previous guide should do it but <a href="https://assets.nagios.com/downloads/nagiosxi/docs/Monitoring_Hosts_Using_SSH.pdf">in case you need extra help</a>.</p>
+</li>
+<li>
+<p>For me, <strong>home directory for <code>nagios</code> was not at <code>/home/nagios</code>, rather at <code>/var/lib/nagios</code> for whatever reason.</strong> So, my whole <code>.ssh</code>, <code>authorized_keys</code>, etc. settings and the permissions are set at <code>/var/lib/nagios</code>.</p>
+</li>
+</ul>
+<h2>Step 4 : TEST your Configs</h2>
+<ul>
+<li>
+<p>Its time for <strong>HURRAH!</strong>. Let's see if everything is fine. </p>
+</li>
+<li>
+<p>Click on the host section and you will see the hosts you have already configured for monitoring. The one we configured is <code>DESKTOP-J3N5TJH.pastcast.com</code>, I have only shown on <strong># Step 2</strong>, how to fill, but I have not should what actually I filled in IP address. I put an IP address and in subsequent fillup, there was hostname. So, this hostname appears here. <strong>It is DOWN and fine</strong>.</p>
+</li>
+</ul>
+<p><img src="/pics/blog-initial-host-down.png" alt="blog-initial-host-down.png"></p>
+<ul>
+<li>Click on <strong>Down</strong> host and see overriew :</li>
+</ul>
+<p><img src="/pics/blog-host-status-check-immediately.png" alt="blog-host-status-check-immediately.png"></p>
+<ul>
+<li>As host was Down, it could not connect to the socket at port <code>22</code>. But after I started windows machine and then <em>enforce immediate recheck</em>, now result :</li>
+</ul>
+<p><img src="/pics/blog-host-now-up.png" alt="blog-host-now-up.png"></p>
+<ul>
+<li>Let's check one of the service we configured i.e. to monitor Available Space on C Drive of the Windows machine :</li>
+</ul>
+<p><img src="/pics/blog-services-Volume-stat.png" alt="blog-services-Volume-stat.png"></p>
+<ul>
+<li>As seen in general notification it is <strong>31GB</strong> used space. Let's click that to see in big :</li>
+</ul>
+<p><img src="/pics/blog-detailed-Volume-overview.png" alt="blog-detailed-Volume-overview.png"></p>
+<ul>
+<li>Ok but <strong>how can I trust this info ?</strong>, I ran similar check on windows and result was :</li>
+</ul>
+<pre><code>C:\Users\user&gt;fsutil volume diskfree C:
+Total free bytes        : 52,278,325,248 (48.7 GB)
+Total bytes             : 85,842,968,576 (79.9 GB)
+Total quota free bytes  : 52,278,325,248 (48.7 GB)
+</code></pre>
+<p>Subtract <code>79.9-48.7=&gt;31.2GB</code> that is used <strong>and correct</strong>.</p>
+<h2>Step 5 : [Optional] Moving Further</h2>
+<h3>Making Changes</h3>
+<ul>
+<li>In <a href="http://doctorg.pastcast.com/nagiosxi/includes/components/ccm/xi-index.php">here</a>, i knew we can see our Core Config Manager View or Summary.</li>
+</ul>
+<p><img src="/pics/blog-nagios-core-config-manager.png" alt="blog-nagios-core-config-manager.png"></p>
+<ul>
+<li>Go ahead and See that <em>25 Services</em> buttom, you could see :</li>
+</ul>
+<p><img src="/pics/blog-nagios-services-configured.png" alt="blog-nagios-services-configured.png"></p>
+<ul>
+<li>As we have already seen status for Volume C, that is the one we are interested on, Hence Clicking that link will lead to :</li>
+</ul>
+<p><img src="/pics/blog-nagios-volC-mgt.png" alt="blog-nagios-volC-mgt.png"></p>
+<ul>
+<li>
+<p>I have highlighted different sections. You could change Name, Description, Display Name. As seen, I have changed that <em>Display Name</em>. Also the command that will be run to get the stat about volume is <code>check_volume_by_ssh</code> that will take only one argument as <code>$ARG1$</code> as seen on <em>Command View</em>.</p>
+</li>
+<li>
+<p><strong>But, the interesting thing I found was : <em>Run Check Command</em> highlighted in red at the center buttom of the screenshot. Click that :</strong></p>
+</li>
+</ul>
+<p><img src="/pics/blog-nagios-run-check-cmd.png" alt="blog-nagios-run-check-cmd.png"></p>
+<ul>
+<li>The command that was running was from <code>/usr/local/nagios/libexec/</code> with the name applied <code>check_volume.ps1.py</code>. The output was as :</li>
+</ul>
+<pre><code>[nagios@doctorG.pastcast.com ~]$ /usr/local/nagios/libexec/check_volume.ps1.py -H 192.168.1.27 -u pardonplease -a '-volumename C:\ -outputType GB -metric Used'
+OK: C Used space is 31 GB | 'C Used Space'=31GB;0;0
+</code></pre>
+<ul>
+<li>The following from the output was the same console message that was seen while we were testing our configuration for Volume C :</li>
+</ul>
+<pre><code>OK: C Used space is 31 GB
+</code></pre>
+<ul>
+<li>I was quite not satisfied with the output becasue <strong>I also wanna know total space</strong>, The format I would like is :</li>
+</ul>
+<pre><code>OK: C Used space is 31 GB of X GB
+</code></pre>
+<ul>
+<li>
+<p>What I was thinking was to create another command that will give me Available Space. For that I would have to use <code>-metric Available</code> in place of <code>-metric Used</code> of the above Command, <strong>But now I may have another way.</strong></p>
+</li>
+<li>
+<p>Now that I know <code>/usr/local/nagios/libexec/check_volume.ps1.py</code> is the location for scripts. <strong>Maybe I could modify it to get desired format output</strong>.</p>
+</li>
+<li>
+<p>Following is the snippt of code I modify to get the desired output :</p>
+</li>
+</ul>
+<p><img src="/pics/blog-nagios-code-snippt.png" alt="blog-nagios-code-snippt.png"></p>
+<ul>
+<li>As I added <code>of $vc $outputType</code> it helps me to get the following output, when I clicked that <strong>Run Check Command</strong> buttom :</li>
+</ul>
+<pre><code>[nagios@doctorG.pastcast.com ~]$ /usr/local/nagios/libexec/check_volume.ps1.py -H 192.168.1.27 -u pardonplease -a '-volumename C:\ -outputType GB -metric Used'
+OK: C Used space is 31 GB of 80 GB| 'C Used Space'=31GB;0;0
+</code></pre>
+<ul>
+<li>Since I am satisfied, I should save and Apply Changes. </li>
+</ul>
+<p><img src="/pics/blog-nagios-save-changes.png" alt="blog-nagios-save-changes.png"></p>
+<ul>
+<li>It will lead to :</li>
+</ul>
+<p><img src="/pics/blog-nagios-changes-not-yet-applied.png" alt="blog-nagios-changes-not-yet-applied.png"></p>
+<ul>
+<li>Click <strong>Apply Configuration</strong> followed by <strong>Apply Configuration</strong> :</li>
+</ul>
+<p><img src="/pics/blog-nagios-config-applied.png" alt="blog-nagios-config-applied.png"></p>
+<h3>Testing Changes</h3>
+<ul>
+<li>Now that you check at the <strong>Volume C: Status</strong> service :</li>
+</ul>
+<p><img src="/pics/blog-nagios-changed-configuration-worked.png" alt="blog-nagios-changed-configuration-worked.png"></p>
+<ul>
+<li>We see our output format is correct, <strong>If changes has not been reflected than you could <em>Force an immediate check</em></strong>.</li>
+</ul>
+<h1>Final Words</h1>
+<p>You could go more deep on modify scripts as per your requirement to get the more result about the Volume. You could even get <strong>Total Reads, Writes</strong> and send notifications Accordingly.</p></div>
