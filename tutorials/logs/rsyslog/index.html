@@ -1,0 +1,164 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>Introduction to rsyslog</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/logs-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Working with logs</h1>
+<p><a href="https://betterstack.com/community/guides/logging/rsyslog-explained/#understanding-the-rsyslog-configuration">have a look</a>
+<a href="https://www.man7.org/linux/man-pages/man5/rsyslog.conf.5.html">also man page</a></p>
+<p>The <code>rsyslog</code> daemon provides a standardized means of performing logging. In the modern systems, capable of performing various tasks single handedly on very high speed; you should be setting up some way to monitor their task for further inspection. This is especially valuable in a large
+heterogeneous environment where it’s necessary to centralize the collection of log entries to gain an accurate picture of what’s going on.</p>
+<h2>Installation</h2>
+<p>Most (almost all) linux distros ship <code>rsyslogd</code>, but in case missing you could :</p>
+<pre><code>sudo apt-get install rsyslog
+</code></pre>
+<p>This is tested on Ubuntu 22.04, but you could refer to this <a href="https://www.rsyslog.com/doc/v8-stable/installation/index.html">installation guide</a> if you are running on different flavor of OS.</p>
+<p>You could verify version and status using these commands :</p>
+<pre><code>rsyslogd -v
+systemctl status rsyslog
+</code></pre>
+<p>Remember, utility is <code>rsyslogd</code> and service is <code>rsyslog</code>; no <em>d</em>.</p>
+<h2>How it works ?</h2>
+<p>In your system, various applications like SSHD, mail clients/servers, and cron tasks generate logs at frequent intervals. These applications write log messages to the <code>/dev/log</code> file as if it were a regular file (pseudo device).</p>
+<p>The Rsyslog daemon monitors this file, collecting logs as they are written, and redirects them to individual plain text files in the <code>/var/log</code> directory, including the <code>/var/log/syslog</code> file. Rsyslog can route logs to their appropriate files by inspecting header information, such as priority and message origin, which it uses for filtering.</p>
+<p>The routing of these messages is based on rules defined in the <code>50-default.conf</code> file, located in the <code>/etc/rsyslog.d/</code> directory, which we'll explore shortly. Different apps generates log and <code>rsyslog</code> daemon is responsible to route them like shown in different files :</p>
+<p><img src="/temp/pics/differnt-apps-generate-log.png" alt="differnt-apps-generate-log.png"></p>
+<p>Imagine Rsyslog as a pipeline. On one end, Rsyslog collects inputs, transforms them, and forwards them to the other end—the destination. On the right of the pipe there are differents appls like : mail, fwd, mysql, etc. On the left side, it says <code>rsyslog</code> can use different protocols, sockets, etc. to collect the different types of logs :</p>
+<p><img src="/temp/pics/rsyslog-log-collecting-like-pipe.png" alt="rsyslog-log-collecting-like-pipe.png"></p>
+<h2>Configs</h2>
+<h3>Main Config File</h3>
+<ul>
+<li>The default config file is <code>/etc/rsyslog.conf</code> and the rules are located at <code>/etc/rsyslog.d</code> directory. Upon startup, rsyslog reads its configuration from the <code>rsyslog.conf</code> file by default. This file may contain references to include other config files like the following line at <code>rsyslog.conf</code> :</li>
+</ul>
+<pre><code>$IncludeConfig /etc/rsyslog.d/*.conf
+</code></pre>
+<ul>
+<li>This file is used to define input modules, filters, actions, and global directives, facilitating the processes of log collection, filtering, routing, and formatting.</li>
+</ul>
+<h3>Main Rule File</h3>
+<ul>
+<li>
+<p>The rule file that has rule to what to do with certain types of logs are mainly listed on <code>/etc/rsyslog.d/50-default.conf</code>.</p>
+</li>
+<li>
+<p>This should look something like :</p>
+</li>
+</ul>
+<pre><code>auth,authpriv.*         /var/log/auth.log
+*.*;auth,authpriv.none      -/var/log/syslog
+kern.*              -/var/log/kern.log
+mail.*              -/var/log/mail.log
+
+mail.err            /var/log/mail.err
+
+*.emerg             :omusrmsg:*
+</code></pre>
+<ul>
+<li>The preceding <code>-</code> on those files says, logs are to be written asynchronously which no <code>-</code> means logs to be written synchronously.</li>
+</ul>
+<h2>Writing Rules</h2>
+<h3>Syntax :</h3>
+<pre><code>&lt;FILTERS&gt;  &lt;ACTIONS&gt;
+</code></pre>
+<h3>Filters</h3>
+<p><a href="https://www.rsyslog.com/doc/configuration/filters.html">Read Docs</a> for full info.</p>
+<h4>Facility and Priority Based Filters</h4>
+<p><a href="https://www.rsyslog.com/doc/configuration/filters.html#selectors">Read on Full</a></p>
+<p>You could essentially write in legacy format as :</p>
+<pre><code>facility.priority
+</code></pre>
+<p>where <code>facility</code> includes <em>kern, user, mail, ftp</em>, etc. You could see <a href="https://wiki.gentoo.org/wiki/Rsyslog#Facility">list of facilities</a>. And for <code>priority</code> it is 0 through 7 as such <em>emerg, alert, crit, error, warning, notice, info, debug</em>. You can see it at <a href="https://wiki.gentoo.org/wiki/Rsyslog#Severity">severity list</a>.</p>
+<h4>Property-Based Filters</h4>
+<p><a href="https://www.rsyslog.com/doc/configuration/filters.html#property-based-filters">Read on Full</a></p>
+<p>The format is simplified as :</p>
+<pre><code>:property, [!]compare-operation, &quot;value&quot;
+</code></pre>
+<p><code>property</code> as defined <a href="https://www.rsyslog.com/doc/configuration/properties.html">here</a> coule be something like <em>msg, source, hostname, fromhost-ip, programname</em>, etc. And <code>compare-operation</code> could be like <em>contains, isequal, startswith, regex, ereregex</em>. Have you notice optional <code>[!]</code> negation there, you could essentially say that you wanna log the message that does not contain <strong>hello</strong> to <code>/var/log/nohello.log</code>.</p>
+<pre><code>:msg, !contains, &quot;aapkikasish&quot;  /var/log/NOaapkikasish.log
+</code></pre>
+<p>You can assume that it provides more control on what and how you wanna log then of the previous method.</p>
+<h3>Actions</h3>
+<p><a href="https://www.rsyslog.com/doc/configuration/actions.html">Read Docs</a> for full info. Here are most commonly used.</p>
+<p>The action field of a rule describes what to do with the message.
+In general, message content is written to a kind of "logfile". But
+also other actions might be done, like writing to a database table
+or forwarding to another host. Some examples include :</p>
+<h4>Regular File in Traditional Format</h4>
+<pre><code>*.*  /var/log/traditionalfile.log;RSYSLOG_TraditionalFileFormat
+</code></pre>
+<h4>Regular File in Modern RFC3399 Format</h4>
+<pre><code>*.*  /var/log/traditionalfile.log
+</code></pre>
+<h4>Forward to Remote Via UDP (@)</h4>
+<pre><code>*.*  @&lt;REMOTE_HOST&gt;
+</code></pre>
+<h4>Forward to Remote Via TCP (@@)</h4>
+<pre><code>*.*  @@&lt;REMOTE_HOST&gt;
+</code></pre>
+<h4>To Users Terminal</h4>
+<p><code>omusrmsg</code> module is used to direct messages to terminal. You don't need to load it since it is built in. Usually critical messges are directed to <code>root</code> but, you can change it :</p>
+<pre><code>*.emerg   :omusrmsg:root,user1,user2
+</code></pre>
+<p>Use <code>*</code> to all users. The messages are directed to each logged in user terminal. Usually <code>root</code> is only able to write to other users terminal as the permissions goes :</p>
+<pre><code>ls -l $(tty)
+crw--w---- 1 user1 tty 136, 3 Apr  4 09:13 /dev/pts/3
+</code></pre>
+<p>So, if <code>user2</code> sends <em>emerg</em> message, it won't be visible in <code>user1</code> as he has no permission to do it. Leave these broadcasts to <code>root</code> unless you know what exactly you are trying to achieve.</p>
+<p>If <code>root</code> sends like :</p>
+<pre><code># logger -p 0 &quot;This is emergy message from root. Turn your PC off.&quot;
+</code></pre>
+<p>For <code>user1</code> it will be like on the terminal :</p>
+<pre><code>user1@PC:~$ 
+Broadcast message from systemd-journald@mankading.example.com (Fri 2025-04-04 09:18:14 +0545):
+
+root[37019]: This is emergy message from root. Turn your PC off.
+
+</code></pre>
+<p>Once pressed Enter key prompt is back.</p>
+<h4>Discard Action (<code>~</code>)</h4>
+<p>This action means that the logs should be discarded and no action should be performed on them. This type of action is specified by the tilde symbol <code>~</code>in the action field. Eg as :</p>
+<pre><code>:msg, contains, &quot;informational&quot;  ~
+</code></pre>
+<h2>Better use Expressions for writing Rules</h2>
+<p>With the help of examples, I will clarify you that why should you use Expression based rules. </p>
+<ul>
+<li>Say, you would like to keep all mail related logs :</li>
+</ul>
+<pre><code>mail.*   /var/log/mail.log
+</code></pre>
+<p>Using Expression, it will be :</p>
+<pre><code>if prifilt(&quot;mail.*&quot;) then {
+    action(type=&quot;omfile&quot; file=&quot;/var/log/mail.log&quot;)
+}
+</code></pre>
+<ul>
+<li>I know what you are thinking. This first one is easier. Now, Hey ! Please log mail messages that contain <em>"HELLO"</em> to <code>/var/log/mail_hello.log</code> and the others at <code>/var/log/mail.log</code>. Ummmm, Now you have no choice but to use Expression :</li>
+</ul>
+<pre><code>if prifilt(&quot;mail.*&quot;) and $msg contains &quot;HELLO&quot; then {
+    action(type=&quot;omfile&quot; file=&quot;/var/log/mail_hello.log&quot;)
+}
+else if prifilt(&quot;mail.*&quot;) then {
+    action(type=&quot;omfile&quot; file=&quot;/var/log/mail.log&quot;)
+}
+</code></pre>
+<p>You will be more delighted if you learn <a href="https://www.rsyslog.com/doc/rainerscript/index.html">RainerScript</a> to write these expressions which will give you full control on what the log should be.</p>
+<h2>Try out Templetes too</h2>
+<p>First of all you gonna have to define your templete before actually using it.</p>
+<pre><code>template(name=&quot;MyTagTemplate&quot; type=&quot;string&quot; string=&quot;%syslogtag% -&gt; %msg% FROM %hostname%\n&quot;)
+</code></pre>
+<p>Now use it :</p>
+<pre><code>if $syslogtag contains '449944' then {
+    action(type=&quot;omfile&quot; file=&quot;/var/log/449944.log&quot; template=&quot;MyTagTemplate&quot;)
+</code></pre>
+<p>Using templete, you are able to extract and log specifc part of log. This is not any useful but just an examples. The <a href="https://www.rsyslog.com/doc/configuration/properties.html">properties described here</a> are enclosed on <code>%&lt;properties&gt;%</code> to specify exact part of message to be used on templete string as in example : <code>"%syslogtag% -&gt; %msg% FROM %hostname%\n</code>. Good Luck</p>
+<p><a href="https://www.rsyslog.com/doc/configuration/templates.html">For more information visit this link of rsyslog templetes</a>.</p>
+<h1>References</h1>
+<p>The links mentioned there are helpful. Please Read them....</p></div>
