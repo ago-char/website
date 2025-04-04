@@ -67,8 +67,7 @@ body.home {
 }
 
 /* Mobile navbar */
-/* @media (max-width: 768px), (min-width: 768px) and (max-zoom: 150%) { */
-@media (max-width: 600px) {
+@media (max-width: 768px), (min-width: 768px) and (max-zoom: 150%) {
     .navbar {
         padding: 0;
         flex-direction: column;

@@ -30,9 +30,9 @@ systemctl status rsyslog
 <p>In your system, various applications like SSHD, mail clients/servers, and cron tasks generate logs at frequent intervals. These applications write log messages to the <code>/dev/log</code> file as if it were a regular file (pseudo device).</p>
 <p>The Rsyslog daemon monitors this file, collecting logs as they are written, and redirects them to individual plain text files in the <code>/var/log</code> directory, including the <code>/var/log/syslog</code> file. Rsyslog can route logs to their appropriate files by inspecting header information, such as priority and message origin, which it uses for filtering.</p>
 <p>The routing of these messages is based on rules defined in the <code>50-default.conf</code> file, located in the <code>/etc/rsyslog.d/</code> directory, which we'll explore shortly. Different apps generates log and <code>rsyslog</code> daemon is responsible to route them like shown in different files :</p>
-<p><img src="/temp/pics/differnt-apps-generate-log.png" alt="differnt-apps-generate-log.png"></p>
+<p><img src="/pics/differnt-apps-generate-log.png" alt="differnt-apps-generate-log.png"></p>
 <p>Imagine Rsyslog as a pipeline. On one end, Rsyslog collects inputs, transforms them, and forwards them to the other end—the destination. On the right of the pipe there are differents appls like : mail, fwd, mysql, etc. On the left side, it says <code>rsyslog</code> can use different protocols, sockets, etc. to collect the different types of logs :</p>
-<p><img src="/temp/pics/rsyslog-log-collecting-like-pipe.png" alt="rsyslog-log-collecting-like-pipe.png"></p>
+<p><img src="/pics/rsyslog-log-collecting-like-pipe.png" alt="rsyslog-log-collecting-like-pipe.png"></p>
 <h2>Configs</h2>
 <h3>Main Config File</h3>
 <ul>

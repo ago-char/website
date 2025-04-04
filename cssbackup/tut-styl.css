@@ -1,0 +1,84 @@
+/* Sidebar styling */
+.sidebar {
+    width: 250px;
+    background-color: #f4f4f4;
+    padding: 15px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+    border-right: 2px solid #ddd;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: rgb(196, 41, 41);
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 5px 0;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    /* color: #333; */
+    color: #020202;
+    transition: background 0.3s ease;
+    border-radius: 5px;
+}
+
+.sidebar ul li a:hover {
+    background-color: #ddd;
+}
+
+.sidebar ul li ul {
+    padding-left: 15px;
+}
+
+/* Content area styling */
+.content {
+    margin-left: 270px;
+    padding: 20px;
+    flex-grow: 1;
+    /* background-color: #fff; */
+    /* min-height: 100vh; */
+    max-height:min-content;
+}
+
+/* Highlight active topic */
+/* :target {
+    background-color: #4CAF50; Green
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+} */
+
+.sidebar a.current {
+    background-color: #345835;
+    color: white;
+}
+
+.sidebar a.current:hover {
+    background-color: #575757;
+    background-color: #8a2e2e;
+}
+
+/*
+.sidebar a {
+    background-color: #4CAF50;
+} */
+
+.sidebar li.current-parent {
+    background-color: #ddd;
+}
