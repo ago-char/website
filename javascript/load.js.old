@@ -55,6 +55,10 @@ function highlightSidebar() {
     if (currentUrl.endsWith('/')){
         currentUrl = currentUrl.slice(0,-1)
     }
+    // tutorial_link = document.querySelector('a[href="/tutorials/"]')
+    // if (currentUrl.includes(tutorial_link.pathname)){
+    //     tutorial_link.classList.add('current')
+    // }
 
     var links = document.querySelectorAll('.navbar a');
     links.forEach(function(link) {
@@ -64,28 +68,19 @@ function highlightSidebar() {
     });
 
     var sidebarLinks = document.querySelectorAll('.sidebar a');
-    var activeLink = null;
-    
     sidebarLinks.forEach(function(link) {
         var linkUrl = link.pathname;
         if (linkUrl === currentUrl) {
             link.classList.add('current');
-            activeLink = link;
             // highlight parent items in nested lists
             var parentLi = link.parentNode;
-            while (parentLi && parentLi.tagName === 'LI') {
+            while (parentLi.tagName === 'LI') {
                 parentLi.classList.add('current-parent');
-                parentLi = parentLi.parentNode.parentNode;
+                parentLi = parentLi.parentNode;
             }
         }
-    });
 
-    // Scroll the active link into view after a short delay
-    if (activeLink) {
-        setTimeout(() => {
-            activeLink.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }, 100);
-    }
+    });
 }
 
 

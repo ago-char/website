@@ -7,7 +7,6 @@
     --border-color: #404040;
     --hover-bg: #3a3a3a;
     --navbar-height: 3rem;
-    --sidebar-indent: 1rem;
 }
 
 /* Reset */
@@ -65,24 +64,6 @@ body {
     margin: 2px 0;
 }
 
-/* First level links (Chapter) */
-.sidebar > ul > li > a {
-    padding-left: 1.5rem;
-}
-
-/* Second level links (Topics) */
-.sidebar > ul > li > ul > li > a {
-    padding-left: calc(1.5rem + var(--sidebar-indent));
-    font-size: 0.85rem;
-}
-
-/* Third level links (Subtopics) */
-.sidebar > ul > li > ul > li > ul > li > a {
-    padding-left: calc(1.5rem + (var(--sidebar-indent) * 2));
-    font-size: 0.8rem;
-    color: #bbb;
-}
-
 .sidebar ul li a {
     display: block;
     padding: 0.4rem 1.5rem;
@@ -90,12 +71,22 @@ body {
     color: var(--text-color);
     transition: background-color 0.2s, color 0.2s;
     border-radius: 0;
+    font-size: 0.9rem;
 }
 
 .sidebar ul li a:hover {
     background-color: var(--hover-bg);
-    color: var(--link-color);
 }
+
+.sidebar ul li ul {
+    padding-left: 1;
+}
+
+.sidebar ul li ul li a {
+    padding-left: 2.5rem;
+    font-size: 0.85rem;
+}
+
 
 /* Content area styling */
 .content {

@@ -7,6 +7,8 @@
     --border-color: #404040;
     --hover-bg: #3a3a3a;
     --navbar-height: 3rem;
+    --sidebar-width: 280px;
+    --sidebar-indent: 1rem;
 }
 
 /* Reset */
@@ -30,7 +32,7 @@ body {
 
 /* Sidebar styling */
 .sidebar {
-    width: 280px;
+    width: var(--sidebar-width);
     background-color: var(--secondary-bg);
     padding: 0;
     height: calc(100vh - var(--navbar-height));
@@ -42,6 +44,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--text-color);
     z-index: 100;
+    transition: transform 0.3s ease;
 }
 
 .sidebar h3 {
@@ -64,6 +67,24 @@ body {
     margin: 2px 0;
 }
 
+/* First level links (Chapter) */
+.sidebar > ul > li > a {
+    padding-left: 1.5rem;
+}
+
+/* Second level links (Topics) */
+.sidebar > ul > li > ul > li > a {
+    padding-left: calc(1.5rem + var(--sidebar-indent));
+    font-size: 0.85rem;
+}
+
+/* Third level links (Subtopics) */
+.sidebar > ul > li > ul > li > ul > li > a {
+    padding-left: calc(1.5rem + (var(--sidebar-indent) * 2));
+    font-size: 0.8rem;
+    color: #bbb;
+}
+
 .sidebar ul li a {
     display: block;
     padding: 0.4rem 1.5rem;
@@ -71,25 +92,16 @@ body {
     color: var(--text-color);
     transition: background-color 0.2s, color 0.2s;
     border-radius: 0;
-    font-size: 0.9rem;
 }
 
 .sidebar ul li a:hover {
     background-color: var(--hover-bg);
-}
-
-.sidebar ul li ul {
-    padding-left: 0;
-}
-
-.sidebar ul li ul li a {
-    padding-left: 2.5rem;
-    font-size: 0.85rem;
+    color: var(--link-color);
 }
 
 /* Content area styling */
 .content {
-    margin-left: 280px;
+    margin-left: var(--sidebar-width);
     padding: 2rem;
     background-color: var(--primary-bg);
     color: var(--text-color);
@@ -97,6 +109,101 @@ body {
     position: relative;
     z-index: 50;
     min-height: calc(100vh - var(--navbar-height));
+}
+
+/* Make content responsive */
+.content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1rem auto;
+}
+
+.content pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.content table {
+    max-width: 100%;
+    overflow-x: auto;
+    display: block;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 100%;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: 100%;
+    }
+
+    .sidebar:focus-within {
+        transform: translateX(0);
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 1rem;
+        width: 100vw;
+        max-width: 100vw;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    /* Force content to wrap */
+    .content > * {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+
+    /* Handle pre and code blocks */
+    .content pre,
+    .content code {
+        max-width: calc(100vw - 2rem) !important;
+        white-space: pre-wrap !important;
+        overflow-x: hidden !important;
+        padding: 1rem;
+        background-color: var(--secondary-bg);
+        border-radius: 4px;
+    }
+
+    /* Handle tables */
+    .content table {
+        display: block;
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow-x: auto;
+    }
+
+    /* Handle images */
+    .content img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Force text wrapping */
+    .content p,
+    .content li,
+    .content h1,
+    .content h2,
+    .content h3,
+    .content h4,
+    .content h5,
+    .content h6 {
+        overflow-wrap: break-word !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+    }
 }
 
 /* Active states */
