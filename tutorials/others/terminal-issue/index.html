@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubuntu Terminal Freezes? Here's What to Do</title>
+    <link rel="stylesheet" href="/css/main-style.css">
+    <link rel="stylesheet" href="/css/tut-styl.css">
+    <link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+    <script src="/javascript/load.js"></script>
+    <script>
+        includeHTML('/includes/navbar.html', 'navbar');
+        includeHTML('/includes/others-sidebar.html', 'sidebar');
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h2 {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        p, ul {
+            margin: 10px 0;
+        }
+        pre {
+            background: #eee;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        code {
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 4.0px;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" id="navbar"></div>
+    <div class="sidebar" id="sidebar"></div>
+    
+    <div class="content">
+        <h1>Ubuntu Terminal Freezes? Here's What to Do</h1>
+            <h2>Issue: Terminal Output Frozen</h2>
+            <p>If your terminal appears to be frozen or unresponsive, it's possible that you've accidentally triggered a pause in the terminal output. This is a common issue and can be easily resolved.</p>
+
+            <h3>Possible Cause</h3>
+            <p>Did you press <strong>Ctrl+S</strong> by any chance? In many terminal applications, <strong>Ctrl+S</strong> is used to pause the output of the terminal. This key combination effectively stops all output until you press <strong>Ctrl+Q</strong> to resume it.</p>
+
+            <h3>How to Resolve</h3>
+            <p>To resume the output in the terminal, simply press:</p>
+            <pre><code>Ctrl+Q</code></pre>
+            <p>This will resume the output that was paused by the <strong>Ctrl+S</strong> key.</p>
+
+            <h3>Additional Tips</h3>
+            <ul>
+                <li>If you frequently encounter this issue, try to avoid accidentally pressing <strong>Ctrl+S</strong> or consider remapping the pause key to avoid conflicts.</li>
+                <li>If the terminal is still unresponsive after pressing <strong>Ctrl+Q</strong>, try closing and reopening the terminal or restarting your session.</li>
+                <li>For further assistance, consult the documentation or community forums for your specific terminal application or distribution.</li>
+            </ul>
+    </div>
+</body>
+<footer>
+    <p>&copy; 2024 <strong>linuxAdmin</strong>. All rights reserved.</p>
+</footer>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GZIP and BZIP2 Compression Tools</title>
+    <link rel="stylesheet" href="/css/main-style.css">
+    <link rel="stylesheet" href="/css/tut-styl.css">
+    <link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+    <script src="/javascript/load.js"></script>
+    <script>
+        includeHTML('/includes/navbar.html', 'navbar');
+        includeHTML('/includes/others-sidebar.html', 'sidebar');
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #0073aa;
+            color: #fff;
+            padding-top: 20px;
+            min-height: 60px;
+            border-bottom: #005177 3px solid;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #0073aa;
+            border-bottom: 2px solid #0073aa;
+            padding-bottom: 5px;
+        }
+        code {
+            background: #eee;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 3px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        .note {
+            background: #e7f4e4;
+            border-left: 5px solid #4caf50;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+        .command {
+            background: #f9f9f9;
+            padding: 10px;
+            border-left: 3px solid #0073aa;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" id="navbar"></div>
+    <div class="sidebar" id="sidebar"></div>
+    
+    <div class="content">
+            <h1>GZIP and BZIP2 Compression Tools</h1>
+            <h2>GZIP</h2>
+            <div class="command">
+                <p><strong>Compress files with GZIP:</strong></p>
+                <pre><code>$ gzip --keep --best --verbose file1</code></pre>
+                <pre><code>$ gzip -k9v pic{1..5}.jpg</code></pre>
+                
+                <p><strong>Decompress files with GZIP:</strong></p>
+                <pre><code>$ gzip --keep --best --verbose file1.gz</code></pre>
+                <pre><code>$ gzip -k9v pic{1..5}.jpg.gz</code></pre>
+                
+                <p><strong>Alternatively, use gunzip to decompress:</strong></p>
+                <pre><code>$ gunzip --keep file1.gz</code></pre>
+                <p class="note">Note: While uncompressing, the suffix (.gz) is optional if the original filename is not present.</p>
+                
+                <p><strong>List metadata of a compressed file:</strong></p>
+                <pre><code>$ gzip --list file.gz</code></pre>
+                
+                <p><strong>Read the content of a compressed file:</strong></p>
+                <pre><code>$ gunzip -c file.gz</code></pre>
+                <pre><code>$ zcat file.gz</code></pre>
+                <pre><code>$ zless file.gz</code></pre>
+            </div>
+            
+            <h2>BZIP2</h2>
+            <div class="command">
+                <p><strong>Compress files with BZIP2:</strong></p>
+                <pre><code>$ bzip2 --keep --verbose file</code></pre>
+                
+                <p><strong>Decompress files with BZIP2:</strong></p>
+                <pre><code>$ bzip2 --decompress --keep --verbose file.bz2</code></pre>
+                <pre><code>$ bunzip2 --keep --verbose file2.bz</code></pre>
+                
+                <p><strong>Read content of a compressed file with BZIP2:</strong></p>
+                <pre><code>$ bzcat file.bz2</code></pre>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

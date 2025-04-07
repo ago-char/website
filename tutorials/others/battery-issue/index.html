@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Increasing Battery Life in Linux</title>
+    <link rel="stylesheet" href="/css/main-style.css">
+    <link rel="stylesheet" href="/css/tut-styl.css">
+    <link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+    <script src="/javascript/load.js"></script>
+    <script>
+        includeHTML('/includes/navbar.html', 'navbar');
+        includeHTML('/includes/others-sidebar.html', 'sidebar');
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        section {
+            margin: 20px 0;
+        }
+        h2 {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        pre {
+            background: #eee;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        code {
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 4.0px;
+        } 
+        a {
+            color: #333;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" id="navbar"></div>
+    <div class="sidebar" id="sidebar"></div>
+    
+    <div class="content">
+        <h1>How to Increase Battery Life in Linux</h1>
+            <h2>TLP</h2>
+            <p>TLP is a powerful tool to optimize battery life on Linux. Here's how to install and configure it:</p>
+
+            <h3>Install TLP</h3>
+            <pre><code>sudo apt install tlp</code></pre>
+
+            <h3>View TLP Statistics</h3>
+            <pre><code>sudo tlp-stat</code></pre>
+
+            <h3>Enable TLP-RDW for USB Support</h3>
+            <pre><code>sudo tlp-rdw [enable|disable]</code></pre>
+
+            <h3>Use TLP as a Service</h3>
+            <pre><code>sudo tlp start</code></pre>
+
+            <h3>Set TLP to Start at Boot</h3>
+            <pre><code>sudo systemctl enable tlp</code></pre>
+
+            <h3>Check if TLP Startup Service is Enabled</h3>
+            <pre><code>sudo systemctl is-enabled tlp</code></pre>
+
+            <div class="note">
+                <p>By default, Bluetooth may be enabled on startup. To disable it:</p>
+                <pre><code>sudo nano /etc/tlp.conf</code></pre>
+                <p>Find the line:</p>
+                <pre><code># DEVICES_TO_DISABLE_ON_STARTUP="bluetooth nfc wifi wwan"</code></pre>
+                <p>Uncomment and modify it to:</p>
+                <pre><code>DEVICES_TO_DISABLE_ON_STARTUP="bluetooth"</code></pre>
+                <p>For more options and details, visit <a href="https://linrunner.de/tlp/installation/ubuntu.html" target="_blank">TLP Installation Guide</a>.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Powertop</h2>
+            <p>Powertop helps you monitor and tune power consumption. Follow these steps to use it:</p>
+
+            <h3>Install Powertop</h3>
+            <pre><code>sudo apt install powertop</code></pre>
+
+            <h3>View Powertop Status</h3>
+            <pre><code>sudo powertop</code></pre>
+
+            <h3>Start Powertop Service</h3>
+            <pre><code>sudo systemctl start powertop.service</code></pre>
+
+            <h3>Set Powertop to Start at Boot</h3>
+            <pre><code>sudo systemctl enable powertop.service</code></pre>
+
+            <h3>Check if Powertop Startup Service is Enabled</h3>
+            <pre><code>sudo systemctl is-enabled powertop</code></pre>
+    </div>
+    <footer>
+        <p>&copy; 2024 <strong>linuxAdmin</strong>. All rights reserved.</p>
+    </footer>
+</body>
+</html>

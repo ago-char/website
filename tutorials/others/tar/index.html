@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAR Command Operations Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .command {
+            background: #f8f9fa;
+            padding: 10px;
+            border-left: 5px solid #007bff;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+        }
+        .note {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+        .highlight {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .nav-link {
+            cursor: pointer;
+        }
+        .nav-link.active {
+            background-color: #007bff;        
+        }
+        .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-primary text-white text-center py-6">
+        <h1 class="text-4xl font-extrabold">TAR Command Operations Guide</h1>
+    </header>
+    <div class="container mt-8">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="create-tab" data-toggle="tab" href="#create" role="tab" aria-controls="create" aria-selected="true">Create Archive</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="false">List Content</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="append-tab" data-toggle="tab" href="#append" role="tab" aria-controls="append" aria-selected="false">Append Content</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab" aria-controls="update" aria-selected="false">Update Archive</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="delete-tab" data-toggle="tab" href="#delete" role="tab" aria-controls="delete" aria-selected="false">Delete Content</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="extract-tab" data-toggle="tab" href="#extract" role="tab" aria-controls="extract" aria-selected="false">Extract Files</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="extract-specific-tab" data-toggle="tab" href="#extract-specific" role="tab" aria-controls="extract-specific" aria-selected="false">Extract Specific File</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="more-tab" data-toggle="tab" href="#more" role="tab" aria-controls="more" aria-selected="false">More Stuff</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content mt-4">
+                    <div class="tab-pane fade show active" id="create" role="tabpanel" aria-labelledby="create-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">Create Archive</h2>
+                                <div class="command">
+                                    <p><strong>Create a tar archive:</strong></p>
+                                    <pre><code>$ tar --create --file archive.tar playground/</code></pre>
+                                    <pre><code>$ tar -cf new-archive.tar playground/</code></pre>
+                                    <pre><code>$ tar cf another-arch.tar playground/</code></pre>
+                                    <p class="note">Note: playground/ or playground will include the playground directory in the *.tar, but playground/* will not.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="list" role="tabpanel" aria-labelledby="list-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">List the Content of Archive</h2>
+                                <div class="command">
+                                    <pre><code>$ tar --list --file archive.tar</code></pre>
+                                    <pre><code>$ tar -tf new-archive.tar</code></pre>
+                                    <pre><code>$ tar tf another-arch.tar</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="append" role="tabpanel" aria-labelledby="append-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">Append Files/Folders to Archive</h2>
+                                <div class="command">
+                                    <pre><code>$ tar --append --file archive.tar newfile</code></pre>
+                                    <pre><code>$ tar -rf archive.tar newdirContents/*</code></pre>
+                                    <pre><code>$ tar rf archive.tar newDir/</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">Update Archive with Newer Files</h2>
+                                <div class="command">
+                                    <pre><code>$ tar --update --file archive.tar file</code></pre>
+                                    <pre><code>$ tar -uf archive.tar contents/*</code></pre>
+                                    <pre><code>$ tar uf archive.tar dir</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="delete" role="tabpanel" aria-labelledby="delete-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">Delete Content from Archive</h2>
+                                <div class="command">
+                                    <pre><code>$ tar --delete --file archive.tar archivedFile</code></pre>
+                                    <pre><code>$ tar --delete --file archive.tar archivedContents/*</code></pre>
+                                    <pre><code>$ tar --delete --file archive.tar archivedDir</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="extract" role="tabpanel" aria-labelledby="extract-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">Extract Files</h2>
+                                <div class="command">
+                                    <pre><code>$ tar --extract --file archive.tar</code></pre>
+                                    <pre><code>$ tar --get --file archive.tar</code></pre>
+                                    <pre><code>$ tar -xf archive.tar</code></pre>
+                                    <pre><code>$ tar xf archive.tar</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="extract-specific" role="tabpanel" aria-labelledby="extract-specific-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">Extract Specific File</h2>
+                                <div class="command">
+                                    <pre><code>$ tar --extract --file archive.tar specifiedFile</code></pre>
+                                    <pre><code>$ tar -xf archive.tar --wildcards '*.txt'</code></pre>
+                                    <pre><code>$ tar xf archive.tar dir</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="more" role="tabpanel" aria-labelledby="more-tab">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h2 class="text-2xl font-semibold text-primary mb-3">More Stuff</h2>
+                                <div class="command">
+                                    <p><strong>Create a tgz archive:</strong></p>
+                                    <pre><code>$ tar cf hello.tgz *.txt</code></pre>
+                                    
+                                    <p><strong>Create a tbz archive:</strong></p>
+                                    <pre><code>$ tar cf hello.bz2 *.py</code></pre>
+                                    
+                                    <p><strong>Use with find:</strong></p>
+                                    <pre><code>$ find . -name "*.txt" -exec tar cf text.tar '{}' +</code></pre>
+                                    
+                                    <p><strong>Use with remote server:</strong></p>
+                                    <pre><code>$ ssh remote 'tar -cf Documents/' | tar xf -</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

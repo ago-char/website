@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZIP File Operations Guide</title>
+    <link rel="stylesheet" href="/css/main-style.css">
+    <link rel="stylesheet" href="/css/tut-styl.css">
+    <link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+    <script src="/javascript/load.js"></script>
+    <script>
+        includeHTML('/includes/navbar.html', 'navbar');
+        includeHTML('/includes/others-sidebar.html', 'sidebar');
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        .content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        code {
+            background: #eee;
+            padding: 5px;
+            border-radius: 3px;
+            display: block;
+            margin: 10px 0;
+        }
+        pre {
+            background: #eee;
+            padding: 15px;
+            border-radius: 3px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .command {
+            background: #f9f9f9;
+            padding: 10px;
+            border-left: 3px solid #333;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+        .note {
+            background: #e7f4e4;
+            border-left: 5px solid #4caf50;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" id="navbar"></div>
+    <div class="sidebar" id="sidebar"></div>
+    
+    <div class="content">
+            <h1>ZIP File Operations Guide</h1>
+            <h2>Create ZIP File</h2>
+            <div class="command">
+                <p><strong>Create a ZIP file with an empty directory:</strong></p>
+                <pre><code>zip new.zip test/</code></pre>
+                
+                <p><strong>Add contents of a directory (non-recursively) to an existing ZIP file:</strong></p>
+                <pre><code>zip new.zip test/*</code></pre>
+                
+                <p><strong>Add contents of a directory recursively to an existing ZIP file:</strong></p>
+                <pre><code>zip -r new.zip test/*</code></pre>
+                
+                <p><strong>Add the content of a directory including the directory itself:</strong></p>
+                <pre><code>zip -r new.zip test</code></pre>
+                <pre><code>zip -r new.zip test/</code></pre>
+            </div>
+            
+            <h2>List Content</h2>
+            <div class="command">
+                <pre><code>unzip -l new.zip</code></pre>
+            </div>
+            
+            <h2>Append Content</h2>
+            <div class="command">
+                <p><strong>Append a file or directory to an existing ZIP file:</strong></p>
+                <pre><code>unzip -u new.zip content</code></pre>
+                
+                <p><strong>Append contents of a directory (non-recursively) to an existing ZIP file:</strong></p>
+                <pre><code>unzip -u new.zip content/*</code></pre>
+                
+                <p><strong>Append contents of a directory recursively:</strong></p>
+                <pre><code>unzip -ru new.zip content</code></pre>
+            </div>
+            
+            <h2>Delete Content</h2>
+            <div class="command">
+                <p><strong>Delete a specific file or directory from the ZIP file:</strong></p>
+                <pre><code>zip -d new.zip content</code></pre>
+                
+                <p><strong>Delete contents of a directory (non-recursively):</strong></p>
+                <pre><code>zip -d new.zip content/*</code></pre>
+                
+                <p><strong>Delete contents of a directory recursively:</strong></p>
+                <pre><code>zip -rd new.zip content</code></pre>
+            </div>
+            
+            <h2>Unzip Files</h2>
+            <div class="command">
+                <p><strong>Unzip a specific file from the ZIP archive:</strong></p>
+                <pre><code>unzip new.zip file</code></pre>
+                
+                <p><strong>Unzip a specific file to another file (using stdout , as <i>-p</i> is used to pipe the output):</strong></p>
+                <pre><code>unzip -p new.zip file > another_file</code></pre>
+                <pre><code>unzip -p new.zip test/dir/sub-dir/new.c > demo.c</code></pre>
+                
+                <p><strong>Unzip the entire archive:</strong></p>
+                <pre><code>unzip new.zip</code></pre>
+                
+                <p><strong>Unzip to a specified external directory:</strong></p>
+                <pre><code>unzip new.zip -d dir</code></pre>
+            </div>
+            
+            <h2>Use with `find` and Pipes</h2>
+            <div class="command">
+                <p><strong>Use `find` to create a ZIP file with files matching a pattern: (<i>-@<i> is use to read files from pipe)</strong></p>
+                <pre><code>find playground -name "file-A" | zip -@ file-A.zip</code></pre>
+                
+                <p><strong>Use `ls` and pipes to create a ZIP file from the output:(<i>-<i> is use to read files from pipe)</strong></p>
+                <pre><code>ls -l /etc/ | zip ls-etc.zip -</code></pre>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
