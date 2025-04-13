@@ -1,0 +1,48 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Incidient Planning</h1>
+<h2>Exercising</h2>
+<p>Before a real security event occurs, it's a good idea to conduct testing. This allows you to evaluate how well your responsibilities are documented and test your security skills. These tests should always be done on non-production systems to avoid affecting live operations.</p>
+<p>Time is often limited during these exercises, and participants usually have other responsibilities, so planning is key. The goal is to test your processes, procedures, and technical skills. After the exercise, it's important to review how it went. You may discover areas that need improvement, leading to changes in future response plans. This is why many organizations hold post-exercise evaluations to refine their procedures.</p>
+<h2>TableTop Exercise</h2>
+<p>At some point, an organization will want to test its entire disaster recovery plan. However, running a full-scale disaster drill takes time, money, and pulls people away from their regular jobs. A more manageable starting point is a tabletop exercise.</p>
+<p>In a tabletop exercise, everyone involved in the response process gathers around a table to walk through a specific scenario, discussing each step based on existing policies and procedures. This method doesn’t require setting up a full-scale simulation but still provides insight into how well your response plan works.</p>
+<p>These exercises can often be completed in just a few hours. Everyone talks through what they would do first, second, and so on. Since all the key players are present, you get real-time feedback on how each part of the organization would respond, helping you identify gaps or areas for improvement.</p>
+<h2>Simulation</h2>
+<p>One common real-world test is a simulated attack to observe how systems and users respond. For example, you might send phishing emails to see who clicks on them, call the help desk to request a password change, or try sending data outside the organization to test your monitoring tools.</p>
+<p>In larger organizations, phishing simulations are often conducted by security teams. These emails might ask users to click a link to update personal information or change a password—actions they should avoid. If someone clicks, the system logs the response and provides a report on who interacted with the email.</p>
+<p>When a third party sends the phishing simulation, it also tests your internal defenses. You can see how well your filters detect and block phishing attempts before they reach users. If someone does click, you can evaluate the performance of your anti-phishing systems and decide whether additional user training is necessary.</p>
+<h2>Root Cause Analysis</h2>
+<p>When a security incident occurs, it often consists of a series of smaller events that together make up a much larger breach. For instance, an attacker might exploit a vulnerability in a server, then begin transferring data, deploying malware, and performing additional actions across the network.</p>
+<p>To understand the full scope of the incident, it’s important to perform a root cause analysis. This helps identify how the attacker initially gained access and which security controls may have failed or were overlooked entirely. By reviewing logs, analyzing files left behind, and reconstructing the attack timeline, you can piece together how the intrusion occurred.</p>
+<p>In many cases, the compromise is not due to a single issue but a chain of vulnerabilities or oversights. It could involve multiple systems and several phases of attack. Human error, such as a user falling for a phishing scam, can also serve as an entry point.</p>
+<p>Recognizing and correcting these mistakes—whether technical or procedural—is critical to improving your defenses and preventing similar incidents in the future.</p>
+<h2>Threat Hunting</h2>
+<p>One proactive way to prevent attackers from exploiting vulnerabilities is through <strong>threat hunting</strong>—the continuous process of actively searching for signs of malicious activity within your environment before a breach occurs. Instead of waiting for alerts from automated systems, threat hunting involves a more hands-on approach to discovering weaknesses and signs of potential compromise.</p>
+<p>This could include:</p>
+<ul>
+<li>
+<p>Reviewing and adjusting <strong>firewall rules</strong> to block suspicious or unnecessary traffic.</p>
+</li>
+<li>
+<p>Staying current with <strong>newly disclosed vulnerabilities</strong> and applying patches promptly.</p>
+</li>
+<li>
+<p>Cross-checking <strong>your existing systems</strong> to ensure they’re properly updated and hardened.</p>
+</li>
+<li>
+<p>Looking for <strong>anomalous behavior</strong> in logs and network traffic that might signal an attacker probing for weak spots.</p>
+</li>
+</ul>
+<p>The main challenge is the reactive nature of most attacks—often you only know it’s happening once it starts. That’s why <strong>automation and monitoring tools</strong> are critical. Modern security solutions, like <strong>intrusion prevention systems (IPS), endpoint detection and response (EDR), and SIEM platforms</strong>, can automatically detect suspicious behavior, correlate data from different sources, and take action even when your team isn’t actively watching.</p>
+<p>When combined, <strong>manual threat hunting</strong> and <strong>automated detection</strong> give your organization a layered, more resilient defense—capable of identifying and mitigating threats early in the kill chain.</p></div>

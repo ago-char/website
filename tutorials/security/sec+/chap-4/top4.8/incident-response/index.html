@@ -1,0 +1,41 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h2>Security Incidents</h2>
+<p>Understanding how to handle security incidents is a key part of a security administrator’s job. These incidents can take many forms. A user might click an email attachment that runs an executable and installs malware. Your WAN connection could be overwhelmed by a distributed denial-of-service (DDoS) attack launched by global botnets. Attackers might steal or exfiltrate information and demand payment to keep it private. Or a user may install software that gives outsiders access to the internal network. Any of these issues can occur at any time, so you must always be prepared.</p>
+<h2>NIST SP800-61</h2>
+<p>If you're interested in how organizations manage these types of security issues, you may want to read the National Institute of Standards and Technology (NIST) Special Publication 800-61 Revision 2, titled <em>Computer Security Incident Handling Guide</em>. This document covers the full incident handling lifecycle, including preparation, detection and analysis, containment, eradication, recovery, and post-incident activities.</p>
+<h2>Preparing for an Incident</h2>
+<p>Before an incident occurs, extensive planning is essential. One key item to have is a list of communication methods, including an up-to-date contact list of everyone who should be informed when an incident happens. You should also prepare an incident go-bag containing the necessary hardware and software to handle various incidents. This could include laptops with specialized tools, removable media for data transfer, forensic software for system analysis, and a digital imaging system for capturing pictures and video.</p>
+<p>Additional helpful resources include server documentation, network diagrams, security baselines, and file hashes of critical files. It's also important to have tools ready to mitigate incidents—especially malware-related ones—such as a known good operating system image or application copies to replace compromised software. Most importantly, there should be clearly defined policies and procedures that everyone follows during a security incident.</p>
+<h2>The challenge of Detection</h2>
+<p>Detecting a security incident is not always straightforward. Different types of systems may be targeted, and it can be hard to determine from the file system alone whether an incident has occurred. Since internet-connected systems face constant attacks, it can be difficult to tell whether an event is just an automated script or a legitimate threat attempting to gain access. Even common incidents like malware infections can involve complex detection. That's why it's important to have clear policies and procedures for identifying incidents and knowing what actions to take when one is discovered.</p>
+<h2>Incident Analysis</h2>
+<p>There are likely many logs available right now that show attempts to attack your network. These logs can provide valuable information about where the attacks are coming from and what types of techniques are being used. For example, web server logs can reveal details when an attacker runs a vulnerability scan against your server.</p>
+<p>It's also important to track patch release schedules, such as Microsoft's monthly updates, so you can begin patching systems promptly and monitor for attacks targeting unpatched systems. In some rare cases, attackers may even contact you directly to announce their attempts to breach your network—an unusual but not unheard-of tactic in the hacking community.</p>
+<p>It's important to know when an attack is happening, and certain network indicators can help alert you in real time. For instance, your intrusion prevention system might flag a buffer overflow attempt against a server, or antivirus software may report malware installed on a user’s workstation.</p>
+<p>In some cases, an attacker may gain access and begin changing security configurations. With proper monitoring, you'll be alerted to these changes. A sudden spike in network traffic could also signal that an attacker is trying to exfiltrate large amounts of data from your network.</p>
+<h2>Isolation and Containment</h2>
+<p>If you find that an attack is underway, you should act quickly to stop it. This is not a situation where you should wait to see what the attacker might do. Some security systems allow you to test suspicious files in a sandbox—a closed environment where applications can be safely run and observed.</p>
+<p>For example, you can load malware into a sandbox, execute it, and analyze which parts of the operating system are affected. However, some malware is designed to behave differently in such environments. It might detect that it’s running inside a virtual machine with limited network access and, in response, delete itself to avoid detection.</p>
+<h2>Recovery After an Incident</h2>
+<p>Once the attack is over, we need to enter recovery mode. This involves removing any malicious software and replacing it with known good software. If malware is present, we may need to remove it or simply re-image the system. Any user accounts that were breached or created by the attacker should be disabled, and we must fix any vulnerabilities that allowed the attacker to gain access.</p>
+<p>If we have reliable backups, we can restore them to replace any compromised files. Alternatively, we may use original installation media to completely reinstall the operating system. The goal is to replace any compromised files and secure the system to prevent the attackers from returning.</p>
+<h2>Lessons Learned</h2>
+<p>After an attack is over, it's important to reflect on what happened and identify ways to improve for the next time. A good opportunity for this is the post-incident meeting. This meeting brings everyone together to discuss the incident, analyze what occurred, and develop strategies for handling similar situations more efficiently in the future.</p>
+<p>These meetings are most effective when held as soon as possible after the incident is resolved, allowing those involved to better recall the details. This way, you can create stronger plans and be better prepared when the next incident occurs.</p>
+<h3>Answer the tough questions</h3>
+<p>During the post-incident analysis, we should ask some tough questions, such as: What exactly happened during this incident? What was the timeline from the start of the incident to its resolution? It's also important to evaluate how well our planning process worked. We should review the documentation to see if the process we followed was the best approach for this situation.</p>
+<p>Based on this review, we can identify areas for improvement and integrate those changes into our planning process for the future. It may also be helpful to determine if we missed any indicators that could have warned us of the incident. If we did overlook something, we should adjust our monitoring to include additional indicators to better detect similar events next time.</p>
+<h2>Training for an Incident</h2>
+<p>All the planning and training for incident response must be done before an incident occurs. Once an incident is live on your network, it's too late for on-the-job training. Extensive documentation and testing of that documentation are necessary so that everyone knows their role during an incident. This includes understanding the initial response, the investigation process when an incident is identified, and the procedures for reporting sensitive information, among other things.</p>
+<p>In large organizations, especially those with multiple incident response teams, this training and planning process can be costly. However, the resources and money invested in training may ultimately save money when a major incident occurs.</p></div>

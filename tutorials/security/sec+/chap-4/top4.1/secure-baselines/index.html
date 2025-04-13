@@ -1,0 +1,71 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Secure Baselines</h1>
+<ul>
+<li>
+<p>Not only the application you are deploying be secure, but also the underlying baselines i.e. OS, vendor devices, firewall, etc. should be deployed or maintained to the best security practice.</p>
+</li>
+<li>
+<p>These should be performed often and create report regarding the check.</p>
+</li>
+</ul>
+<h2>Establish Baselines</h2>
+<ul>
+<li>
+<p>For deploying secure baselines, you first need to build one.</p>
+</li>
+<li>
+<p>Fortunately, these baselines are often vendor specific. For eg: if you are using windows OS, they have <a href="https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/windows-security-baselines">well documented security baselines practice</a>, and often similar with any product if it is switches, routers, software, etc.</p>
+</li>
+<li>
+<p>For that, you sould consider visiting specific manufacturer for reference.</p>
+</li>
+<li>
+<p>There are many policy regarding everthing, but you should filter security-related.</p>
+</li>
+</ul>
+<h2>Deploy Baselines</h2>
+<ul>
+<li>
+<p>Once you build baselines for security, you gonna have to deploy them.</p>
+</li>
+<li>
+<p>Often managed by centrally administrative console or utility like <code>iptables</code> for linux based system as firewalls, or so on.</p>
+</li>
+<li>
+<p>This may not be efficient and effective when in large no. of hosts, you may need multiple deployment mechanisms like : Active Directory policy, group policy, MDM, etc.</p>
+</li>
+<li>
+<p>While managing these is kind of tedious and overwhelming task, you should always look forward to automation when possible.</p>
+</li>
+</ul>
+<h2>Maintain baselines</h2>
+<ul>
+<li>
+<p>Security baselines are often best practices, but should regularly maintain them.</p>
+</li>
+<li>
+<p>Security baselines may require update if :</p>
+<ul>
+<li>A new vulnerability is discovered</li>
+<li>Application itself has updated</li>
+<li>New OS is installed/deployed</li>
+</ul>
+</li>
+<li>
+<p>This may not always be easy, because sometimes, existing things like software or hardware or even OS version, may not interact well with the application. You may require it to further modify, update or even change underlying infrastructure.</p>
+</li>
+<li>
+<p>Audit and Documentation is most.</p>
+</li>
+</ul></div>

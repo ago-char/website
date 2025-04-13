@@ -1,0 +1,179 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Analyzing Vulnerabilities</h1>
+<h2>False Positives</h2>
+<ul>
+<li>
+<p>Occur when the scanner flags something that is not actually a vulnerability.</p>
+</li>
+<li>
+<p>Can waste time and resources if not identified and managed properly.</p>
+</li>
+</ul>
+<h2>Low Severity</h2>
+<ul>
+<li>
+<p>Vulnerabilities that pose minimal risk.</p>
+</li>
+<li>
+<p>Typically may not require immediate attention but should still be monitored.</p>
+</li>
+<li>
+<p>Often not likely to be exploited in the short term.</p>
+</li>
+</ul>
+<h2>False Negatives</h2>
+<ul>
+<li>
+<p>Occur when the scanner fails to detect a real vulnerability.</p>
+</li>
+<li>
+<p>Can be risky because they give a false sense of security.</p>
+</li>
+<li>
+<p>Requires ongoing vigilance and a multi-layered security approach.</p>
+</li>
+</ul>
+<h2>Update Your Signatures</h2>
+<ul>
+<li>
+<p>Regularly updating vulnerability signatures is crucial to stay current with new threats.</p>
+</li>
+<li>
+<p>Ensure the scanner's fingerprinting mechanism is up-to-date to catch the latest vulnerabilities.</p>
+</li>
+</ul>
+<h2>Contact Manufacturer of Vulnerability Scanner</h2>
+<ul>
+<li>
+<p>If you're unsure about a vulnerability’s legitimacy, contact the manufacturer of the scanner.</p>
+</li>
+<li>
+<p>They can help determine whether the app is truly vulnerable or if the scanner's output is a false alarm.</p>
+</li>
+</ul>
+<h1>Prioritizing Vulnerabilities</h1>
+<ul>
+<li>
+<p>Not all vulnerabilities are the same; some are more critical than others.</p>
+</li>
+<li>
+<p>Use publicly available databases to help prioritize vulnerabilities.</p>
+</li>
+</ul>
+<h2>NIST</h2>
+<ul>
+<li>
+<p>Synced with CVE (Common Vulnerabilities and Exposures).</p>
+</li>
+<li>
+<p>Offers enhanced search functionality to help prioritize vulnerabilities.</p>
+</li>
+</ul>
+<h2>CVE</h2>
+<ul>
+<li>
+<p>Resources like <strong>nist</strong>, <strong>cve.mitre.org</strong>, and <strong>Microsoft security bulletins</strong> are reliable sources for prioritizing vulnerabilities.</p>
+</li>
+<li>
+<p>Vendor-specific advisories should also be checked regularly.</p>
+</li>
+</ul>
+<h2>Vulnerability Scanner DB</h2>
+<ul>
+<li>
+<p>Vulnerability scanners rely on signatures and fingerprints of apps to detect vulnerabilities.</p>
+</li>
+<li>
+<p>Ensure that the scanner's database is updated regularly to stay ahead of new vulnerabilities.</p>
+</li>
+</ul>
+<h1>Patch Planning</h1>
+<h2>Exposure Factor</h2>
+<ul>
+<li>
+<p>Represents the loss of value or business activity if the vulnerability is exploited.</p>
+</li>
+<li>
+<p>Expressed as a percentage.</p>
+</li>
+<li>
+<p>Example: If a DDoS attack could cause a server to be down 50% of the time, the exposure factor would be 50%.</p>
+</li>
+<li>
+<p>For a server with a vulnerability that could completely disable it, the exposure factor would be 100%.</p>
+</li>
+</ul>
+<h2>Environment Variables</h2>
+<ul>
+<li>
+<p>Not all environments are the same; some are on the cloud, some are on-premises, and others may be external, internal, or honeypots.</p>
+</li>
+<li>
+<p>Prioritize patching based on the environment:</p>
+<ul>
+<li>
+<p><strong>Public servers</strong> should be patched immediately.</p>
+</li>
+<li>
+<p><strong>Internal networks</strong> may have more time, especially if they are isolated from external threats.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2>Industry/Organizational Impact</h2>
+<ul>
+<li>
+<p>A vulnerability with a low priority may still require immediate attention if it impacts your organization's ability to operate.</p>
+</li>
+<li>
+<p>Different organizations will experience different impacts from the same vulnerability, depending on their infrastructure, operations, and tolerance for downtime.</p>
+</li>
+</ul>
+<h2>Risk Tolerance</h2>
+<ul>
+<li>
+<p>The amount of risk the organization is willing to accept for a particular vulnerability.</p>
+</li>
+<li>
+<p>Example: If exposure is low (e.g., 10%), the organization may decide to take the risk and delay patching.</p>
+</li>
+<li>
+<p>Risk tolerance is influenced by factors like:</p>
+<ul>
+<li>
+<p>Downtime and its financial impact</p>
+</li>
+<li>
+<p>The cost of patching and testing</p>
+</li>
+<li>
+<p>Potential gain vs. potential loss</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Testing Policy</strong>:</p>
+<ul>
+<li>
+<p>The extent of testing needed before deploying patches varies.</p>
+</li>
+<li>
+<p>Insufficient testing could lead to system crashes, while excessive testing could delay the patch and increase vulnerability.</p>
+</li>
+<li>
+<p>A balanced approach is required to minimize risks while keeping the organization operational.</p>
+</li>
+</ul>
+</li>
+</ul></div>

@@ -1,0 +1,206 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Application Security</h1>
+<h2>Secure Software Development Practices</h2>
+<h3>1. <strong>Security Patches and QA Process</strong></h3>
+<ul>
+<li>
+<p>Ensure <strong>security patches</strong> are installed regularly.</p>
+</li>
+<li>
+<p>Include <strong>security checks</strong> as part of the QA (Quality Assurance) process.</p>
+</li>
+<li>
+<p>Internal <strong>security researchers</strong> or <strong>ethical hackers</strong> may attempt to find and exploit vulnerabilities in a <strong>testing environment</strong> before the application is deployed.</p>
+</li>
+</ul>
+<hr />
+<h3>2. <strong>Developer-Level Security Checks</strong></h3>
+<h4>a. <strong>Input Validation</strong></h4>
+<ul>
+<li>
+<p>All input fields (forms, fields, etc.) must be validated.</p>
+</li>
+<li>
+<p>Example: A phone number field should accept <strong>only N digits</strong>, not more or less, to avoid buffer overflow vulnerabilities.</p>
+</li>
+<li>
+<p><strong>Manual testing</strong> each field is necessary, but may be time-consuming.</p>
+</li>
+<li>
+<p>Use <strong>automated testing tools</strong> that generate arbitrary data to test field behavior — this process is known as <strong>fuzzing</strong>.</p>
+</li>
+</ul>
+<h4>b. <strong>Cookies</strong></h4>
+<ul>
+<li>
+<p>Cookies are simple data files — not executable — but their <strong>contents can be exploited</strong>.</p>
+</li>
+<li>
+<p>Example: Session IDs in cookies can be used to hijack sessions if intercepted.</p>
+</li>
+<li>
+<p><strong>Do not store sensitive information</strong> (like credit card numbers) in cookies.</p>
+</li>
+<li>
+<p>Always use cookies:</p>
+<ul>
+<li>
+<p>Over <strong>HTTPS</strong></p>
+</li>
+<li>
+<p>In an <strong>encrypted</strong> format</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4>c. <strong>Static Code Analyzers (SAST)</strong></h4>
+<ul>
+<li>
+<p>Use <strong>Static Application Security Testing (SAST)</strong> tools to analyze source code and detect known vulnerabilities.</p>
+</li>
+<li>
+<p>These tools are helpful but not perfect:</p>
+<ul>
+<li>
+<p>Vulnerability databases may be outdated.</p>
+</li>
+<li>
+<p>Standard functions (e.g., <code>printf()</code>) may not be dangerous, but <strong>improper usage</strong> can cause issues (e.g., use <code>fprintf(stderr, ...)</code> or <code>perror()</code> for error messages).</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Always <strong>review false positives</strong> and <strong>manually verify critical findings</strong>.</p>
+</li>
+</ul>
+<hr />
+<h3>3. <strong>Malware Detection via Digital Signatures</strong></h3>
+<h4>a. <strong>Why It's Important</strong></h4>
+<ul>
+<li>
+<p>A seemingly legitimate application may contain <strong>injected malware</strong> if tampered with.</p>
+</li>
+<li>
+<p>Even if the app performs its intended task, it could pose a threat.</p>
+</li>
+</ul>
+<h4>b. <strong>Validation Process</strong></h4>
+<p><strong>On the Signer's Side:</strong></p>
+<ol>
+<li>
+<p>Generate a public/private key pair.</p>
+</li>
+<li>
+<p>Compute a hash of the file: <code>hash_value = SHA-256(file)</code></p>
+</li>
+<li>
+<p>Encrypt the hash with the private key: <code>signature = encrypt(hash_value)</code></p>
+</li>
+<li>
+<p>Attach the signature to the file or distribute it separately.</p>
+</li>
+</ol>
+<p><strong>On the Recipient's Side:</strong></p>
+<ol>
+<li>
+<p>Extract the signature.</p>
+</li>
+<li>
+<p>Retrieve the sender's certificate and public key.</p>
+</li>
+<li>
+<p>Hash the received file: <code>hash_value = SHA-256(file)</code></p>
+</li>
+<li>
+<p>Decrypt the signature using the public key: <code>original_hash = decrypt(signature)</code></p>
+</li>
+<li>
+<p>Compare both hashes:</p>
+<ul>
+<li>
+<p>If equal → <strong>Signature is valid</strong></p>
+</li>
+<li>
+<p>If not → <strong>File may be tampered with</strong></p>
+</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3>4. <strong>Sandboxing</strong></h3>
+<h4>a. <strong>Development Phase</strong></h4>
+<ul>
+<li>
+<p>Run the app in a <strong>sandboxed environment</strong> isolated from production.</p>
+</li>
+<li>
+<p>Limit access to:</p>
+<ul>
+<li>
+<p>System resources (CPU, memory)</p>
+</li>
+<li>
+<p>File system</p>
+</li>
+<li>
+<p>Network interfaces</p>
+</li>
+<li>
+<p>Permissions</p>
+</li>
+</ul>
+<h4>b. <strong>Deployment Phase</strong></h4>
+</li>
+<li>
+<p>Deploy the application on a <strong>dedicated VM</strong> separate from others.</p>
+</li>
+<li>
+<p>Many platforms, like <strong>mobile devices</strong>, have built-in sandboxing.</p>
+</li>
+<li>
+<p>Use OS features like <strong>UAC (User Account Control)</strong> or <strong>browser isolation</strong> to further enhance safety.</p>
+</li>
+</ul>
+<hr />
+<h3>5. <strong>Built-in Application Monitoring</strong></h3>
+<ul>
+<li>
+<p>Implement <strong>monitoring systems</strong> directly within the application:</p>
+<ul>
+<li>
+<p>Track usage, performance (CPU, memory), and user behavior.</p>
+</li>
+<li>
+<p>Log access times, user IDs, and actions.</p>
+</li>
+<li>
+<p>Send logs to centralized logging or SIEM systems.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Include:</p>
+<ul>
+<li>
+<p><strong>Alert systems</strong></p>
+</li>
+<li>
+<p><strong>Anomaly detection</strong></p>
+</li>
+<li>
+<p><strong>Protection</strong> against common attacks like SQL injection or buffer overflows</p>
+</li>
+</ul>
+</li>
+</ul></div>

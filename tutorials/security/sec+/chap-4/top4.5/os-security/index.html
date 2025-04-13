@@ -1,0 +1,29 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Operating System Security</h1>
+<h2>Active Directory (Windows)</h2>
+<p>If you're working in an environment with mini windows devices.Then you're probably taking advantage of active directory.Active directory is a database containing all of the different components of your network. This includes all of the computers and other devices on your network. Every user account is listed in the act of directory database list of the false shares and printers, the security groups.And anything else that makes up your network.</p>
+<p>Since all of this information is stored in a Central redundant database, we can manage all of our authentication from this Central resource. When a user needs to log in to a device or authenticate to another resource, they would use the username and password that is already defined in the active directory database. </p>
+<p>We can also use this database to assign access permissions. We can create a list of permissions. And assign those permissions to an individual user or we can create a group of users and assign those permissions to the entire group. If you're adding accounts, managing these access rights modifying passwords or removing accounts, you're probably performing all of those functions using active directory.</p>
+<p><img src="/pics/active-directory.png" alt="active-directory.png"></p>
+<h2>Group Policies (Windows)</h2>
+<p>We can also overlay a group of security policies on this list of computers and users that are stored in active directory. We refer to this as group policy and it allows us to set different configuration settings or permissions for each individual user or individual devices.</p>
+<p>This is usually run from a Central console known as the group policy management editor and allows us to configure log in scripts. When a user connects to the network, we can set up network configuration such as quality of service and of course, we can set security parameters that all of these devices and users must follow.</p>
+<p>This combination of active directory and group policy allows us to create a comprehensive mechanism for everything that's on our network. If you need to set a configuration setting for a particular device or you need to configure security policies for an individual user.You can perform all of those functions using group policy.</p>
+<p><img src="/pics/group-policy.png" alt="group-policy.png"></p>
+<h2>Security Enhanched Linux (SHLinux)</h2>
+<p>The Linux operating system by default works as a discretionary access control device. This means that the user has their own discretion to be able to assign rights and permissions to different resources in the Linux operating system.</p>
+<p>But in many highly secure environments, a discretionary access control is not appropriate. Instead, they would like to use mandatory access control where all of those rights and permissions are assigned by a Central administrator one way to provide this mandatory access control is to install a number of patches that enable security, enhanced Linux or SELinux. </p>
+<p>This allows the system administrator to take advantage up least privilege. This is where rights and permissions are associated with the users that allowed them to do exactly what their job tells and nothing more. This means that if there is some type of security issue, a breach or some type of malicious code, it will have a limited scope on what it's able to do on that Linux device.</p>
+<p>And like most things Linux related, SELinux is open source that can be downloaded and installed on many different Linux distributions.</p>
+<p><img src="/pics/SELinux.png" alt="SELinux.png"></p></div>

@@ -1,0 +1,32 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>File Integrity Monitoring (FIM)</h1>
+<p>Integrity is always concerned with the change. Some files in the system need or should not be change, unless, of course, they are updated from a valid source or manually. These includes executables, pre-loaded configs, libraries, etc. You could monitor them for integrity check.</p>
+<p>One simple way to do in host based is that, calculate the initiate <code>sha256sum</code> of these files, and if any changes in the app or file happens to be in place then that <code>sha256sum</code> will change. This way by simply running this checker as a service, you could even provide log to central database. But there are tools made for these such as : <a href="https://en.wikipedia.org/wiki/System_File_Checker">System File Checker</a> for windows, <a href="https://www.tripwire.com/">Tripwire</a> for linux based OS. Choose as per your need. There are many hosts based IPS that are shipped with the feature of FIM.</p>
+<h1>Data Loss Prevention (DLP)</h1>
+<p>Data loss prevention is a security solution that identifies and helps <strong>prevent unsafe or inappropriate sharing, transfer, or use of sensitive data</strong>. So, this can work on <em>host based, server based, network based</em>. It can help your organization monitor and protect sensitive information across on-premises systems, cloud-based locations, and endpoint devices.</p>
+<p>It can prevent data loss on the data that is at <em>rest</em> running as a software in the server itself. For data at rest, it is often considered to prevent and get logs of unauthorized access or something unusual happening to the data. For data in <em>use</em>, for eg : if someone is accessing important data or trying to copy sensitive data or may be screenshot, it can prevent those things. The real time blocking in association with NGFWs or IPS or standalone is the most important feature that DLP solutions provide. It moniters packets at real time and check if something sensitive is being sent accross the network or even at USB transfer, it depends on the type of DLP soultion you are using.</p>
+<h2>USB Blocking</h2>
+<p>This simply includes blocking USB devices at all or may be blocking sensitive file transfers over USB or may be allowing some files only. This is often used at endpoints coz, USB transfers at network are too rare and often not implemented. This could enforce Layer-8 i.e. policy that you are not allowed to bring any USB devices at your organization at all.</p>
+<h2>Cloud Based DLP</h2>
+<p>Of course, these days, many of our applications are not on our local devices or even in our local data center. Instead, they may be running in the cloud. And we also need data loss prevention solutions for cloud based applications.</p>
+<p>This is very similar to the DL piece solution that might run on a local workstation or network-based appliance. This is simply running as a cloud based appliance and is watching all of the traffic going in and out of a particular cloud based application instance. So if someone does try to transfer sensitive information into this cloud based storage, the cloud based DLP will recognize that data and block it before it stored in the cloud. </p>
+<p>Many of these cloud based deal piece solutions can also look for and block other types.  It's a traffic such as malware viruses and anything else that may seem malicious.</p>
+<p><img src="/pics/cloud-based-DLP.png" alt="cloud-based-DLP.png"></p>
+<h2>DLP and Email</h2>
+<p>One of the most common threat factors for sensitive information or data that should be blocked on the network with DLP is your email system. Email is a very easy way to send sensitive information across the network and you need a deal piece solution to block those messages from being sent from your organization.</p>
+<p>This email based DOP can look for sensitive information in outgoing emails or in incoming emails, and there are options available. If you run your email system locally in your own data center or if your email system runs in the cloud. </p>
+<p>For inbounding emails, the DLP can look for keywords that may make this email a bit suspicious. It can identify any emails that may be spoofed or maybe impostors. And all of these emails can. be quarantine so that they never arrive in the user's inbox.</p>
+<p>These solutions can also look at outbound email being sent by anyone in the organization. This can block fake wire transfer emails that are being sent back-and-forth. And if someone's trying to send W2 information, which should include social security numbers, they can block those as well, anything that is outbound. Email that appears to contain sensitive data can be blocked immediately using this email based DLP solution.</p>
+<p><img src="/pics/email-based-dlp.png" alt="email-based-dlp.png"></p>
+<p>This email based deal. Piece solution would have come in handy in November of 2016. When a Boeing company's employee sent their spouse, an email containing a spreadsheet. When they looked at the spreadsheet, it appeared to be blank. But in reality there were hidden fields in the spreadsheet that contained personal information for 36000 Boeing employees. This included their social security numbers, data birth and other sensitive information. An email based deal piece solution would have blocked that email. Ironically, Boeing sells its own version of the DLP software that was not used in this instance, normally that DLP is used on customer networks that have classified information.</p></div>

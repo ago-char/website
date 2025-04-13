@@ -1,0 +1,145 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Hardening Targets</h1>
+<ul>
+<li>
+<p>No system is safe or secure on their default configs, so you have to change it to best available practice.</p>
+</li>
+<li>
+<p>Hardening guides are avl in vendor website, manual. If not, people may have posted bulletin or discuss in the forums. Ask AI, if nothing avl.</p>
+</li>
+</ul>
+<h2>Mobile Device Hardening</h2>
+<ul>
+<li>
+<p>It is important to har
+  den mobile devices, this is because they are often always connected to internet.</p>
+</li>
+<li>
+<p>Hardening checklists, bug fix, updates, etc. are usually easily available, do it.</p>
+</li>
+<li>
+<p>Data segmentation is done logically (say business data at one location, user data at other), so if attacker happens to find one part of info may not necessarily gain access to another information.</p>
+</li>
+<li>
+<p>Often managed and monitor by MDM (<strong>Mobile Device Manager</strong>), this is because you will be monitoring multiple devices.</p>
+</li>
+</ul>
+<h2>Workstations Hardening</h2>
+<ul>
+<li>
+<p>Your Windows, Linux or Mac OS may have their own kind of security posture.</p>
+</li>
+<li>
+<p>Constantly monitor and update OS, applications, and firmwares installed on these OS, etc.</p>
+</li>
+<li>
+<p>You may wanna automate monthly updates, but you may also wanna check it in test environment and then push to producation one.</p>
+</li>
+<li>
+<p>For extra security, you may also wanna connect to Policy Mgt System like Active Directory in the network.</p>
+</li>
+<li>
+<p>The better security practice is to remove the application, software or service which are not in use as each of them are point of entry for attacker even if they have not known vulnerabilities.</p>
+</li>
+</ul>
+<h2>Network Devices Hardening</h2>
+<ul>
+<li>
+<p>Routers, Switch, etc. may not have particular day-day OS running, they will run their own OS (often vendor specific) to support particular task that they are trying to accomplish.</p>
+</li>
+<li>
+<p>Often, this is not easy task to get inside OS at low level.</p>
+</li>
+<li>
+<p>They do get security update very less often, so it is more essential to test and update as soon as you get information of update.</p>
+</li>
+<li>
+<p><strong>The most important is to change default creds</strong>. You may also have to connect them to external credential manager.</p>
+</li>
+</ul>
+<h2>Cloud Infrastructure Hardening</h2>
+<ul>
+<li>
+<p>You may have workstation that is particularly used for cloud administration, you may wanna apply additional security on those devices.</p>
+</li>
+<li>
+<p>You should have least privilege architecture (less right on service, network, application) on those device. You may wanna segment from mainstream network. Also cloud based applications be on least privelege.</p>
+</li>
+<li>
+<p>Your keys, passwords, 2FA to cloud be at secure location.</p>
+</li>
+<li>
+<p>You may wanna introduce, Endpoint Detection and Response (EDR), IPS/IDS technology to manage from central administrative console with the workstation connected to cloud.</p>
+</li>
+<li>
+<p>Eventhough, you are using cloud,  you should always have backups to different cloud and you may also wanna have own backup for most important data.</p>
+</li>
+</ul>
+<h2>Servers Hardening</h2>
+<ul>
+<li>
+<p>Servers computer are varied on size, OS, etc.</p>
+</li>
+<li>
+<p>Each should be monitored and applied correct solution depending on OS, application, etc.</p>
+</li>
+<li>
+<p>Close accounts not in use, apply minimum password requirements, isolate from internet if possible, etc.</p>
+</li>
+<li>
+<p>Keep up to date with latest version of anti virus and anti malware product.</p>
+</li>
+</ul>
+<h2>SCADA Hardening</h2>
+<ul>
+<li>
+<p>If you also have SCADA on your environment, you must be extra security sensitive.</p>
+</li>
+<li>
+<p>You may wanna isolate from main netowork and often place these systems in locations which are not directly visible from public point of view and obviously don't want it to connect to any internet.</p>
+</li>
+</ul>
+<h2>Embedded Systems Hardening</h2>
+<ul>
+<li>
+<p>It is very unlikely to get updates from embedded systems, even if then they may be difficult to update. But if you get one, you should update as they will be generally critical vulnerabilities.</p>
+</li>
+<li>
+<p>Segement them and prevent unauthorize access. You can keep them behind firewall and deploy security measures on firewall.</p>
+</li>
+</ul>
+<h2>Real-Time OS Hardening</h2>
+<ul>
+<li>
+<p>This is cruical because they does most important task in sensitive areas like : militery, car automation, automobiles, etc.</p>
+</li>
+<li>
+<p>You should protect them using builtin firewalls or others, external firewall.</p>
+</li>
+<li>
+<p>Isolating the system is equally important.</p>
+</li>
+</ul>
+<h2>IOT Devices Hardening</h2>
+<ul>
+<li>
+<p>You should connect IOT devices on their own but may not wanna provide internet access to them.</p>
+</li>
+<li>
+<p>Unlikely to get updates, but if you get, its crucial.</p>
+</li>
+<li>
+<p>Change defaults and segemt usuage and network.</p>
+</li>
+</ul></div>

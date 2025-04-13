@@ -1,0 +1,119 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Securing Wireless and Mobile</h1>
+<h2>Site Surverys for APs</h2>
+<ul>
+<li>
+<p>While doing surverys, you could identify <em>existing APs, channels and frequencies</em> that they are working on and then design our own landscape.</p>
+</li>
+<li>
+<p>You may not wanna use the frequencies that overlap. <code>1, 6, 11</code> does not overlap eachother, but if 2 APs are using same channel, then there may be problem.</p>
+</li>
+<li>
+<p>You could use tools like <code>NetSpot</code> or other 3rd party tools to identify signal coverage, potential interference and so on.</p>
+</li>
+<li>
+<p>Here is similar tool <code>nmcli</code> for linux which views on command line as :</p>
+</li>
+</ul>
+<pre><code>$ nmcli -f BSSID,SSID,CHAN,SIGNAL,BARS,RATE,SECURITY dev wifi
+
+BSSID              SSID                 CHAN  SIGNAL  BARS  RATE        SECURITY  
+5C:8C:30:4B:9C:A9  5G                   6     94      ▂▄▆█  130 Mbit/s  WPA1 WPA2 
+5C:8C:30:4B:9C:AD  NA                   149   78      ▂▄▆_  270 Mbit/s  WPA2      
+78:4F:24:5E:23:C3  durga@vianet         6     55      ▂▄__  130 Mbit/s  WPA1 WPA2 
+7A:4F:24:4E:23:C3  --                   6     54      ▂▄__  130 Mbit/s  WPA2      
+D8:B0:20:B0:09:29  lekhanath55_fbrtc_2  11    32      ▂▄__  130 Mbit/s  WPA2      
+F8:2E:3F:7D:A9:74  Bijita wifi          11    29      ▂___  130 Mbit/s  WPA1 WPA2 
+5C:A4:F4:FF:3C:86  doma@vianet          8     25      ▂___  130 Mbit/s  WPA2      
+DA:B0:20:C0:09:29  --                   11    25      ▂___  130 Mbit/s  WPA2      
+74:3C:18:C9:86:89  gopal999_fbrtc       9     24      ▂___  130 Mbit/s  WPA1 WPA2 
+78:4F:24:5E:23:C7  durga@vianet         36    24      ▂___  270 Mbit/s  WPA2      
+78:4F:24:F6:BA:39  ramesh@vianet        11    22      ▂___  130 Mbit/s  WPA1 WPA2 
+A0:8C:F8:A1:3B:38  jitendra823_wnepal   1     17      ▂___  130 Mbit/s  WPA1 WPA2 
+98:86:5D:BB:9A:81  566358@ClassicTech   6     15      ▂___  130 Mbit/s  WPA1 WPA2 
+5C:A4:F4:FF:3C:88  doma@vianet_5G       60    14      ▂___  270 Mbit/s  WPA2      
+</code></pre>
+<h2>Mobile Device Mgt ( MDM )</h2>
+<ul>
+<li>
+<p>Whether your org has policy of BYOD or COPE, your mobile devices as long as is morden or smart enough, can be managed using centralized console.</p>
+</li>
+<li>
+<p>This is important to set policies for using apps, camera, data, etc. because your devices will not only have your personal data, but also business data.</p>
+</li>
+<li>
+<p>MDM utilities like <strong>MaaS 360, AirWatch, DataJAR, MS Intune</strong>, etc. are able to set policies to control your whole device or part of it. Here is a screenshot from <em>microsoft intune MDM</em> :</p>
+</li>
+</ul>
+<p><img src="/pics/ms-intune-mdm.png" alt="ms-intune-mdm.png"></p>
+<ul>
+<li>So, for eg : these MDM are capable of disabling your camera, if you are in business premises but re-enable it, when you leave business premises.</li>
+</ul>
+<h3>Bring Your Own Device (BYOD)</h3>
+<ul>
+<li>
+<p>You should bring your personal device, but the device should meet the requirements of company. This is also referred as <strong>Bring Your Own Technology</strong>.</p>
+</li>
+<li>
+<p>It is quite hard to protect and set policies because of multiple data i.e. private and institutional;  Device will be at home, also at office, etc.</p>
+</li>
+<li>
+<p>Also, you have to consider what if employee wanna sell that device ? You have to ensure, data is transmitted to new device and fully erased from old one.</p>
+</li>
+</ul>
+<h3>Corporate Owned Personally Enabled (COPE)</h3>
+<ul>
+<li>
+<p>This is company owned device, but you will use it; depending on policy you are allowed or dis-allowed to keep your personal data.</p>
+</li>
+<li>
+<p>Company will have full control of device and information can be deleted at any time, so be careful while using such devices.</p>
+</li>
+<li>
+<p><strong>CYOD-Choose Your Own Device</strong>, is similar to COPE, here you will be given choice what type of device (linux, android, apple, etc.) you wish to keep.</p>
+</li>
+</ul>
+<h2>Cellular Networks Security</h2>
+<ul>
+<li>
+<p>Our mobile devices are always moving and connecting to a lot of cell towers for data transmisssion. </p>
+</li>
+<li>
+<p>Even if it is our mobile device, we don't have fully control over it because the cellular networks like 4G, 5G are provided by our provider to us and data or usuage can be subject to monitoring, location tracking, etc.</p>
+</li>
+</ul>
+<h2>Wi-Fi Security</h2>
+<ul>
+<li>
+<p>Even with Wi-Fi, attackers could set potential unencrypted rouge APs to capture your data and internet activity behaviour.</p>
+</li>
+<li>
+<p>You should always encrypt your data, either use known APs or use VPNs over unknown ones.</p>
+</li>
+<li>
+<p>Never connect to Wi-Fi or leave it ON, when unnecessary.</p>
+</li>
+</ul>
+<h2>Bluetooth Security</h2>
+<ul>
+<li>
+<p>Bluetooth is also most commonly used wireless technology for short distance connectivity for devices like smart watch, speakers, earpods, mouse, keyboard, etc. </p>
+</li>
+<li>
+<p>There is usually normal pairing process to bluetooth for the first time, afterwareds,  your bluetooth may connect automatically.        </p>
+</li>
+<li>
+<p>You should not connect to unknown ones, also have settings for <em>click required</em>, even if it is previously paired.</p>
+</li>
+</ul></div>

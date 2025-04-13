@@ -1,0 +1,43 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Multifactor Authentication</h1>
+<p>This often means the combination of Who you are and what are the other authentication factors.</p>
+<p>When you log in to a website, it's very common to have authentication model as:
+- Use a username and password. 
+- There might be a mobile app that provides a sudo random code.
+- Use your GPS location.</p>
+<p>We refer to these different types of log in parameters as authentication factors.And some very common authentication factors might be :</p>
+<ul>
+<li>Something you know</li>
+<li>Something you have </li>
+<li>Something you are  </li>
+<li>Somewhere you are </li>
+</ul>
+<p>Although these are very popular authentication factors.There are others you could use as well.</p>
+<h2>Something You Know</h2>
+<p>Something you know is probably one of the most popular authentication factors because this includes the password that you've memorized. Obviously, your password is made up of a string of characters or a particular phrase and it's something that's only known to you.</p>
+<p>Another good example is a Personal Identification Number (PIN). If you put your card into an ATM, you're commonly asked to provide a 4 digit pin. This personal identification number isn't written down anywhere. So it clearly would be something that only you know.</p>
+<p>And you might have a mobile phone or a tablet that uses some type of pattern to be able to unlock that system. This is also referred to as something you know, since you're the only one who knows the specific pattern that allows you access to that device.</p>
+<h2>Something You Have</h2>
+<p><img src="/pics/something-you-have.png" alt="something-you-have.png"></p>
+<p>Another type of authentication factor is something you have. For example, you might have an ID and that ID is part of a smart card. That smartcard can be inserted into a device and usually it's used in conjunction with a personalized identification number to provide multiple types of authentication. </p>
+<p>Another good example of something you have is a USB security key. The security key has a Certificate on that key that is specific to you. So if you plug in that key, it's assumed that that must be you because you're the only one with that USB drive.</p>
+<p>You might also have a hardware device that creates a seemingly randomized set of numbers, and those numbers are also duplicated on the server. So when you log in with the username of password, you might also be asked to input the number that happens to be on your hardware token. </p>
+<p>There are also software tokens available that you can use on your mobile phone you own. So that you don't have to carry around yet another device and carrying your phone with you also is something you have. And it's not uncommon to use SMS or text messages to send a code to your phone that you can use during the log in process.</p>
+<h2>Something You Are</h2>
+<p><img src="/pics/fingerprint.png" alt="fingerprint.png"></p>
+<p>A type of authentication factor that is very personal is something you are. This is commonly used with biometric authentication where you're using a fingerprint, a voice print or something else that is specific to you as a person. This works by storing a mathematical representation of the biometric. So a picture of your fingerprint itself is not being stored and compared, it's actually a mathematical representation of your fingerprint. This is also a very difficult type of authentication factor to change or modify. </p>
+<p>Since it's very difficult to change something like a voice print or fingerprint, and usually this type of authentication factor is used in conjunction with other factors at the same time, especially since we've seen situations where biometrics can be circumvented, so you may want to include this something you are along with one of the other authentication factors as well.</p>
+<h2>Somewhere You Are</h2>
+<p>Our mobile devices are very good at determining our location, and we can use that location information as an authentication factor we call somewhere you are, for example, if a log in is attempted from a country that's different than where you were 10 minutes ago, the system may not allow that log in to occur because it is checking on somewhere you are. </p>
+<p>We can also get an idea of where someone might be based on their IP address. This is not a perfect representation of where someone might be, and it becomes much more difficult when we start having much larger addresses such as the ones found with IP version 6 and of course, we could use multiple types of location services to determine where someone might be. We can query their IP address, Combine that with the GPS coordinates help understand where a person may physically be located. And once that Geo location process is complete, it can all be used as another authentication factor to allow you to log in to the system.</p></div>
