@@ -1,0 +1,4 @@
+alltohtml website
+frameworkforwebroot -md temp.md -html temp.html --forwebsite --blog
+find . -name 'index.html' -exec sed -i 's/others-sidebar/sec\+-sidebar/g' {} \;
+find . -name 'index.html' -exec sed -i 's/temp\/pics/pics/g' {} \;
