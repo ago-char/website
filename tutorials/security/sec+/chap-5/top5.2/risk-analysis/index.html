@@ -1,0 +1,249 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Risk Analysis</h1>
+<p>Several methods of analysing risk are described in this chapter. </p>
+<h2>Qualitative Risk Assessment</h2>
+<p>Instead of dealing on numbers to rate the level of risks, it deals with visual grid, for eg : <a href="https://citoolkit.com/articles/traffic-light-assessment/">Traffic light grid</a>, <a href="https://mudassiriqbal.net/probability-and-impact-matrix/">probability &amp; impact matrix</a>, etc.</p>
+<p><img src="/pics/traffic-light-risk-analysis.png" alt="traffic-light-risk-analysis.png"></p>
+<p>In the above example, it has shown analysis on traffic light grid basis where we can say <span style="color:green">Green</span> be low seveity, <span style="color:yellow">Yellow</span> be medium and <span style="color:red">Red</span> being high. For instance, the <em>impact</em> of having Legacy Windows Clients may have medium impact but that could bring a lot of security challenges (high) over the period of time and so having medium cost of controls. This can be displayed as overall risk to be HIGH.</p>
+<p>This gives us high level view to solve our problems, well the red areas to be improved first while green can wait.</p>
+<h2>Quantitative Risk Assessments</h2>
+<p>There may be certain risks where we can calculate a specific value. These are referred to as <strong>quantitative risk assessments</strong>. This process involves measurable components:</p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Abbr.</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Annualized Rate of Occurrence</strong></td>
+<td>ARO</td>
+<td>How often a risk is expected to occur in a year. Example: hurricanes are more likely in Florida than Montana.</td>
+</tr>
+<tr>
+<td><strong>Asset Value</strong></td>
+<td>AV</td>
+<td>The value of the asset to the organization, not just replacement cost—it may include impact on sales, reputation, etc.</td>
+</tr>
+<tr>
+<td><strong>Exposure Factor</strong></td>
+<td>EF</td>
+<td>The percentage of asset loss if the risk occurs. EF = 0.25 (25% loss), EF = 1.0 (total loss).</td>
+</tr>
+<tr>
+<td><strong>Single Loss Expectancy</strong></td>
+<td>SLE</td>
+<td>SLE = AV × EF → the cost of a single loss event.</td>
+</tr>
+<tr>
+<td><strong>Annualized Loss Expectancy</strong></td>
+<td>ALE</td>
+<td>ALE = ARO × SLE → the estimated yearly loss from that risk.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<ul>
+<li>
+<p><strong>Asset</strong>: Laptop</p>
+</li>
+<li>
+<p><strong>AV</strong> = $1000</p>
+</li>
+<li>
+<p><strong>EF</strong> = 1.0 (entire loss)</p>
+</li>
+<li>
+<p>→ <strong>SLE</strong> = $1000 × 1.0 = <strong>$1000</strong></p>
+</li>
+<li>
+<p><strong>ARO</strong> = 7 stolen laptops/year</p>
+</li>
+<li>
+<p>→ <strong>ALE</strong> = 7 × $1000 = <strong>$7000</strong></p>
+</li>
+</ul>
+<p>This helps determine the <strong>financial impact</strong> of a risk. However, it's important to remember that <strong>data on the laptops</strong> might be even more valuable than the devices themselves. That's why organizations also use <strong>qualitative risk assessments</strong> alongside quantitative ones.</p>
+<p>Here's a compact table that includes a <strong>quantitative risk assessment</strong> side-by-side with a <strong>qualitative risk evaluation</strong> for better clarity:</p>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>AV (Asset Value)</th>
+<th>EF (Exposure Factor)</th>
+<th>SLE (Single Loss Expectancy)</th>
+<th>ARO (Annualized Rate of Occurrence)</th>
+<th>ALE (Annualized Loss Expectancy)</th>
+<th>Qualitative Risk Impact</th>
+<th>Risk Likelihood</th>
+<th>Overall Risk Level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Laptop</td>
+<td>$1000</td>
+<td>1.0</td>
+<td>$1000</td>
+<td>7</td>
+<td>$7000</td>
+<td>High (sensitive data loss)</td>
+<td>Medium</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Web Server</td>
+<td>$5000</td>
+<td>0.5</td>
+<td>$2500</td>
+<td>2</td>
+<td>$5000</td>
+<td>Critical (public-facing)</td>
+<td>Low</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Customer DB</td>
+<td>$50,000</td>
+<td>0.2</td>
+<td>$10,000</td>
+<td>1</td>
+<td>$10,000</td>
+<td>Critical (PII leakage)</td>
+<td>Low</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Employee Email</td>
+<td>$500</td>
+<td>0.1</td>
+<td>$50</td>
+<td>20</td>
+<td>$1000</td>
+<td>Low (spam/phishing risk)</td>
+<td>High</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>HVAC System</td>
+<td>$2000</td>
+<td>0.25</td>
+<td>$500</td>
+<td>3</td>
+<td>$1500</td>
+<td>Moderate (disruption)</td>
+<td>Medium</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<h3>Legend for Qualitative Columns:</h3>
+<ul>
+<li>
+<p><strong>Qualitative Risk Impact</strong>: Assesses <strong>business or operational consequences</strong> if the asset is compromised.</p>
+</li>
+<li>
+<p><strong>Risk Likelihood</strong>: Subjective estimation (Low/Medium/High) of how likely the risk is to occur, based on non-numerical judgment.</p>
+</li>
+<li>
+<p><strong>Overall Risk Level</strong>: A combined interpretation of quantitative and qualitative analysis.</p>
+</li>
+</ul>
+<h2>Impact of Risk</h2>
+<p>We take into account a number of different impacts of events that may occur in our risk calculations. The most important of these is <strong>life</strong>. We want to be sure that everyone in the organization is safe. We can replace assets, but we can't replace people, so we usually put life at the very top of our concerns.</p>
+<p>We then also have to consider the impact to <strong>property</strong>. This includes the buildings and resources that we commonly use in our organization. We should also consider the impact of <strong>safety</strong>. If there is a risky event, what type of safety impact does it have on individuals and the company itself?</p>
+<p>There is also, of course, a <strong>financial</strong> impact. We discussed some of that with our quantitative analysis i.e. what the the final financial loss.</p>
+<h2>Likelihood and Probability of Risk</h2>
+<p>We've probably already seen that our risk calculations tend to take into account <strong>likelihood</strong> and <strong>probability</strong>. The <strong>likelihood</strong> of a risk is a <strong>qualitative</strong> value, so we might consider a risk to be <em>rare</em>, <em>possible</em>, <em>almost certain</em>, or use some other type of qualitative measurement.</p>
+<p><strong>Risk probability</strong>, on the other hand, tends to be a <strong>quantitative</strong> number, so we can associate a statistic or measurement to that specific risk. We often base this on historical performance, and in some cases, on expected future trends. These two terms are often used interchangeably, and sometimes we might even calculate a <strong>risk probability</strong> and then associate a <strong>likelihood</strong> label based on that value.</p>
+<p><img src="/pics/likelihood-probability.png" alt="likelihood-probability.png"></p>
+<h2>Risk Appetite and Tolerance</h2>
+<p>Not all risk requires an organization to act. There may be a certain amount of risk that the organization is willing to take. We refer to that value as <strong>risk appetite</strong>. Some organizations will set a qualitative value on this appetite and refer to it as a <strong>risk appetite posture</strong>. For example, they might look at a particular risk and say they are <em>conservative</em>, <em>neutral</em>, or <em>expansionary</em> toward that specific risk type.</p>
+<p>Another important value to consider is <strong>risk tolerance</strong>. This is often a larger variance than the risk appetite. An organization might have a low risk appetite but accept a slightly higher level of risk within the <strong>risk tolerance</strong> range.</p>
+<p>Here’s a practical analogy that differentiates between risk appetite and risk tolerance:</p>
+<ul>
+<li>
+<p>The <strong>speed limit</strong> on a highway is set at <strong>55 mph</strong>. This represents the <strong>risk appetite</strong> — the formal limit that balances safety and convenience.</p>
+</li>
+<li>
+<p>If you drive at <strong>60 mph</strong>, you are technically exceeding the risk appetite, but you may not be penalized. Law enforcement often won’t ticket until you’re going well beyond the speed limit — say <strong>65+ mph</strong>. That upper threshold represents the <strong>risk tolerance</strong>.</p>
+</li>
+<li>
+<p>This <strong>risk tolerance</strong> can also change. For example, during <strong>bad weather</strong>, the tolerance for speeding is reduced. Law enforcement may now view <strong>55 mph</strong> as risky and enforce stricter limits to ensure safety.</p>
+</li>
+</ul>
+<p>In summary:</p>
+<ul>
+<li>
+<p><strong>Risk Appetite</strong> = Desired/acceptable level of risk.</p>
+</li>
+<li>
+<p><strong>Risk Tolerance</strong> = Maximum risk allowed before taking action.</p>
+</li>
+<li>
+<p>Risk posture examples: <em>Conservative</em>, <em>Neutral</em>, <em>Expansionary</em>.</p>
+</li>
+</ul>
+<h2>Risk Register</h2>
+<p>It's not unusual for a project or an organization to maintain a list of risks associated with implementing a particular project. This list is typically documented in a <strong>risk register</strong>, where each risk is clearly defined so that all stakeholders understand the associated concerns.</p>
+<p>The purpose of the <strong>risk register</strong> is to:</p>
+<ul>
+<li>
+<p>Document each individual risk.</p>
+</li>
+<li>
+<p>Provide potential solutions or mitigation strategies.</p>
+</li>
+<li>
+<p>Assign accountability.</p>
+</li>
+<li>
+<p>Determine the acceptable <strong>risk threshold</strong>.</p>
+</li>
+</ul>
+<p>Check this out for example : </p>
+<p><img src="/pics/risk-register.png" alt="risk-register.png"></p>
+<p>Each line in the risk register includes a <strong>key risk indicator (KRI)</strong> — a metric or condition that signals potential risk (or description of risk). Examples of KRIs in a project might include:</p>
+<ul>
+<li>
+<p>Project purpose and need is not well-defined.</p>
+</li>
+<li>
+<p>Project design and deliverable definitions are incomplete.</p>
+</li>
+<li>
+<p>Project schedule is unclear or misunderstood.</p>
+</li>
+</ul>
+<p>For each KRI:</p>
+<ul>
+<li>
+<p>An <strong>owner</strong> is assigned — the person responsible for managing or overseeing that risk.</p>
+</li>
+<li>
+<p>A <strong>risk threshold</strong> is set — the level of risk the organization is willing to accept before corrective actions are required.</p>
+</li>
+</ul>
+<p>Finally, the organization must <strong>balance</strong>:</p>
+<ul>
+<li>
+<p>The <strong>cost of mitigating</strong> the risk.</p>
+</li>
+<li>
+<p>Against the <strong>potential impact</strong> or <strong>cost of the risk materializing</strong>.</p>
+</li>
+</ul>
+<p>This ensures that risk management is both effective and economically viable.</p></div>

@@ -1,0 +1,17 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/sec+-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Business Impact Analysis based on Recovery</h1>
+<p>When recovering from an outage, one of the most critical concerns for management is how long it will take to get operations back online. This is measured as the <strong>Recovery Time Objective (RTO)</strong>—the maximum acceptable amount of time required to restore business operations after a disruption. For instance, your RTO might only be met once both the database server and web server are fully operational.</p>
+<p>Another essential metric is the <strong>Recovery Point Objective (RPO)</strong>. This defines how much data loss is acceptable, measured as a point in time to which data must be recovered. For example, if your organization requires at least the last 12 months of customer data to be available, then restoring those 12 months from backup sets your RPO.</p>
+<p>In planning for outages, it's also important to consider how long it typically takes to resolve issues. This is measured by the <strong>Mean Time to Repair (MTTR)</strong>—the average time it takes to diagnose, acquire parts, install, and configure the replacement. Organizations can reduce MTTR by investing in spare equipment on-site or service contracts that guarantee rapid replacement, though this often involves higher upfront costs.</p>
+<p>Additionally, when evaluating hardware, you might come across the <strong>Mean Time Between Failures (MTBF)</strong>. This represents the expected operational lifespan of a system before another failure occurs. MTBF can be based on manufacturer estimates or real-world performance data. A rough calculation involves dividing total uptime by the number of failures, helping organizations assess risk and plan for future outages.</p></div>
