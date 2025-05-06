@@ -1,0 +1,213 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<title>Practical approach to non-repudiation</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>When You have your signature, you can't deny you have not sent the message</h1>
+<p><a href="https://en.wikipedia.org/wiki/Non-repudiation">Non-repudiation</a> in IT Security is the case where sending party can not deny that the package, message or any thing sent by him is not from him. This is because, the piece of message includes his signature which is only and only could be signed by him.</p>
+<p>This is as simple as that signature in cheque because only the real account holder will have that cheque and only he could sign it. Another example could be, if email has been sent from x@gmail.com, then the sender can't be y@gmail.com, this is simply because only <strong>X</strong> should have acess to that email. While sending email, the process of encrypting, signing, sending, receiving, decrypting, verifying, etc. happens automatically on behalf of you done by the application.</p>
+<p>Here, we have developed simple analogy and example to understand <strong>Non-Repuiation</strong>.
+In the example, <strong>Alice</strong> will send message to <strong>Bob</strong>.</p>
+<h2>You should have Key-Pair for both Alice and Bob</h2>
+<p>You can generate key pair using <code>openssl</code> as such :</p>
+<pre><code># Generate
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+
+# Extract public key
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+</code></pre>
+<h2>Each Party should have others party Public Key, and keep own private key to ownself</h2>
+<p>As Alice should have public key of Bob and vice versa. For this analogy, in Alice Directory there is his own private key and public key of Bob :</p>
+<pre><code>ls sender_alice/
+alice_private.pem  bob_public.pem
+</code></pre>
+<p>Which is oppose in case of Bob :</p>
+<pre><code>ls receiver_bob/
+alice_public.pem  bob_private.pem
+</code></pre>
+<h2>Alice sends the message using <code>send_msg</code></h2>
+<p>For the Alice to send the message to Bob, he should complete these steps :</p>
+<ol>
+<li>
+<p>Get or Create or Generate the Message to be sent.</p>
+</li>
+<li>
+<p>Calculate the length of  message, this will be initial header of combined message.</p>
+</li>
+<li>
+<p>Calculate the hash (digest) of message (using <em>sha256</em>)and store it on binary file.</p>
+</li>
+<li>
+<p>Sign the digest using own Private Key (<strong>step of non-repudiation</strong>) and store that signature as binary file.</p>
+</li>
+<li>
+<p>Combined the message to be 2+3+4 i.e. (<em>msg_len+msg+signature</em>).</p>
+</li>
+<li>
+<p>This combined message could have been sent and still get the intended result of non-repudiation, but message can easily be extracted and change to plain text. So, Generate random Key and IV (Initialization Vector) to be used on AES encryption.</p>
+</li>
+<li>
+<p>Encrypt that combined message (5) using AES encryption with the help of Key and IV generated at step 6. </p>
+</li>
+<li>
+<p>Well message is ready to be sent but, you need that AES key too, which can't be sent in plain, so encrypt AES key (key+IV) with the public key of Bob.</p>
+</li>
+<li>
+<p>Send both combined message and AES key to Bob.</p>
+</li>
+</ol>
+<p>The <code>send_msg</code> script is as follow :</p>
+<pre><code>#!/bin/bash
+# 0. Generate Keys for Alice
+# 0. Generate Keys for Bob
+
+# 1. Create the message
+
+if 
+&lt;a href=&quot;/temp/files/ $1 == &quot;help&quot; &quot;&gt; $1 == &quot;help&quot; &lt;/a&gt;
+; then
+    echo &quot;Usuage : $0 &lt;help|msg&gt;&quot;
+    echo &quot;Was This 'help' part of message ? If yes, it will be sent as message else exited(y/n) : &quot;
+    read -n 1 key
+    if 
+&lt;a href=&quot;/temp/files/ $key != &quot;y&quot; || $key != &quot;Y&quot; &quot;&gt; $key != &quot;y&quot; || $key != &quot;Y&quot; &lt;/a&gt;
+; then
+        echo
+        exit
+    fi
+fi
+
+msg=&quot;$*&quot;
+
+echo -n &quot;$msg&quot; &gt; message.txt
+
+# 2. Get the message length and create a 2-byte length header
+msg_len=$(wc -c &lt; message.txt)
+printf &quot;%04x&quot; $msg_len | xxd -r -p &gt; msglen.bin # 2B len because 2hex digit is 1 byte so 4 hex digit equals 2 bytes
+
+# 3. Create message digest (SHA-256) hash in binary
+openssl dgst -sha256 -binary message.txt &gt; message_digest.bin
+
+# 4. Sign the digest with Alice's private key
+openssl pkeyutl -sign -inkey alice_private.pem -in message_digest.bin -out signature.bin
+
+# 5. Combine message length + message + signature
+cat msglen.bin message.txt signature.bin &gt; combined_message.bin
+
+# 6. Generate AES key and IV (for encryption)
+openssl rand 32 &gt; aes_key.bin  # AES-256 key
+openssl rand 16 &gt; aes_iv.bin   # AES IV
+
+# 7. Encrypt the combined message with AES-256-CBC
+openssl enc -aes-256-cbc \
+ -in combined_message.bin \
+ -out encrypted_data.bin \
+ -K $(xxd -p -c 256 aes_key.bin) \ # -c 256 is used because this is one line, by defualt xxd view 16B per line which is not here the case, key(-K) is required in hex string, so xxd is used
+ -iv $(xxd -p -c 256 aes_iv.bin) # -c 256 is used for same reason, well you could have used 128, but who cares, just make it same for simplicity, well iv is required in hex so xxd is used
+
+# 8. Encrypt the AES key with Bob's public key
+cat aes_key.bin aes_iv.bin &gt; key_iv.bin
+openssl pkeyutl -encrypt -inkey bob_public.pem -pubin -in key_iv.bin -out encrypted_key_iv.bin
+
+# 9. Send both files to Bob (encrypted AES key + message)
+echo &quot;Sending to Bob:&quot;
+echo &quot;  encrypted_key_iv.bin&quot;
+echo &quot;  encrypted_data.bin&quot;
+mv ~/tmp/non-repudiation/sender_alice/encrypted_key_iv.bin ~/tmp/non-repudiation/sender_alice/encrypted_data.bin ~/tmp/non-repudiation/receiver_bob/
+
+# Clean up temporary files
+./revert
+</code></pre>
+<p>I believe the script is self explanatory with the comments. You may wonder why <code>mv</code> is used instead of sending. This is just to make it simple. You could have used named pipes or even sockets.</p>
+<h2>Bob reads the message using <code>receive_msg</code></h2>
+<p>For Bob, to read message sent by Alice, he should complete following steps :</p>
+<ol>
+<li>
+<p>Decrypt the AES Key using his private key, because it was encrypted using Bob's public key by Alice.</p>
+</li>
+<li>
+<p>That Key was combination of Key+IV, so split them.</p>
+</li>
+<li>
+<p>Decrypt the combined message with the Key and IV yeild from step 2.</p>
+</li>
+<li>
+<p>Extract the different components of message from combined message, which was (<em>msg_len+msg+signature</em>), so will be extracted in same order.</p>
+</li>
+<li>
+<p>As by now, Bob will have message, he will now generate the binary hash (digest) of that message.</p>
+</li>
+<li>
+<p>That hash is signed using Alice's private key. He do have Alice's public key and signature to extract the original hash (<strong>step of non-repudation</strong>), he will now calculate and compare with the hash generated at step 5 and finally if validated, he will read the message. He could read even if not verified, but he will not trust as it may have been compromised.</p>
+</li>
+</ol>
+<p>The <code>receive_msg</code> script is as follow :</p>
+<pre><code>#!/bin/bash
+
+# echo &quot;Step 1: Decrypting AES key and IV...&quot;
+openssl pkeyutl -decrypt -inkey bob_private.pem -in encrypted_key_iv.bin -out key_iv.bin
+if [ $? -ne 0 ]; then
+    echo &quot;Error: Failed to decrypt AES key and IV&quot;
+    exit 1
+fi
+
+# echo &quot;Step 2: Splitting key and IV...&quot;
+head -c 32 key_iv.bin &gt; aes_key.bin
+tail -c 16 key_iv.bin &gt; aes_iv.bin
+
+# echo &quot;Step 3: Decrypting message...&quot;
+openssl enc -aes-256-cbc -d \
+    -in encrypted_data.bin \
+    -out combined_message.bin \
+    -K $(xxd -p -c 256 aes_key.bin) \
+    -iv $(xxd -p -c 256 aes_iv.bin)
+if [ $? -ne 0 ]; then
+    echo &quot;Error: Failed to decrypt message&quot;
+    exit 1
+fi
+
+# echo &quot;Step 4: Extracting message components...&quot;
+# Read the first 2 bytes as message length
+msg_len_hex=$(head -c 2 combined_message.bin | xxd -p | tr -d '\n')
+msg_len=$((16#$msg_len_hex))  # Convert hex to decimal
+echo &quot;Message length: $msg_len bytes&quot;
+
+# Extract message, skip first 2 bytes because that is message length header
+dd if=combined_message.bin of=message.txt bs=1 skip=2 count=$msg_len 2&gt;/dev/null
+
+# Extract signature, skip 2+msg_len, because 2 bytes is message len header, msg_len is actual message, then the remaining is signature you are looking for
+dd if=combined_message.bin of=signature.bin bs=1 skip=$((2 + msg_len)) 2&gt;/dev/null
+
+# echo &quot;Step 5: Creating message digest...&quot;
+openssl dgst -sha256 -binary message.txt &gt; message_digest.bin
+
+# echo &quot;Step 6: Verifying signature...&quot;
+openssl pkeyutl -verify -pubin -inkey alice_public.pem -sigfile signature.bin -in message_digest.bin 
+
+# if status of previous command is success, means signature verification success else failed 
+if [ $? -eq 0 ]; then
+    # echo &quot;Signature verification successful!&quot;, no need to echo previous command automatically does that for you
+    echo &quot;Message from Alice:&quot;
+    cat message.txt
+    echo
+else
+    echo &quot;Tampred Message:&quot;
+    cat message.txt
+fi
+
+# Clean up temporary files
+./revert
+</code></pre>
+<p>You may have wondered why use of <code>./revert</code> in both cases. This is because, the script calculates various things and dump them as file which is not necessary. The uncessary files are deleted after sending or receiving message. If you argue, what could be inside that clenup script. Well, don't. This is open source :</p>
+<pre><code>#!/bin/bash
+shopt -s extglob
+rm !(alice*|bob*|send*|receive*|revert*)
+</code></pre>
+<h2>Final Words</h2>
+<p><strong>As you have seen what Alice will do to send the message and what Bob have to do in order to read the message. It is simple that both party requires their own private key in  order to sign or decrypt the message. So both party can't bargain that for Alice, he could not say that he has not sent the message because the message is decrypted and verified using his public key which could only be possible if the message is encrypted and signed with his private key. Similarly for Bob, he can't deny he has not read the message because the AES key i.e. encrypted by using Bob's public key can only be decrypted using his private key which he only has access to. Either way, it is the situation of NON-REPUDIATION.</strong></p></div>

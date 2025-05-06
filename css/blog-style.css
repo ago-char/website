@@ -111,7 +111,7 @@ p code, li code {
     background-color: var(--secondary-bg);
     padding: 0.2em 0.4em;
     border-radius: 3px;
-    color: var(--link-color);
+    color: var(--code-color);
 }
 
 pre code {

@@ -1,0 +1,140 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<title>Building Deb package for binaries</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>How To Build deb Packages for Linux Binaries/Executables</h1>
+<p>A deb file with <code>.deb</code> extention is an archive of files that contains control information, metadata, path to executable or binary. Deb files are handy when your app needs to take care of additional dependencies, integrate itself with the desktop, run pre and post install scripts and so on.</p>
+<h2>Features or Anatomy</h2>
+<p>A deb package contains a collection of folders that mimics a typical Linux file system. So, for example a binary file put into <code>&lt;.deb&gt;/usr/local/bin/binaryfile</code> will be installed to <code>/usr/local/bin/binaryfile</code>. </p>
+<p>Well, almost all deb package files follow a specific naming convention:</p>
+<pre><code>&lt;name&gt;_&lt;version&gt;-&lt;revision&gt;_&lt;architecture&gt;.deb
+</code></pre>
+<p>That is:</p>
+<ul>
+<li>
+<p><code>&lt;name&gt;</code> – the name of your application;</p>
+</li>
+<li>
+<p><code>&lt;version&gt;</code> – the version number of your application;</p>
+</li>
+<li>
+<p><code>&lt;revision&gt;</code> – the version number of the current deb package;</p>
+</li>
+<li>
+<p><code>&lt;architecture&gt;</code> – the hardware architecture your program will be run on.</p>
+</li>
+</ul>
+<p>For example, suppose you want to release your program called <em>hello</em>, version 1.0, built for 64-bit ARM processors. Your deb file name would look something like <code>hello_1.0-1_arm64.deb</code>.</p>
+<h2>Before creating the deb package</h2>
+<p>You will require to have <em>hello</em> binary before creating the deb package. Well, this is not the scope of this tutorial but the following is simple source for <code>hello.c</code> which can be complied to create the required binary.</p>
+<pre><code>#include&lt;stdio.h&gt;
+
+int main(){
+    printf(&quot;This is HELLO from RAYMOND RED REDINGTON!!\n&quot;);
+}
+</code></pre>
+<p>You can compile as such :</p>
+<pre><code>gcc hello.c -o hello
+</code></pre>
+<p>This will give you <em>hello</em> binary to work on.</p>
+<h2>Building deb package</h2>
+<h3>Create Working Directory</h3>
+<p>You can name anything you want, but as you should be used to with naming convention, it is better to follow the similar approach with <code>.deb</code> so :</p>
+<pre><code>mkdir hello_1.0-1_arm64
+</code></pre>
+<h3>Create location where you wanna place your binary</h3>
+<p>Create the internal directory where you wanna place your <em>hello</em> binary or where the user will be installing the binary. Let's make it simiple with <code>/usr/local/bin</code> :</p>
+<pre><code>mkdir -p hello_1.0-1_arm64/usr/local/bin
+</code></pre>
+<p>You gonna have to copy your binary <em>hello</em> to the above location :</p>
+<pre><code>cp ~/path/to/hello hello_1.0-1_arm64/usr/local/bin/
+</code></pre>
+<h3>Create the <code>control</code> file</h3>
+<p>The <code>control</code> file lives inside the <code>DEBIAN</code> directory. Mind the uppercase: a similar directory named <code>debian</code> (lowecase) is used to store source code for the so-called <a href="https://www.debian.org/doc/debian-policy/ch-source.html"><strong>source packages</strong></a>. This tutorial is about binary packages, so we don't need it.</p>
+<p>Let's create the <code>DEBIAN</code> folder first:</p>
+<pre><code>mkdir -p hello_1.0-1_arm64/DEBIAN
+</code></pre>
+<p>And then create the empty <code>control</code> file:</p>
+<pre><code>touch hello_1.0-1_arm64/DEBIAN/control
+</code></pre>
+<h3>Write control contents in <code>control</code> file</h3>
+<p>Each Debian package contains the master 'control' file, which contains control information regarding the installation of binary.</p>
+<p><a href="https://linux.die.net/man/5/deb-control">As listed in here</a>, the following are the mandetory fields to fill up :</p>
+<ul>
+<li>
+<p><code>Package</code> – the name of your program;|</p>
+</li>
+<li>
+<p><code>Version</code> – the version of your program;|</p>
+</li>
+<li>
+<p><code>Architecture</code> – the target architecture;|</p>
+</li>
+<li>
+<p><code>Maintainer</code> – the name and the email address of the person in charge of the package maintenance;|</p>
+</li>
+<li>
+<p><code>Description</code> – a brief description of the program.</p>
+</li>
+</ul>
+<p>For example:</p>
+<pre><code>Package: hello
+Version: 1.0
+Architecture: amd64
+Maintainer: agochar &lt;maharaja@doctorG.pastcast.com&gt;
+Description: Regards from the natorious criminal at the top of the FBI most WANTED list -&gt; RAYMOND RED REDINGTON
+</code></pre>
+<p>There are a lot of additional fields to be filled up if you are building the <code>.deb</code> professionally because of <a href="https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps">binary dependencies</a> that will require before installation, at the time of installation and even after installation. But for the process to be as simple as it could be for you to get minimal understanding, this is the required for our <em>hello</em> binary.</p>
+<h3>Invoke <code>dpkg-deb</code> to build actual package</h3>
+<p>This is the last step. Invoke <code>dpkg-deb</code> as following:</p>
+<pre><code>dpkg-deb --build --root-owner-group &lt;package-dir&gt;
+</code></pre>
+<p>So in our example:</p>
+<pre><code>dpkg-deb --build --root-owner-group hello_1.0-1_arm64
+</code></pre>
+<p>The <code>--root-owner-group</code> flag makes all deb package content owned by the root user, which is the standard way to go. Without such flag, all files and folders would be owned by your user, which might not exist in the system the deb package would be installed to.</p>
+<p>The command above will generate a nice <code>.deb</code> file alongside the working directory or print an error if something is wrong or missing inside the package. If the operation is successful you have a deb package ready for distribution.</p>
+<h2>Testing Phase</h2>
+<p>It's a good idea to test your deb package once created. You can install it like any other regular deb package:</p>
+<pre><code>sudo dpkg -i &lt;package&gt;
+</code></pre>
+<p>Make sure it can be also uninstalled easily. You can just remove the package:</p>
+<pre><code>sudo dpkg -r &lt;appname&gt;
+</code></pre>
+<p>or remove it along with the configuration files (if any):</p>
+<pre><code>sudo dpkg -P &lt;appname&gt;
+</code></pre>
+<p>Make sure the application has been removed correctly by issuing:</p>
+<pre><code>dpkg -l | grep &lt;appname&gt;
+</code></pre>
+<p>The <code>dpkg -l</code> command lists all the packages installed, while <code>grep</code> searches for <code>&lt;appname&gt;</code>. The output should be blank if the app has been uninstalled correctly.</p>
+<p>So, In our example these are the series of commands to test :</p>
+<pre><code># install binary
+sudo dpkg -i hello_1.0-1_arm64
+
+# verify installation, this should should hello package
+dpkg -l | grep hello
+
+# remove it
+sudo dpkg -r hello
+
+# verify removal, results should be empty
+dpkg -l | grep hello
+</code></pre>
+<h2>Taking care of external dependencies</h2>
+<p>You can generate them automatically with <code>dpkg-shlibdeps</code>. It will parse your binary and look for external symbols. At the time of writing, that tool doesn't seem to work out of the box. For some unknown (to me) reasons it wants the <code>debian/control</code> file to be present in the working directory – that's for source packages, remember? The workaround here is to create it, then move into the working folder and run:</p>
+<pre><code>dpkg-shlibdeps -O path/to/binary/file
+</code></pre>
+<p>The <code>-O</code> flag will print dependencies on the standard output. Copy the output and paste it in the <code>Depends</code> section of your <code>DEBIAN/control</code> file. You can get rid of the <code>debian/control</code> file once done. I'm pretty sure there are better ways for this, though: I will update the article once I get additional information on this step.</p>
+<h2>Run scripts before or after package installation and removal</h2>
+<p>Four files: <code>postinst</code>, <code>preinst</code>, <code>postrm</code>, and <code>prerm</code> are called <em>maintainer scripts</em>. Such files live inside the <code>DEBIAN</code> directory and, as their names suggest, <code>preinst</code> and <code>postinst</code> are run before and after installation, while <code>prerm</code> and <code>postrm</code> are run before and after removal. They must be marked as executables. Also, remember to set permissions: must be between <code>0555</code> and <code>0775</code>.</p>
+<h1>REFERENCES</h1>
+<p><a href="https://www.internalpointers.com/post/build-binary-deb-package-practical-guide">Building binary deb packages: a practical guide</a></p>
+<p><a href="https://linux.die.net/man/5/deb-control">deb-control man page</a></p></div>
