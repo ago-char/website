@@ -93,7 +93,8 @@ function highlightSidebar() {
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("pre").forEach(preBlock => {
         const button = document.createElement("button");
-        button.innerText = "cp";
+        // button.innerText = "cp";
+        button.innerText = "📋";
         button.classList.add("copy-btn");
         preBlock.style.position = "relative"; // Ensure relative positioning
         preBlock.appendChild(button);
@@ -102,7 +103,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const code = preBlock.querySelector("code").innerText;
             navigator.clipboard.writeText(code).then(() => {
                 button.innerText = "Copied!";
-                setTimeout(() => button.innerText = "cp", 2000);
+                // setTimeout(() => button.innerText = "cp", 2000);
+                setTimeout(() => button.innerText = "📋", 2000);
             }).catch(err => {
                 console.error("Failed to copy text: ", err);
             });

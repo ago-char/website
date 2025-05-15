@@ -1,0 +1,226 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Local Security</h1>
+<p>In simple terms, Local security addresses the problem of attacks that require the attacker to be able to do something on the system itself for the purpose of gaining root access
+(administrative access).</p>
+<h2>Risk of SetUID Apps NOT CHECKING FILES  PROPERLY</h2>
+<p>You can't say always but many apps or programs you use today creates temporary files, usually at <code>/tmp</code>. There is nothing wrong with this, as programs may need to save the output temporarily or may be user exit before saving output or may be some other reasonable reason. </p>
+<p>The real question is that does the application check that temporary file has been created by own application before start writing, or before opening ? Does it check the permission or symlink that file points to ? <strong>WHY is it IMPORTANT ?</strong></p>
+<p>Look at the applicaiton (example) source code :</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+int main(){
+
+    FILE *fp = fopen(&quot;/tmp/practice/attackerfile&quot;, &quot;w&quot;);
+    if (!fp){
+        fprintf(stderr, &quot;You may not have permissions to open this file '/tmp/practice/attackerfile'\n&quot;);
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(fp, &quot;Your FILE has been corrupted by our Attack!!\n&quot;);
+    printf(&quot;YOU HAVE BEEN HACKEED !! \n&quot;);
+    return 0;
+}
+</code></pre>
+<p>This code state that the <code>vulnerbale</code> program, created by compling this code, will not check for any pre-existent file named <code>attackerfile</code>. <strong>The most important fact is that the <code>vulnerable</code> app will rull with SetUID <em>root</em> access.</strong> This means when the file is opened, the previous content will disappear. Ok, it is temp file, so what's wrong ?</p>
+<p>Imaging attacker or someone on the system creating file <code>attackerfile</code> symbolic link to <code>/etc/passwd</code>, that's it. When you run application, it is actually opening <code>/etc/passwd</code> and writing the content to it. This means, <code>/etc/passwd</code> is corrupted and attacker can use it in his leverage.</p>
+<h3>What should the app do ?</h3>
+<p>The program or app should update. It should check the ownership, permissions, any symlink or any other parameters before opening and writing even in temp files because the application should know that it is running with elevated privileges.</p>
+<h3>What can you do ?</h3>
+<p>If attacker is already in your system, well you may not know that. But obviously will know that your files has been corrupted. If you came accross, this application is doing such, you should kick the app out analysing the cost effictiveness. If you have the source code and enough knowledege to develop from there, you are welcomed.</p>
+<h3>Finding Apps with SetUID and SetGID</h3>
+<p>You can just use <code>find</code> :</p>
+<pre><code># for SetUID
+find / -perm -4000 -ls
+# for SetGID
+find / -type f -perm -2000 -ls
+</code></pre>
+<p>Analyze as much as application and its behaviour you can. My tip is you should at least trust application like <code>mount</code>, <code>ping</code>. Well it's in you, you may wanna review source code of these programs, you are warmly welcomed.</p>
+<p>This is what the SetUID program looks like :</p>
+<pre><code>ls -l myprogram
+-rwsr-xr-x. 1 root root 43160 Jul 13 2018 myprogram
+</code></pre>
+<p>See that <code>s</code> in the fourth place. </p>
+<p>For a single file, you can say :</p>
+<pre><code>stat -c '%A %a %n' `which mount`
+-rwsr-xr-x 4755 /bin/mount
+</code></pre>
+<p>Here <code>4XXX</code> suggests, it is SetUID, well <code>s</code> is already there.</p>
+<h2>Why removing unnecessary programs, apps, processess, services, etc. are important ?</h2>
+<p>There is no ponit in keeping any apps, programs, processess, services, etc. when are not and will not be use in near feature even if you trust it. This is because even if the program is not doing anything, or being idle; it is still consuming disk, memory, some cpu. Well you can control amount of memory, cpu the process/app will be taking. But this require headache, <strong>Do you want headache for no gain ?</strong> </p>
+<ul>
+<li>
+<p>First of all, don't install what is not needed. If you are not using, do cleanup.</p>
+</li>
+<li>
+<p>Goto <strong>Settings-&gt;Apps</strong> to see the list of GUI apps installed. Check and remove if not necessary.</p>
+</li>
+<li>
+<p>A lot of binaries recide in different locations, but standard location is <code>bin/</code>, this is annoying but try :</p>
+</li>
+</ul>
+<pre><code>sudo find / -type d -name 'bin'
+</code></pre>
+<p>This will give you standard location of binaries, Visit suspicious locations or the locations of the application internal bin which you are not using.</p>
+<ul>
+<li>Services :</li>
+</ul>
+<pre><code># running services, active ones
+systemctl list-units --type=service --state=running
+# startups services
+systemctl list-units --type=service --state=running | grep enabled
+</code></pre>
+<p>Examine, spot remove or disable.</p>
+<ul>
+<li>Processes :</li>
+</ul>
+<pre><code>ps auxww
+</code></pre>
+<p><strong>THE MOST IMPORTANT IS <em>TO GET THE FEEL THAT SOMETHING WENT WRONG</em> AND IF YOU GET THAT FEELING THEN GO CHECK PROCESS/APP/SERVICE, ETC. RELATED TO IT.</strong></p>
+<h2>What should be your default RunLevel ?</h2>
+<p>If you are normal user doing a good amount of stuffs on GUI apps, you should have the <strong>GUI-mdoe</strong>. But if you are server, which require no work in GUI, you should be working in <strong>text-mode</strong>. This gets as simple as that.</p>
+<p>Let me remind you : </p>
+<p><code>graphical.target</code> ==&gt; GUI mode</p>
+<p><code>multi-user.target</code> ==&gt; Text mode</p>
+<ul>
+<li>Your default runlevel :</li>
+</ul>
+<pre><code>systemctl get-default
+</code></pre>
+<ul>
+<li>Switch into Text-mode : (no reboot, instant)</li>
+</ul>
+<pre><code>sudo systemctl isolate multi-user.target
+</code></pre>
+<p>You might get black screen, to get the console back, you may need : <strong>Alt+F1</strong>, <strong>Alt+F2</strong>, etc.</p>
+<ul>
+<li>Switch back to GUI mode : (no reboot, instant)</li>
+</ul>
+<pre><code>sudo systemctl isolate graphical.target
+</code></pre>
+<p>You will get your GUI login prompt.</p>
+<ul>
+<li>Set default runlevel :</li>
+</ul>
+<pre><code>sudo systemctl set-default {graphical.target|multi-user.target}
+</code></pre>
+<h2>How <em>chroot</em> environment could be a way of reducing risk ?</h2>
+<p>A chroot environment will protect against accessing files outside
+of the directory, but it does not protect against system utilization, memory access,
+kernel access, and interprocess communication. This means that if there is a security
+vulnerability that someone can take advantage of by sending signals to another
+process, it will be possible to exploit it from within a chroot environment. In other
+words, chroot is not a perfect cure, but is rather more of a deterrent.</p>
+<blockquote>
+<p>If any application runs in <em>chroot jail</em>, it only sees the files in that world. Meaning that for others the root may be <code>/</code>, but if you are chrooted at <code>/jail/</code>, for you or for the app the root is <code>/jail</code>. Now if the application wanna access <code>/bin/named</code>, the real file must be in <code>/jail/bin/named</code>. It does not see the real <code>/bin/named</code> because for the app, root is <code>/jail</code> and not <code>/</code>. Hope you get it.</p>
+</blockquote>
+<p>The idea behind the <strong>jailing</strong> is quite simple. Imagine SetUID application with the vulnerability of being able to modify <code>/etc/shadow</code>. If this app is in open environment and if attacker could attack this flaw, he should be able to modify <code>/etc/shadow</code>, but if it has been run in it's own environment, the <code>/jail/etc/shadow</code> will get modified which possess low risk than of that important file.</p>
+<h3>Confining or Limiting your binary in chroot jail</h3>
+<p>This is just an example of no use. But you will get the idea.</p>
+<ul>
+<li>Let's create the directory for chroot jail :</li>
+</ul>
+<pre><code>mkdir myroot
+</code></pre>
+<ul>
+<li>We want <code>/bin/bash</code> to be inside our jail, So : </li>
+</ul>
+<pre><code>mkdir -p myroot/bin
+cp /bin/bash myroot/bin/
+</code></pre>
+<ul>
+<li>Let's copy <code>ls</code> to our path too, this will be used for test purpose :</li>
+</ul>
+<pre><code>cp $(which ls) myroot/bin/
+</code></pre>
+<ul>
+<li>Run <code>bash</code> in chroot environment :</li>
+</ul>
+<pre><code>sudo chroot . /bin/bash
+chroot: failed to run command ‘/bin/bash’: No such file or directory
+</code></pre>
+<p>Wait, What ? We have alredy copied binary ? </p>
+<ul>
+<li>Here is the catch, it requires dependencies/libraries also be there.  So dependencies for <code>bash</code> and <code>ls</code> :</li>
+</ul>
+<pre><code>ldd bin/bash bin/ls
+</code></pre>
+<p>Will result in : </p>
+<pre><code>bin/bash:
+    linux-vdso.so.1 (0x00007fea2f4db000)
+    libtinfo.so.6 =&gt; /lib/x86_64-linux-gnu/libtinfo.so.6 (0x00007fea2f31c000)
+    libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007fea2f000000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007fea2f4dd000)
+bin/ls:
+    linux-vdso.so.1 (0x00007868bceb2000)
+    libselinux.so.1 =&gt; /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007868bce41000)
+    libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007868bcc00000)
+    libpcre2-8.so.0 =&gt; /lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007868bcb66000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007868bceb4000)
+</code></pre>
+<ul>
+<li>They should be copied as exact path, So let's create directories for <strong>lib</strong> and <strong>lib64</strong> :</li>
+</ul>
+<pre><code>mkdir lib lib64
+mkdir -p lib64/x86_64-linux-gnu
+</code></pre>
+<ul>
+<li>Now copy all those dependencies one by one :</li>
+</ul>
+<pre><code>cp /lib/x86_64-linux-gnu/libtinfo.so.6 lib/x86_64-linux-gnu/libtinfo.so.6
+cp /lib/x86_64-linux-gnu/libc.so.6 lib/x86_64-linux-gnu/libc.so.6
+cp /lib64/ld-linux-x86-64.so.2 lib64/ld-linux-x86-64.so.2
+cp /lib/x86_64-linux-gnu/libselinux.so.1 lib/x86_64-linux-gnu/libselinux.so.1
+cp /lib/x86_64-linux-gnu/libc.so.6 lib/x86_64-linux-gnu/libc.so.6
+cp /lib64/ld-linux-x86-64.so.2 lib64/ld-linux-x86-64.so.2
+cp /lib/x86_64-linux-gnu/libpcre2-8.so.0 lib/x86_64-linux-gnu/libpcre2-8.so.0
+</code></pre>
+<ul>
+<li>Try again to go in chroot :</li>
+</ul>
+<pre><code>sudo chroot . /bin/bash
+</code></pre>
+<ul>
+<li>I get the following console, and series of command I tried :</li>
+</ul>
+<pre><code>bash-5.2# ls
+bin  lib  lib64
+bash-5.2# whoami
+bash: whoami: command not found
+bash-5.2# pwd
+/
+bash-5.2# exit
+exit
+</code></pre>
+<p>I got the prompt as <code>bash-5.2</code> because, it is default if you don't have <code>.bashrc</code>.
+<code>ls</code> is the one we copied. No problem there.
+<code>whoami</code> is not copied, so can't execute.
+<code>pwd</code> is not copied, but can execute because it is part of <code>bash</code> built-in, so is <code>exit</code> to exit.</p>
+<p>You get the idea, <strong>chrooting</strong> means to be in jail. The others commands or directories are not visible on that environment.</p>
+<p>Another thing is that, it is not necessary to invoke <code>bash</code>. If your application does not want, don't even put that on the enviroment. Say you want <code>test</code> which simply prints <strong>HI</strong>, then just put that on <code>/bin/</code> as :</p>
+<pre><code>cp testprogram myroot/bin/
+</code></pre>
+<p>Remember to check for the libraries and put them in appropriate directory for the program <code>testprogram</code> to be able to run and run the program :</p>
+<pre><code>sudo chroot myroot test
+</code></pre>
+<p>This will output :</p>
+<pre><code>HI
+</code></pre>
+<h2>Limiting Resources</h2>
+<p>You should see <a href="https://phoenixnap.com/kb/ulimit-linux-command">how to limit resources using ulimit</a>.
+The same thing can be achieved by editing <a href="https://linux.die.net/man/5/limits.conf">limits.conf</a>.</p>
+<h2>AppArmor</h2>
+<p>A seperate blog will be dedicated to this topic.</p>
+<h2>Monitor your System</h2>
+<p><a href="http://doctorg.pastcast.com:8080/tutorials/logs/rsyslog/">rsyslog</a></p>
+<p><a href="http://doctorg.pastcast.com:8080/tutorials/monitoring-system/nagios/">Install nagios</a></p>
+<p><a href="http://doctorg.pastcast.com:8080/blogs/posts/monitor-windows10-using-ssh/">Basic Monitoring</a></p></div>

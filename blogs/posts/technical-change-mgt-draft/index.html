@@ -1,0 +1,258 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<title>Chagne MGT in IT - installing firewall</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>How Techinical Change Mgt is done ?</h1>
+<p>You should <a href="https://www.atlassian.com/itsm/change-management">read this article</a> to know how actually change management is done in IT sector. For the sake of time, following is summary of steps :</p>
+<ol>
+<li>
+<p>Someone issues <strong>Change Request</strong></p>
+</li>
+<li>
+<p>Someone responsibe will <strong>Review Change Request</strong></p>
+</li>
+<li>
+<p>While reviewing, the team may create <strong>Change Plan</strong></p>
+</li>
+<li>
+<p><strong>Change Request be Approved or Denied</strong> by reviewer or Change Advisory Board</p>
+</li>
+<li>
+<p>If approved, <strong>Change will be implemented</strong></p>
+</li>
+<li>
+<p>Implemented changed will be <strong>Reviewed and Closed</strong></p>
+</li>
+</ol>
+<h2>Change Scenario</h2>
+<p><em><strong>Install and configure a firewall (UFW) on a Linux server to enhance security.</strong></em></p>
+<h3>1 : Change Request</h3>
+<p>You can download or create your own <a href="https://www.smartsheet.com/content/change-request-form-templates">templete for change request from here</a>. But for time being and to keep it simple, the form I will show will be in <code>.txt</code> file format. Let's name it as <code>CR-2025-05-07-ufw-implement.txt</code>. The name pretty much describes what the change request is for. This looks like :</p>
+<pre><code>Change ID: CR-2025-001
+Title: Install and configure UFW Firewall on Ubuntu Server
+Type: Standard
+Submitted by: James Hostage
+Employee Title: System Admin for Ubuntu Server (A-100)
+Date Submitted: 2025-05-07
+
+Risk Level: Low
+Impact Level: Medium
+Impacted Services: None (initial implementation)
+Change Window: Between 2025-05-08 and 2025-05-10
+Implementation Time: 02:00 - 03:00 (Office Break)
+Reason: Enhance server security
+
+Implementation Steps (init.sh script at Attachments):
+  1. Install UFW using apt
+  2. Allow OpenSSH (UFW will implicitly deny everthing others)
+  3. Enable UFW
+
+Rollback Plan (revert.sh script at Attachments):
+  4. Disable UFW
+  5. Remove UFW
+
+Code Aval at : github.com/company/CR/ufw
+
+Attachments :
+  1. init.sh
+  2. revert.sh
+
+Approval: Pending
+Status: Draft
+
+------------
+Approved BY :
+</code></pre>
+<p>Attachments :</p>
+<pre><code>#!/bin/bash
+
+# init.sh
+echo &quot;Installing UFW...&quot;
+sudo apt update &amp;&amp; sudo apt install ufw -y
+
+echo &quot;Allowing SSH...&quot;
+sudo ufw allow OpenSSH
+
+echo &quot;Enabling UFW...&quot;
+sudo ufw enable
+
+echo &quot;UFW Status:&quot;
+sudo ufw status verbose
+</code></pre>
+<pre><code>#!/bin/bash
+
+# revert.sh
+
+echo &quot;Disabling UFW...&quot;
+sudo ufw disable
+
+echo &quot;Removing UFW...&quot;
+sudo apt remove ufw
+</code></pre>
+<p>You will submit your request to higher officer responsible of handling change requests.</p>
+<h3>2 :  Change Request Review</h3>
+<p>Change manager who is responsible will either approve or deny this request to further process in upper level on the basis of some of the few questions :</p>
+<ul>
+<li>
+<p>How likely is it to be successful?</p>
+</li>
+<li>
+<p>Are the risks and rewards accurate?</p>
+</li>
+<li>
+<p>Is it worth making?</p>
+</li>
+</ul>
+<h3>3 : Change Plan</h3>
+<p>If the manager approves the request, now his team will create a game plan for the change including resources required, outcomes, timeline, testing, rollback, etc. But as in here, the game plan is already disclosed in request form. This may not required. If, else was the case, then, manager may have to do it on his own or ask the team to do these analysis.</p>
+<h3>4 : Change Approval</h3>
+<p>Well, change approval process may not stop at manager. Even if manager has accepted, he may have to present to change control board or change advisory board on the basis of request being made. He will present original request alongwith his ideas and thoughts.</p>
+<p>Well after approval, the document of change request may look like at the end part as :</p>
+<pre><code>  ------------
+   Approved BY :
+📝━━━━━━━━━━━━━━
+👤  Simran Neupane, IT Dept CAB Head
+📅  2025-05-09
+🔐  Approved
+━━━━━━━━━━━━━━━
+See DOs and Donts in Attachments ~~, strictly to be followed.
+
+</code></pre>
+<p>Attachments :</p>
+<pre><code>CAB Guidelines for UFW Implementation
+-------------------------------------
+
+DOs:
+1. Take a full system backup before applying any UFW rules.
+2. Test the UFW configuration in a staging or test environment first.
+3. Allow essential services (e.g., SSH) before enabling UFW:
+   Command: sudo ufw allow OpenSSH
+4. Set default UFW policies before defining specific rules:
+   sudo ufw default deny incoming
+   sudo ufw default allow outgoing
+5. Document all firewall rules being applied or changed.
+6. Notify users or teams about the change and possible brief downtime.
+7. Include a tested rollback plan (e.g., sudo ufw disable).
+8. Monitor services and firewall status after implementation.
+
+DON’Ts:
+1. Don’t enable UFW without allowing SSH first, or you may lose remote access.
+2. Don’t apply changes directly to a production system without CAB approval.
+3. Don’t use GUI tools for UFW when managing on servers—stick to CLI.
+4. Don’t leave unnecessary ports open—only allow required services.
+5. Don’t forget to log and document each rule added or changed.
+6. Don’t bypass the change process for future firewall modifications.
+
+Approval Notes:
+- SSH access must be preserved.
+- All steps must be documented.
+</code></pre>
+<h3>5 : Change Implementation</h3>
+<p>Now that you are approved and you have list of what are you allowed and what you are not, you can work and implement your <code>init.sh</code> script. After that, the documentation on your implementation should be kept or sent to higher levels. The documentation may look like as follows :</p>
+<pre><code>
+# CAB Implementation Documentation for UFW Change
+
+## Change Summary
+
+- Change ID: CR-2025-001
+
+- Title: Install and configure UFW on Ubuntu server
+
+- Date of Implementation: 2025-05-08
+
+- Implemented by: Your Name (Linux Admin)
+
+- Approval Reference: CAB Approval on 2025-05-07
+
+- Scheduled Window: 02:00 – 03:00 AM
+- 
+
+## Pre-Implementation Checks
+
+- ✅ Full system backup taken using rsync to external disk /mnt/backup_2025-05-08
+
+- ✅ Verified SSH access via IP whitelisting in test server
+
+- ✅ Change reviewed and approved by CAB
+
+- ✅ Notified stakeholders of potential 5-minute disruption
+
+
+## Step-by-Step Implementation Log
+
+02:01 AM
+sudo apt update
+
+02:03 AM
+sudo apt install ufw -y
+
+02:06 AM
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+02:08 AM
+sudo ufw allow OpenSSH
+
+02:10 AM
+sudo ufw allow http
+sudo ufw allow https
+
+02:12 AM
+sudo ufw enable
+sudo ufw status verbose
+
+## Post-Implementation Checks
+
+- ✅ SSH access verified from external IP
+
+- ✅ Website (port 80/443) loading successfully
+
+- ✅ No unexpected service disruptions
+
+- ✅ Firewall log monitored with sudo journalctl -u ufw
+
+- ✅ No denied packets for essential services
+
+
+## Rollback Plan Status
+
+- 🔄 Not used — change was successful
+
+- 🔁 Tested beforehand:
+
+sudo ufw disable
+sudo apt remove ufw
+
+
+## Monitoring Plan
+
+- Continuous monitoring using:
+    - ufw status
+    - Custom script logging to /var/log/ufw_monitor.log
+
+- Next review scheduled: 2025-05-09 at 02:00 AM
+
+
+## Sign-Off
+
+🧑‍💻 Implemented by: TEAM-CR-2025-05-07-UFW
+
+📅 Date: 2025-05-10
+
+🔐 Status: Successfully implemented
+
+✔️ Approved by CAB | Monitored and documented
+</code></pre>
+<h3>6 : Change Clousure</h3>
+<p>When appropriate, the change manager reviews and closes the change when appropriate. Their report should communicate whether the change was successful, timely, accurately estimated, within budget, etc. This is done according to the document you created while making changes. You may be cross checked or referenced.</p>
+<h1>FINAL WORDS</h1>
+<blockquote>
+<p>USE <code>git</code> for version control because you are documenting this. This may required for future change and assistance. So, better to keep it with you and update in future.</p>
+</blockquote></div>
