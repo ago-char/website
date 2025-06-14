@@ -9,6 +9,7 @@
     --navbar-height: 3rem;
     --sidebar-width: 280px;
     --sidebar-indent: 1rem;
+    --code-color: #cac2ca;
 }
 
 /* Reset */
@@ -126,6 +127,10 @@ body {
     word-wrap: break-word;
 }
 
+.content code {
+    color: var(--code-color)
+}
+
 .content table {
     max-width: 100%;
     overflow-x: auto;
@@ -174,6 +179,8 @@ body {
         padding: 1rem;
         background-color: var(--secondary-bg);
         border-radius: 4px;
+        color: var(--code-color);
+
     }
 
     /* Handle tables */

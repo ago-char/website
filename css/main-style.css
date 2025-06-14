@@ -26,11 +26,22 @@ body {
 }
 
 body.home {
+    /* old stuffs  */
     font-family: Arial, sans-serif;
-    background-image: url('/pics/com.jpeg');
+    background-color: #1a1a1a;
+    /* background-image: url('/pics/com.jpeg'); 
     background-repeat: repeat;
-    background-size: cover;
+    background-size: contain; */
 }
+
+div.home img {
+    height: calc(100vh - var(--navbar-height));
+    object-fit: cover;
+    margin-left: 14%;
+    position: fixed;
+    z-index: 0;
+}
+
 
 /* Navbar styling */
 .navbar {

@@ -80,7 +80,7 @@ code {
     background: var(--secondary-bg);
     padding: 0.2em 0.4em;
     border-radius: 3px;
-    color: var(--link-color);
+    color: var(--code-color);
     font-size: 0.9em;
 }
 
