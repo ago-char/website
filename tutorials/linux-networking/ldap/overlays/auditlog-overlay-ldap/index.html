@@ -1,0 +1,82 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/others-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Deploying Auditlog Overlay in LDAP</h1>
+<p>The Audit Logging overlay can be used to record all changes on a given backend database to a specified log file. Changes are logged as standard LDIF, with an additional comment header giving the timestamp of the change and the identity of the user making the change.</p>
+<p>For Add and Modify operations the identity comes from the modifiersName associated with the operation. This is usually the same as the requestor's identity, but may be set by other overlays to reflect other values.</p>
+<p>If  you have come through deploying 
+<a href="/tutorials/linux-networking/ldap/overlays/accesslog-overlay-ladp">Access Logging in LDAP</a>
+, you would, by now, know how to deploy and kind of module or overlay. So I will keep it short, just to creating, adding, and testing.</p>
+<h2>Step 1 :  Load auditlog module in cn=config</h2>
+<pre><code># loadAuditLogModule.ldif
+dn: cn=module{3},cn=config
+changetype: add
+objectClass: olcModuleList
+cn: module{3}
+olcModulePath: /usr/lib/ldap
+olcModuleLoad: {0}auditlog
+</code></pre>
+<p>Add :</p>
+<pre><code>sudo ldapmodify -Y EXTERNAL -H ldapi:/// -f loadAuditLogModule.ldif
+</code></pre>
+<h2>Step 2: Add Overlay to required Database</h2>
+<p>Here our database is <em>olcDatabase={1}mdb</em>, so :</p>
+<pre><code># addAuditLogOverlay.ldif
+dn: olcOverlay={0}auditlog,olcDatabase={1}mdb,cn=config
+changetype: add
+objectclass: olcOverLayConfig
+objectclass: olcAuditLogConfig
+olcOverlay: {0}auditlog
+olcAuditLogFile: /var/lib/ldap/auditlog.ldif
+</code></pre>
+<p>If you have setup <code>/var/lib/ldap/auditlog.ldif</code> as log file. You should first create directory and ensure proper permissions. As LDAP data is matter of sensitivity, permissions are strict :</p>
+<pre><code>sudo mkdir /var/lib/ldap
+sudo chown -R openldap:openldap /var/lib/ldap
+sudo chmod 700 /var/lib/ldap
+</code></pre>
+<p>Add :</p>
+<pre><code>sudo ldapmodify -Y EXTERNAL -H ldapi:/// -f addAuditLogOverlay.ldif
+</code></pre>
+<h1>Testing Phase</h1>
+<p>Let's test it by modifying the description of one of the user in the database :</p>
+<pre><code>ldapmodify -xW -D cn=admin,dc=example,dc=com                    
+Enter LDAP Password: 
+dn: cn=Deeya,ou=Partners,dc=example,dc=com
+changetype: modify
+replace: description
+description: hey deeya ily
+
+modifying entry &quot;cn=Deeya,ou=Partners,dc=example,dc=com&quot;
+</code></pre>
+<p>See the content of <code>/var/log/ldap/auditlog.ldif</code> :</p>
+<pre><code>sudo cat /var/log/ldap/auditlog.ldif
+# modify 1751009652 dc=example,dc=com cn=admin,dc=example,dc=com IP=[::1]:49688 conn=1015
+dn: cn=Deeya,ou=Partners,dc=example,dc=com
+changetype: modify
+replace: description
+description: hey deeya ily
+-
+replace: entryCSN
+entryCSN: 20250627073412.975865Z#000000#000#000000
+-
+replace: modifiersName
+modifiersName: cn=admin,dc=example,dc=com
+-
+replace: modifyTimestamp
+modifyTimestamp: 20250627073412Z
+-
+# end modify 1751009652
+</code></pre>
+<p>As seen in the log, it does not record everything as such in accesslog. This records only the change made. It is useful for simple reading but if you have already set up accesslog in your production environment, you may not need this. But if you want overview and simplicity over complexity, you have liberty to set and test it as suggested in this guide.</p>
+<h1>Further Study</h1>
+<p>Check out the original <a href="https://www.openldap.org/doc/admin26/guide.html#Audit%20Logging">openldap documentation on Audit Logging</a>.</p>
+<p>Spend your 5 minutes to read this <a href="https://linux.die.net/man/5/slapo-auditlog">short auditlog man page</a>.</p></div>

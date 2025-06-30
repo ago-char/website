@@ -1,0 +1,295 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>AccessLog Overlay in LDAP</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Deploying Accesslog Overlay in LDAP</h1>
+<p>If you have ever imagined or thought how would I log the attempt or action of read, write activities in LDAP DIT. The answer would be <a href="https://www.openldap.org/doc/admin26/guide.html#Access%20Logging">accesslog overlay</a>. Typically, you will log these kind of actions in some file or database. And as man page suggests : </p>
+<blockquote>
+<p>The Access Logging overlay can be used to record all accesses to a given backend database on another database. This allows all of the activity on a given database to be reviewed using arbitrary LDAP queries, instead of just logging to local flat text files. Configuration options are available for selecting a subset of operation types to log, and to automatically prune older log records from the logging database.</p>
+</blockquote>
+<p>So, as logs are stored on another database, we have two options in fornt :
+1.  Ask the overlay to use a file in the system to log the entries
+2.  Create a log database (just another branch) in our DIT (<strong>cn=config</strong>) suffix and ask the overlay to use this one to log Access related entries</p>
+<p>You could choose whatever you like, but the second is more convinient as man page says again and again : <em>This allows all of the activity on a given database to be reviewed using arbitrary LDAP queries, instead of just logging to local flat text files.</em> So, I am baised towards this. You are free to use option 1.</p>
+<h2>Let's first create branch in which overlay will log</h2>
+<p>As with all other online configuration you did in LDAP, this is similar to them. You will have ldif file which you will run against <code>ldapmodify</code>. Typically, file may look like :</p>
+<pre><code># addLogDB.ldif
+dn: olcDatabase={2}mdb,cn=config
+changetype: add
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: {2}mdb
+olcDbDirectory: /var/lib/ldap/log
+olcSuffix: cn=log
+olcRootDN: cn=Manager,cn=log
+olcRootPW: secret
+</code></pre>
+<p>A thing here to consider is <code>olcDbDirectory: /var/lib/ldap/log</code>. This is important because you gonna have to create this directory(you may prefer to use different location, I use this because <code>/var/lib/ldap</code> already is processed with required permissions). Also you have to set the right permissions and ownership. Run as root as such :</p>
+<pre><code># create directory for database
+mkdir /var/lib/ldap/log
+# set ldap (this may be in other linux systems) or openldap (mine) as owner
+chown -R openldap:openldap /var/lib/ldap/log
+# directory be rwx only by the owner
+chmod 700 /var/lib/ldap/log
+</code></pre>
+<p>I believe write access to <code>cn=config</code> is only permitted to localhost when authenticated as system root user, so to add the log database on that DITkali, you should run as root :</p>
+<pre><code>ldapmodify -Y EXTERNAL -H ldapi:/// -f addLogDB.ldif
+</code></pre>
+<p>If you get no error you have successfully added another database, which you can search and you will get exactly same information as above file :</p>
+<pre><code>ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config 'olcSuffix= cn=log' -LLL
+# output
+dn: olcDatabase={2}mdb,cn=config
+changetype: add
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: {2}mdb
+olcDbDirectory: /var/lib/ldap/log
+olcSuffix: cn=log
+olcRootDN: cn=Manager,cn=log
+olcRootPW: secret
+</code></pre>
+<p>Of course, we are not looking at security point of view, so password <code>olcRootPw: secret</code> is no more <strong>secret</strong> to you. <strong><em>COME HACK ME</em></strong>.</p>
+<h2>Now it's time to Add the accesslog Overlay</h2>
+<p>Again adding is similar procedure, the ldif file is :</p>
+<pre><code># addAccessLogOverlay.ldif
+dn: olcOverlay={1}accesslog,olcDatabase={1}mdb,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcAccessLogConfig
+olcOverlay: {1}accesslog
+olcAccessLogDB: cn=log
+olcAccessLogOps: all
+</code></pre>
+<p>Remember, you are adding overlay to <code>olcDatabase={1}mdb</code> where <strong>example.com</strong> exists.</p>
+<p>Same as, you should authenticate as local root to write on <code>cn=config</code>. Run as root :</p>
+<pre><code>ldapmodify -Y EXTERNAL -H ldapi:/// -f addAccessLogOverlay.ldif
+</code></pre>
+<p>Everthing you had expected has broken into pieces and the sky is falling. You may see error :</p>
+<pre><code>adding new entry &quot;olcOverlay={1}accesslog,olcDatabase={1}mdb,cn=config&quot;
+ldap_add: Invalid syntax (21)
+        additional info: objectClass: value #1 invalid per syntax
+</code></pre>
+<p><strong>But the syntax is correct</strong>.  This is usually because the objectclass you defined in the file is not in <code>cn=config</code> DIT. You can confirm with search and grep :</p>
+<pre><code>ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config 'ObjectClass=*' -LLL | grep olcOverlayConfig
+# result
+olcObjectClasses: ( OLcfgGlOc:5 NAME 'olcOverlayConfig' DESC 'OpenLDAP Overlay
+# But the search for olcAccessLogConfig
+ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config 'ObjectClass=*' -LLL | grep olcAccessLogConfig
+# no result
+</code></pre>
+<p>As seen the objectClass <em>olcAccessLogConfig</em> has not been loaded in <code>cn=config</code> DIT, you should load it. This class is imported when you load <code>accesslog</code> overlay. What do I mean mean by that ? Haven't we already add accesslog overlay with <code>addAccessLogOverlay.ldif</code> file ? Well this is just an entry, actual overlay attributes requires its module to be loaded. Actually, overlays are loaded as modules, so if no modules has been added for accesslog, the error you encouter will be encountered on any platform. You can confirm by search though :</p>
+<pre><code>ldapsearch -QY EXTERNAL -H ldapi:/// -b cn=config 'objectClass=olcModuleList' -LLL # result    
+dn: cn=module{0},cn=config
+objectClass: olcModuleList
+cn: module{0}
+olcModulePath: /usr/lib/ldap
+olcModuleLoad: {0}back_mdb
+</code></pre>
+<p>See only one module has been loaded i.e. <code>back_mdb</code> with <code>{0}</code> index. Seeing this configuration, you can easily create the ldif for required module just by changing the last <code>olcModuleLoad</code> with the name of module you wanna load. As the configuration suggests the path for modules is <code>/usr/lib/ldap</code>,  you can verify that : </p>
+<pre><code>ls -l /var/lib/ldap/back_mdb*
+</code></pre>
+<p>Typically, the module is <code>back_mdb.so</code>, I use <code>*</code> because, while loading the module, no extention is required, but the file do have extention. Also check for our <code>accesslog*</code> :</p>
+<pre><code>ls -l /usr/lib/ldap/accesslog.*
+# result
+-rw-r--r-- 1 root root   938 Mar 11 19:27 /usr/lib/ldap/accesslog.la
+lrwxrwxrwx 1 root root    20 Mar 11 19:27 /usr/lib/ldap/accesslog.so -&gt; accesslog.so.2.0.200
+lrwxrwxrwx 1 root root    20 Mar 11 19:27 /usr/lib/ldap/accesslog.so.2 -&gt; accesslog.so.2.0.200
+-rw-r--r-- 1 root root 61008 Mar 11 19:27 /usr/lib/ldap/accesslog.so.2.0.200
+</code></pre>
+<p>So, the file for adding our <code>accesslog</code> module be like :</p>
+<pre><code># addAccessLogModule.ldif
+dn: cn=module{1},cn=config
+changetype: add
+objectClass: olcModuleList
+cn: module{1}
+olcModulePath: /usr/lib/ldap
+olcModuleLoad: {0}accesslog
+</code></pre>
+<p>Again adding would be the same as previous :</p>
+<pre><code>ldapmodify -Y EXTERNAL -H ldapi:/// -f addAccessLogModule.ldif
+</code></pre>
+<p>This is added. <strong>NOW THE SKY WON'T FALL</strong>.</p>
+<p>Now, when you add that previous file you won't get any errror, I promise. You can check that because the <code>olcAccessLogConfig</code> objectClass has been loaded :</p>
+<pre><code>ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config 'ObjectClass=*' -LLL | grep olcAccessLogConfig
+# result 
+olcObjectClasses: ( OLcfgOvOc:4.1 NAME 'olcAccessLogConfig' DESC 'Access log c
+objectClass: olcAccessLogConfig
+</code></pre>
+<p>You will be delighted when you run the following command, of course as Root, to add the accessoverlay now :</p>
+<pre><code>ldapmodify -Y EXTERNAL -H ldapi:/// -f addAccessLogOverlay.ldif
+</code></pre>
+<p>You may have felt relief. So do I.</p>
+<h1>Testing Phase</h1>
+<p>Now that we have successfully deployed accesslog overlay to do his job, but is he doing ? Well check that log database, if it has been populated with anything. </p>
+<pre><code>ldapsearch -x -D &quot;cn=Manager,cn=log&quot; -w secret -b &quot;cn=log&quot; -LLL
+# result
+dn: cn=log
+objectClass: auditContainer
+cn: log
+</code></pre>
+<p>This means nothing yet because we have not try to read or write on example.com domain.</p>
+<p>Let's read : </p>
+<pre><code>ldapsearch -x -LLL -D 'cn=admin,dc=example,dc=com'
+</code></pre>
+<p>Now check the log again :</p>
+<pre><code>ldapsearch -x -D &quot;cn=Manager,cn=log&quot; -w secret -b &quot;cn=log&quot; -LLL
+</code></pre>
+<p>Circumstances has changed : </p>
+<pre><code>dn: cn=log
+objectClass: auditContainer
+cn: log
+
+dn: reqStart=20250627014511.000001Z,cn=log
+objectClass: auditSearch
+reqStart: 20250627014511.000001Z
+reqEnd: 20250627014511.000002Z
+reqType: search
+reqSession: 1047
+reqAuthzID:
+reqDN: dc=example,dc=com
+reqResult: 0
+reqScope: sub
+reqDerefAliases: never
+reqAttrsOnly: FALSE
+reqFilter: (objectClass=*)
+reqEntries: 4
+reqTimeLimit: 3600
+reqSizeLimit: 500
+
+dn: reqStart=20250627015250.000000Z,cn=log
+objectClass: auditBind
+reqStart: 20250627015250.000000Z
+reqEnd: 20250627015250.000001Z
+reqType: bind
+reqSession: 1005
+reqAuthzID:
+reqDN: cn=admin,dc=example,dc=com
+reqResult: 0
+reqVersion: 3
+reqMethod: SIMPLE
+
+dn: reqStart=20250627015250.000003Z,cn=log
+objectClass: auditObject
+reqStart: 20250627015250.000003Z
+reqEnd: 20250627015250.000004Z
+reqType: unbind
+reqSession: 1005
+reqAuthzID: cn=admin,dc=example,dc=com
+
+dn: reqStart=20250627015303.000001Z,cn=log
+objectClass: auditSearch
+reqStart: 20250627015303.000001Z
+reqEnd: 20250627015303.000002Z
+reqType: search
+reqSession: 1006
+reqAuthzID:
+reqDN: dc=example,dc=com
+reqResult: 0
+reqScope: sub
+reqDerefAliases: never
+reqAttrsOnly: FALSE
+reqFilter: (objectClass=*)
+reqEntries: 4
+reqTimeLimit: 3600
+reqSizeLimit: 500
+
+dn: reqStart=20250627015331.000000Z,cn=log
+objectClass: auditBind
+reqStart: 20250627015331.000000Z
+reqEnd: 20250627015331.000001Z
+reqType: bind
+reqSession: 1008
+reqAuthzID:
+reqDN: cn=admin,dc=example,dc=com
+reqResult: 0
+reqVersion: 3
+reqMethod: SIMPLE
+
+dn: reqStart=20250627015331.000002Z,cn=log
+objectClass: auditSearch
+reqStart: 20250627015331.000002Z
+reqEnd: 20250627015331.000003Z
+reqType: search
+reqSession: 1008
+reqAuthzID: cn=admin,dc=example,dc=com
+reqDN: dc=example,dc=com
+reqResult: 0
+reqScope: sub
+reqDerefAliases: never
+reqAttrsOnly: FALSE
+reqFilter: (objectClass=*)
+reqEntries: 4
+reqTimeLimit: -1
+reqSizeLimit: -1
+
+dn: reqStart=20250627015331.000004Z,cn=log
+objectClass: auditObject
+reqStart: 20250627015331.000004Z
+reqEnd: 20250627015331.000005Z
+reqType: unbind
+reqSession: 1008
+reqAuthzID: cn=admin,dc=example,dc=com
+
+dn: reqStart=20250627015348.000000Z,cn=log
+objectClass: auditBind
+reqStart: 20250627015348.000000Z
+reqEnd: 20250627015348.000001Z
+reqType: bind
+reqSession: 1009
+reqAuthzID:
+reqDN: cn=admin,dc=example,dc=com
+reqResult: 49
+reqVersion: 3
+reqMethod: SIMPLE
+
+dn: reqStart=20250627015402.000000Z,cn=log
+objectClass: auditBind
+reqStart: 20250627015402.000000Z
+reqEnd: 20250627015402.000001Z
+reqType: bind
+reqSession: 1010
+reqAuthzID:
+reqDN: cn=admin,dc=example,dc=com
+reqResult: 0
+reqVersion: 3
+reqMethod: SIMPLE
+
+dn: reqStart=20250627015402.000002Z,cn=log
+objectClass: auditSearch
+reqStart: 20250627015402.000002Z
+reqEnd: 20250627015402.000003Z
+reqType: search
+reqSession: 1010
+reqAuthzID: cn=admin,dc=example,dc=com
+reqDN: dc=example,dc=com
+reqResult: 0
+reqScope: sub
+reqDerefAliases: never
+reqAttrsOnly: FALSE
+reqFilter: (objectClass=*)
+reqEntries: 4
+reqTimeLimit: -1
+reqSizeLimit: -1
+
+dn: reqStart=20250627015402.000004Z,cn=log
+objectClass: auditObject
+reqStart: 20250627015402.000004Z
+reqEnd: 20250627015402.000005Z
+reqType: unbind
+reqSession: 1010
+reqAuthzID: cn=admin,dc=example,dc=com
+</code></pre>
+<p>You sould try writing (<code>ldapmodify</code>) and see what it does.</p>
+<h1>Further Reading</h1>
+<p>Search in <code>cn=config</code> and save the output to some file. Now examine what are the entries related to accesslog overlay. Use find operation in your favorite text editor to filter.</p>
+<p>Read <a href="https://www.openldap.org/doc/admin26/guide.html#Access%20Logging">Official Documentation on Access Logging</a> .</p>
+<p>Also, the <a href="https://linux.die.net/man/5/slapo-accesslog">man page for accesslog overlay</a>.</p></div>

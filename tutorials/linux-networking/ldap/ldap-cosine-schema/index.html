@@ -1,0 +1,493 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>LDAP Cosine Schema</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>LDAP Cosine Schema at <i>/etc/ldap/schema/core.schema</i></h1>
+<h3>📘 COSINE Schema: ObjectClasses Overview</h3>
+<table>
+<thead>
+<tr>
+<th><strong>objectClass</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>SUP</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>MUST</strong></th>
+<th><strong>MAY</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pilotPerson</td>
+<td>pilot schema person</td>
+<td>person</td>
+<td>STRUCTURAL</td>
+<td>—</td>
+<td>userid, textEncodedORAddress, rfc822Mailbox, favouriteDrink, roomNumber, userClass, homeTelephoneNumber, homePostalAddress, secretary, personalTitle, preferredDeliveryMethod, businessCategory, janetMailbox, otherMailbox, mobileTelephoneNumber, pagerTelephoneNumber, organizationalStatus, mailPreferenceOption, personalSignature</td>
+</tr>
+<tr>
+<td>account</td>
+<td>account entry</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>uid</td>
+<td>description, seeAlso, localityName, organizationName, organizationalUnitName, host</td>
+</tr>
+<tr>
+<td>document</td>
+<td>document metadata entry</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>documentIdentifier</td>
+<td>cn, description, seeAlso, localityName, organizationName, organizationalUnitName, documentTitle, documentVersion, documentAuthor, documentLocation, documentPublisher</td>
+</tr>
+<tr>
+<td>room</td>
+<td>room entry</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>cn</td>
+<td>roomNumber, description, seeAlso, telephoneNumber</td>
+</tr>
+<tr>
+<td>documentSeries</td>
+<td>documentSeries entry</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>cn</td>
+<td>description, seeAlso, telephoneNumber, localityName, organizationName, organizationalUnitName</td>
+</tr>
+<tr>
+<td>domain</td>
+<td>domain entry</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>dc</td>
+<td>associatedName, organizationName, description, businessCategory, seeAlso, searchGuide, userPassword, localityName, st, streetAddress, physicalDeliveryOfficeName, postalAddress, postalCode, postOfficeBox, facsimileTelephoneNumber, internationalISDNNumber, telephoneNumber, teletexTerminalIdentifier, telexNumber, preferredDeliveryMethod, destinationIndicator, registeredAddress, x121Address</td>
+</tr>
+<tr>
+<td>RFC822localPart</td>
+<td>RFC822 local-part under domain</td>
+<td>domain</td>
+<td>STRUCTURAL</td>
+<td>—</td>
+<td>see domain MAY minus associatedName, plus surname</td>
+</tr>
+<tr>
+<td>dNSDomain</td>
+<td>DNS domain entry</td>
+<td>domain</td>
+<td>STRUCTURAL</td>
+<td>—</td>
+<td>aRecord, mDRecord, mXRecord, nSRecord, sOARecord, cNAMERecord</td>
+</tr>
+<tr>
+<td>domainRelatedObject</td>
+<td>domain-related auxiliary</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>associatedDomain</td>
+<td>—</td>
+</tr>
+<tr>
+<td>friendlyCountry</td>
+<td>friendly country name under country</td>
+<td>country</td>
+<td>STRUCTURAL</td>
+<td>friendlyCountryName</td>
+<td>—</td>
+</tr>
+<tr>
+<td>pilotOrganization</td>
+<td>pilot org/unit entry</td>
+<td>organization or organizationalUnit</td>
+<td>STRUCTURAL</td>
+<td>—</td>
+<td>buildingName</td>
+</tr>
+<tr>
+<td>pilotDSA</td>
+<td>pilot DSA entry</td>
+<td>dSA</td>
+<td>STRUCTURAL</td>
+<td>—</td>
+<td>dSAQuality</td>
+</tr>
+<tr>
+<td>qualityLabelledData</td>
+<td>quality-labelled auxiliary entry</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>dSAQuality</td>
+<td>subtreeMinimumQuality, subtreeMaximumQuality</td>
+</tr>
+</tbody>
+</table>
+<p>Here's the <strong>COSINE schema attributeTypes</strong> table, following the same clean, structured format:</p>
+<hr />
+<h3>📘 COSINE Schema: AttributeTypes Overview (Part 1 of 2)</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Attribute Name(s)</strong></th>
+<th><strong>OID</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>EQUALITY</strong></th>
+<th><strong>SUBSTR</strong></th>
+<th><strong>SYNTAX</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>textEncodedORAddress</td>
+<td>0.9.2342.19200300.100.1.2</td>
+<td>—</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>info</td>
+<td>0.9.2342.19200300.100.1.4</td>
+<td>General information</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{2048}</td>
+</tr>
+<tr>
+<td>drink, favouriteDrink</td>
+<td>0.9.2342.19200300.100.1.5</td>
+<td>Favorite drink</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>roomNumber</td>
+<td>0.9.2342.19200300.100.1.6</td>
+<td>Room number</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>0.9.2342.19200300.100.1.7</td>
+<td>Photo (G3 fax)</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.23{25000}</td>
+</tr>
+<tr>
+<td>userClass</td>
+<td>0.9.2342.19200300.100.1.8</td>
+<td>Category of user</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>host</td>
+<td>0.9.2342.19200300.100.1.9</td>
+<td>Host computer</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>manager</td>
+<td>0.9.2342.19200300.100.1.10</td>
+<td>DN of manager</td>
+<td>distinguishedNameMatch</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.12</td>
+</tr>
+<tr>
+<td>documentIdentifier</td>
+<td>0.9.2342.19200300.100.1.11</td>
+<td>Unique document ID</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>documentTitle</td>
+<td>0.9.2342.19200300.100.1.12</td>
+<td>Document title</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>documentVersion</td>
+<td>0.9.2342.19200300.100.1.13</td>
+<td>Document version</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>documentAuthor</td>
+<td>0.9.2342.19200300.100.1.14</td>
+<td>DN of document author</td>
+<td>distinguishedNameMatch</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.12</td>
+</tr>
+<tr>
+<td>documentLocation</td>
+<td>0.9.2342.19200300.100.1.15</td>
+<td>Location of document original</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>homePhone, homeTelephoneNumber</td>
+<td>0.9.2342.19200300.100.1.20</td>
+<td>Home telephone number</td>
+<td>telephoneNumberMatch</td>
+<td>telephoneNumberSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.50</td>
+</tr>
+<tr>
+<td>secretary</td>
+<td>0.9.2342.19200300.100.1.21</td>
+<td>DN of secretary</td>
+<td>distinguishedNameMatch</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.12</td>
+</tr>
+<tr>
+<td>otherMailbox</td>
+<td>0.9.2342.19200300.100.1.22</td>
+<td>Other mailbox</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.39</td>
+</tr>
+</tbody>
+</table>
+<h3>📘 COSINE Schema: AttributeTypes Overview (Part 2 of 2)</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Attribute Name(s)</strong></th>
+<th><strong>OID</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>EQUALITY</strong></th>
+<th><strong>SUBSTR</strong></th>
+<th><strong>SYNTAX</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aRecord</td>
+<td>0.9.2342.19200300.100.1.26</td>
+<td>A (host address) record</td>
+<td>caseIgnoreIA5Match</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26</td>
+</tr>
+<tr>
+<td>mDRecord</td>
+<td>0.9.2342.19200300.100.1.27</td>
+<td>Mail destination record</td>
+<td>caseIgnoreIA5Match</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26</td>
+</tr>
+<tr>
+<td>mXRecord</td>
+<td>0.9.2342.19200300.100.1.28</td>
+<td>Mail exchange record</td>
+<td>caseIgnoreIA5Match</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26</td>
+</tr>
+<tr>
+<td>nSRecord</td>
+<td>0.9.2342.19200300.100.1.29</td>
+<td>Name server record</td>
+<td>caseIgnoreIA5Match</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26</td>
+</tr>
+<tr>
+<td>sOARecord</td>
+<td>0.9.2342.19200300.100.1.30</td>
+<td>Start of authority record</td>
+<td>caseIgnoreIA5Match</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26</td>
+</tr>
+<tr>
+<td>cNAMERecord</td>
+<td>0.9.2342.19200300.100.1.31</td>
+<td>Canonical name record</td>
+<td>caseIgnoreIA5Match</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26</td>
+</tr>
+<tr>
+<td>associatedName</td>
+<td>0.9.2342.19200300.100.1.38</td>
+<td>DN associated with domain</td>
+<td>distinguishedNameMatch</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.12</td>
+</tr>
+<tr>
+<td>homePostalAddress</td>
+<td>0.9.2342.19200300.100.1.39</td>
+<td>Home postal address</td>
+<td>caseIgnoreListMatch</td>
+<td>caseIgnoreListSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.41</td>
+</tr>
+<tr>
+<td>personalTitle</td>
+<td>0.9.2342.19200300.100.1.40</td>
+<td>Personal title</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>mobile, mobileTelephoneNumber</td>
+<td>0.9.2342.19200300.100.1.41</td>
+<td>Mobile number</td>
+<td>telephoneNumberMatch</td>
+<td>telephoneNumberSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.50</td>
+</tr>
+<tr>
+<td>pager, pagerTelephoneNumber</td>
+<td>0.9.2342.19200300.100.1.42</td>
+<td>Pager number</td>
+<td>telephoneNumberMatch</td>
+<td>telephoneNumberSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.50</td>
+</tr>
+<tr>
+<td>co, friendlyCountryName</td>
+<td>0.9.2342.19200300.100.1.43</td>
+<td>Friendly country name</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15</td>
+</tr>
+<tr>
+<td>uniqueIdentifier</td>
+<td>0.9.2342.19200300.100.1.44</td>
+<td>Unique identifier</td>
+<td>caseIgnoreMatch</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>organizationalStatus</td>
+<td>0.9.2342.19200300.100.1.45</td>
+<td>Organizational status</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>janetMailbox</td>
+<td>0.9.2342.19200300.100.1.46</td>
+<td>Janet mailbox</td>
+<td>caseIgnoreIA5Match</td>
+<td>caseIgnoreIA5SubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26{256}</td>
+</tr>
+<tr>
+<td>mailPreferenceOption</td>
+<td>0.9.2342.19200300.100.1.47</td>
+<td>Mail preference option</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.27</td>
+</tr>
+<tr>
+<td>buildingName</td>
+<td>0.9.2342.19200300.100.1.48</td>
+<td>Name of building</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15{256}</td>
+</tr>
+<tr>
+<td>dSAQuality</td>
+<td>0.9.2342.19200300.100.1.49</td>
+<td>DSA quality</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.19 (SINGLE-VALUE)</td>
+</tr>
+<tr>
+<td>singleLevelQuality</td>
+<td>0.9.2342.19200300.100.1.50</td>
+<td>Single-level quality</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.13 (SINGLE-VALUE)</td>
+</tr>
+<tr>
+<td>subtreeMinimumQuality</td>
+<td>0.9.2342.19200300.100.1.51</td>
+<td>Subtree minimum quality</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.13 (SINGLE-VALUE)</td>
+</tr>
+<tr>
+<td>subtreeMaximumQuality</td>
+<td>0.9.2342.19200300.100.1.52</td>
+<td>Subtree maximum quality</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.13 (SINGLE-VALUE)</td>
+</tr>
+<tr>
+<td>personalSignature</td>
+<td>0.9.2342.19200300.100.1.53</td>
+<td>Personal signature (G3 fax)</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.23</td>
+</tr>
+<tr>
+<td>dITRedirect</td>
+<td>0.9.2342.19200300.100.1.54</td>
+<td>DIT Redirect</td>
+<td>distinguishedNameMatch</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.12</td>
+</tr>
+<tr>
+<td>audio</td>
+<td>0.9.2342.19200300.100.1.55</td>
+<td>Audio (u-law)</td>
+<td>—</td>
+<td>—</td>
+<td>1.3.6.1.4.1.1466.115.121.1.4{25000}</td>
+</tr>
+<tr>
+<td>documentPublisher</td>
+<td>0.9.2342.19200300.100.1.56</td>
+<td>Publisher of document</td>
+<td>caseIgnoreMatch</td>
+<td>caseIgnoreSubstringsMatch</td>
+<td>1.3.6.1.4.1.1466.115.121.1.15</td>
+</tr>
+</tbody>
+</table></div>

@@ -1,0 +1,173 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>Password Policy Overlay in LDAP</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Deploying Password Policy in LDAP</h1>
+<p>If  you have come through deploying 
+<a href="/tutorials/linux-networking/ldap/overlays/accesslog-overlay-ladp">Access Logging in LDAP</a>
+, you would, by now, know how to deploy and kind of module or overlay. So I will keep it short, just to creating, adding, and testing.</p>
+<h2>Step 1 :  Load ppolicy module in cn=config</h2>
+<pre><code># loadPPolicyModule.ldif
+dn: cn=module{2},cn=config
+changetype: add
+objectClass: olcModuleList
+cn: module{2}
+olcModulePath: /usr/lib/ldap
+olcModuleLoad: {0}ppolicy
+</code></pre>
+<p>Add :</p>
+<pre><code>sudo ldapmodify -Y EXTERNAL -H ldapi:/// -f loadPPolicyModule.ldif
+</code></pre>
+<h2>Step 2: Create Branch on suffix of the database for the module to work on</h2>
+<p>Here suffix for the <em>olcDatabase={1}mdb</em> is <strong>dc=example,dc=com</strong>. The reference taken from the policy <a href="https://www.openldap.org/doc/admin26/guide.html#Password%20Policies">described in documentation</a> :</p>
+<pre><code># defaultPwPolicy.ldif
+dn: cn=defaultPwPolicy,dc=example,dc=com
+changetype: add
+objectClass: pwdPolicy
+objectClass: device
+objectClass: top
+cn: defaultPwPolicy
+pwdAllowUserChange: TRUE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdExpireWarning: 600
+pwdFailureCountInterval: 30
+pwdInHistory: 5
+pwdLockout: TRUE
+pwdLockoutDuration: 0
+pwdMaxAge: 0
+pwdMaxFailure: 5
+pwdMinAge: 0
+pwdMinLength: 10
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+</code></pre>
+<p>Add :</p>
+<pre><code>ldapmodify -xW -D cn=admin,dc=example,dc=com -f defaultPwPolicy.ldif
+</code></pre>
+<h2>Step 3: Add Overlay to required Database</h2>
+<p>Here our database is <em>olcDatabase={1}mdb</em>, so :</p>
+<pre><code># addPPolicyOverlay.ldif
+dn: olcOverlay={0}ppolicy,olcDatabase={1}mdb,cn=config
+changetype: add
+objectclass: olcPPolicyConfig
+olcOverlay: {0}ppolicy
+olcPPolicyDefault: cn=defaultPwPolicy,dc=example,dc=com
+olcPPolicyHashClearText: TRUE
+</code></pre>
+<p>Add :</p>
+<pre><code>sudo ldapmodify -Y EXTERNAL -H ldapi:/// -f addPPolicyOverlay.ldif
+</code></pre>
+<h1>Testing Phase</h1>
+<p>Let's see if our policy for password has been implemented correctly. But first check how our DIT looks like :</p>
+<pre><code>ldapsearch -xWLLL -D 'cn=admin,dc=example,dc=com' -b 'dc=example,dc=com'
+</code></pre>
+<p>The output is :</p>
+<pre><code>dn: dc=example,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: surror
+dc: example
+
+dn: ou=Partners,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Partners
+description: Business Partners
+
+dn: cn=defaultPwPolicy,dc=example,dc=com
+objectClass: pwdPolicy
+objectClass: device
+objectClass: top
+cn: defaultPwPolicy
+pwdAllowUserChange: TRUE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdExpireWarning: 600
+pwdFailureCountInterval: 30
+pwdInHistory: 5
+pwdLockout: TRUE
+pwdLockoutDuration: 0
+pwdMaxAge: 0
+pwdMaxFailure: 5
+pwdMinAge: 0
+pwdMinLength: 10
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+</code></pre>
+<p>This defines the following posture of <strong>example.com</strong> :</p>
+<p><img src="/pics/exampleComwithPartners.png" alt="exampleComwithPartners.png"></p>
+<p>Ok, what we want is a partner who will have <code>userPassword</code> because afterall we are checking if the password policy is being implemented correctly. We want the following tree :</p>
+<p><img src="/pics/partnerDeeya.png" alt="partnerDeeya.png"></p>
+<p>Hence, a simple ldif for Deeya to be our partner :</p>
+<pre><code class="language-dd"># addDeeyaPartner.ldif
+dn: cn=Deeya,ou=Partners,dc=example,dc=com
+changetype: add
+objectClass: person
+cn: Deeya
+sn: Pokheral
+userPassword: Deeyabeb1
+</code></pre>
+<p>Look carefully, the <code>pwdMinLength: 10</code> but the <code>userPassword: Deeyabeb1</code> is of 9 characters.</p>
+<p>Add :</p>
+<pre><code>ldapmodify -xW -D 'cn=admin,dc=example,dc=com' -f /tmp/addDeeyaPartner.ldif 
+</code></pre>
+<p>You will be surprised that the record is added despite the fact the policy is violated.  <span style="color: red;">THE IS BECAUSE ROOTDN IS CAPABLE OF DOING ANYTHING. NO ACL WILL REGULATE HIM.</span> The rule is now applied for the users only, here in case is <strong>Deeya</strong>. Try authenticating with this user and change the password to <em>Hibeb2</em> which is of 6 characters. Let's see :</p>
+<pre><code>ldapmodify -xW -D 'cn=Deeya,ou=Partners,dc=example,dc=com'
+Enter LDAP Password: 
+dn: cn=Deeya,ou=Partners,dc=example,dc=com
+changetype: modify   
+replace: userPassword
+userPassword: Hibeb2
+
+modifying entry &quot;cn=Deeya,ou=Partners,dc=example,dc=com&quot;
+ldap_modify: Constraint violation (19)
+    additional info: Password fails quality checking policy
+</code></pre>
+<p>Yes the rule is violated.</p>
+<p>Next thing is to be checked is that our policy has <code>pwdInHistory: 5</code> means last 5 password can't be reused. Let's check if we change password same as <code>Deeyabeb1</code> :</p>
+<pre><code>ldapmodify -xW -D 'cn=Deeya,ou=Partners,dc=example,dc=com'
+Enter LDAP Password: 
+dn: cn=Deeya,ou=Partners,dc=example,dc=com
+changetype: modify   
+replace: userPassword
+userPassword: Deeyabeb1
+
+modifying entry &quot;cn=Deeya,ou=Partners,dc=example,dc=com&quot;
+ldap_modify: Constraint violation (19)
+    additional info: Password fails quality checking policy
+</code></pre>
+<p>This means our policy is working, now change it to some 10+ chars password :</p>
+<pre><code>ldapmodify -xW -D 'cn=Deeya,ou=Partners,dc=example,dc=com'
+Enter LDAP Password: 
+dn: cn=Deeya,ou=Partners,dc=example,dc=com
+changetype: modify
+replace: userPassword
+userPassword: Simran99333
+
+modifying entry &quot;cn=Deeya,ou=Partners,dc=example,dc=com&quot;
+</code></pre>
+<p>See it works.</p>
+<h1>Further Reading</h1>
+<p>Obvious <a href="https://www.openldap.org/doc/admin26/guide.html#Password%20Policies">official docs on password policy</a>.</p>
+<p><a href="https://linux.die.net/man/5/slapo-ppolicy">Man page for ppolicy overlay</a>.</p>
+<p>This suggests an attribute :</p>
+<blockquote>
+<p><strong>pwdCheckModule</strong></p>
+<p>This attribute names a user-defined loadable module that must instantiate the check_password() function. This function will be called to further check a new password if <strong>pwdCheckQuality</strong> is set to one (1) or two (2), after all of the built-in password compliance checks have been passed. This function will be called according to this function prototype:</p>
+<p>int <em>check_password</em> (char <em>pPasswd, char </em><em>ppErrStr, Entry </em>pEntry);</p>
+<p>The <strong>pPasswd</strong> parameter contains the clear-text user password, the <strong>ppErrStr</strong> parameter contains a double pointer that allows the function to return human-readable details about any error it encounters. The optional <strong>pEntry</strong> parameter, if non-NULL, carries a pointer to the entry whose password is being checked. If <strong>ppErrStr</strong> is NULL, then <em>funcName</em> must NOT attempt to use it/them. A return value of LDAP_SUCCESS from the called function indicates that the password is ok, any other value indicates that the password is unacceptable. If the password is unacceptable, the server will return an error to the client, and <strong>ppErrStr</strong> may be used to return a human-readable textual explanation of the error. The error string must be dynamically allocated as it will be free()'d by slapd.</p>
+<p>( 1.3.6.1.4.1.4754.1.99.1 NAME 'pwdCheckModule' EQUALITY caseExactIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )</p>
+<p>Note: The user-defined loadable module named by <strong>pwdCheckModule</strong> must be in <strong>slapd's</strong> standard executable search PATH.</p>
+<p>Note: <strong>pwdCheckModule</strong> is a non-standard extension to the LDAP password policy proposal.</p>
+</blockquote>
+<p>If you know C programming Language, code your own Module/program.</p></div>

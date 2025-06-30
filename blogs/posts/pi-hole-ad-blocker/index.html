@@ -1,0 +1,172 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/blog-style.css">
+<title>Block Malware and Ads with Pihole</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>Block Ads with pi-hole</h1>
+<p>If you have raspberry pi laying somewhere doing nothing, why not set it up as a ad blocker, it may also block some malicious sites including malware, sensitive content filtering, but the purpose is to block the ad. Pi-hole works by acting as a network-wide ad blocker and <a href="https://en.wikipedia.org/wiki/DNS_sinkhole">DNS sinkhole</a>. It intercepts DNS requests from your devices and checks them against a blocklist. If a request matches a domain on the blocklist (like an ad server), Pi-hole blocks the request by returning a fake IP address, preventing the ad from loading. If the domain is not blocked, Pi-hole forwards the request to a real DNS server to resolve the IP address and then returns the result to the requesting device</p>
+<p>Since, the <a href="https://docs.pi-hole.net/main/prerequisites/">prerequisites of pi-hole</a> are thse low, you can essentially run at any small linux box. I am using raspberry pi 4, which is, I know, way too overkill for this purpose. But, I had other plans, of course, secret bebe. Stay tuned.</p>
+<p>Let's not waste time and get started.</p>
+<h2>1  :  Get your Pi ready</h2>
+<p>Yo bro, I am not covering how to make raspberry os installation here coz <a href="https://www.raspberrypi.com/documentation/computers/getting-started.html">the official documentation</a> covers everything you will need to set it up.</p>
+<p>I might tell you that, if you are using headless installation over wlan then, it could be sometimes tedious that your interface is down. So, once you need to go at system settings to set it up using <a href="https://www.raspberrypi.com/documentation/computers/configuration.html">raspi-config</a>. Using ethernet, if you have, is preference.</p>
+<p>If you are using wlan, even setting up static IP address that will later required by pi-hole, sometimes, seems like WTF. Don't worry here is a <a href="/blogs/posts/static-ip-on-raspberryPI">cheatsheet</a>.</p>
+<h2>2  :  Installing pi-hole</h2>
+<p>As simple as this command is <a href="https://docs.pi-hole.net/main/basic-install/">the installation of pi-hole</a> :</p>
+<pre><code>curl -sSL https://install.pi-hole.net | bash
+</code></pre>
+<p>I am not going to cover the installation setup step by step as <a href="https://www.crosstalksolutions.com/the-worlds-greatest-pi-hole-and-unbound-tutorial-2023/#Settings">this guy claims he has built the worlds greatest tutotial on  pi-hole</a>, I am in no mood to offend him. The another reason is that most or all of the defaults help in get going, no need to change any unless you require specialized configuration.</p>
+<h6><span style="color:red;">WARNING</span></h6>
+<blockquote>
+<p>Please make sure you have set up static IP address, this is important as pi-hole setup whatever it needs to. Again, ethernet network is recommended. But if this is hassle for you, go look at this <a href="/blogs/posts/static-ip-on-raspberryPI">cheatsheet</a> to setup over wifi.</p>
+</blockquote>
+<p>It will present you with <code>http://&lt;your_ip&gt;/admin/</code> page with the password. Go and login, you might see the screen as follows :</p>
+<p><img src="/pics/pi-hole-initial-dashboard.png" alt="pi-hole-initial-dashboard.png"></p>
+<p>I am quite filled up. You won't be, because I am writing this blog after few hours I install pi-hole. You can already see how much queries are blocked already, they are mostly ads related.</p>
+<h2>3  :  Changing Password (optional)</h2>
+<p>If you wish to change password to the one easy to remember, but yet difficult to crack meaning that you wish to keep your own password rather than automatically generated for you, then you should run the following command in your pi-hole server :</p>
+<pre><code>pihole -a -p
+</code></pre>
+<p>You may seem confusing, how to run, coz you don't set it up to use with monitor. But this does not mean you can't connect to console. Connect to monitor if you want, and disconnect after changing password. But SSHing is more convinient and recommended.</p>
+<h2>4  :  Adding More Lists to Adblocker</h2>
+<p>Default list to block DNS that will ultimately block Ads are big, but if you wish more privacy, you can always point to the location of list, and add it to blacklist. Well, if you wish some sites, which are not to be blocked then, you should add as whitelist. </p>
+<p><img src="/pics/list-mgt-pi-hole.png" alt="list-mgt-pi-hole.png"></p>
+<p>If you wonder, where to get the list, I will talk about it later. Here, you can be confused with group assignment, don't be. Just Add Groups in the group tab you are seeing above Lists and choose one. As this url listed site for adults, I just create and assign to group namely Adult. But to apply the actually blocking the list must also belong to <strong>Default</strong> group.</p>
+<p>The list you just added is placed at the buttom.</p>
+<p><img src="/pics/list-not-updated-pi-hole.png" alt="list-not-updated-pi-hole.png"></p>
+<p>But this is not yet loaded and updated to pi-hole, You will have to Go at <strong>Tools-&gt;Update Gravity-&gt;Update</strong> to update.</p>
+<p><img src="/pics/list-updated-pi-hole.png" alt="list-updated-pi-hole.png"></p>
+<h2>5  :  More Lists (Optional)</h2>
+<p>If you wish to be more privacy concerned, you can check the <a href="https://firebog.net/">blocklist online</a>. As long as they are Green colored, or even blue without overline, you can add them.</p>
+<h2>6  :  Disable Blocking (Optional)</h2>
+<p><strong>Disable Blocking</strong> – this lets you stop Pi-hole from blocking any domains for various amounts of time (or indefinitely). Very useful in troubleshooting – if something isn’t working in your network or Internet browsing, try disabling blocking for 5 minutes and see if that fixes it. If it DOES fix it, then you know there are probably some domains you’re going to have to whitelist.</p>
+<p>One extra tip since we’re talking about disabling blocking – logging into the Pi-hole Admin GUI to disable blocking can be cumbersome! I find myself doing this on a fairly regular basis (once or twice a week), and I have multiple Pi-holes running for redundancy! So – it can take some time. To shorten up the time it takes to disable blocking, you can do some scripting. It all starts with this URL:</p>
+<pre><code>http://192.168.200.52/admin/api.php?disable=300&amp;auth=PWHASH
+</code></pre>
+<p>Let’s break this down – the IP address is the IP address of your Pi-hole (don’t use mine for this). The ‘disable=300’ means disable for 300 seconds (5 minutes), and the <code>auth=PWHASH</code> is the hashed value of <code>WEBPASSWORD</code> which can be found in the /etc/pihole/setupVars.conf file. You can see it if you log into your Pi-hole with SSH and run the command:</p>
+<pre><code>cat /etc/pihole/setupVars.conf | grep WEBPASSWORD
+</code></pre>
+<h2>7  :  Using unbound</h2>
+<p>This [official pi-hole doc for unbound] is detailed, but I will place summary here.</p>
+<h3>Install</h3>
+<pre><code>sudo apt install unbound
+</code></pre>
+<h3>Config</h3>
+<p>Write following content at <code>/etc/unbound/unbound.conf.d/pi-hole.conf</code> :</p>
+<pre><code>server:
+    # If no logfile is specified, syslog is used
+    # logfile: &quot;/var/log/unbound/unbound.log&quot;
+    verbosity: 0
+
+    interface: 127.0.0.1
+    port: 5335
+    do-ip4: yes
+    do-udp: yes
+    do-tcp: yes
+
+    # May be set to no if you don't have IPv6 connectivity
+    do-ip6: yes
+
+    # You want to leave this to no unless you have *native* IPv6. With 6to4 and
+    # Terredo tunnels your web browser should favor IPv4 for the same reasons
+    prefer-ip6: no
+
+    # Use this only when you downloaded the list of primary root servers!
+    # If you use the default dns-root-data package, unbound will find it automatically
+    #root-hints: &quot;/var/lib/unbound/root.hints&quot;
+
+    # Trust glue only if it is within the server's authority
+    harden-glue: yes
+
+    # Require DNSSEC data for trust-anchored zones, if such data is absent, the zone becomes BOGUS
+    harden-dnssec-stripped: yes
+
+    # Don't use Capitalization randomization as it known to cause DNSSEC issues sometimes
+    # see https://discourse.pi-hole.net/t/unbound-stubby-or-dnscrypt-proxy/9378 for further details
+    use-caps-for-id: no
+
+    # Reduce EDNS reassembly buffer size.
+    # IP fragmentation is unreliable on the Internet today, and can cause
+    # transmission failures when large DNS messages are sent via UDP. Even
+    # when fragmentation does work, it may not be secure; it is theoretically
+    # possible to spoof parts of a fragmented DNS message, without easy
+    # detection at the receiving end. Recently, there was an excellent study
+    # &gt;&gt;&gt; Defragmenting DNS - Determining the optimal maximum UDP response size for DNS &lt;&lt;&lt;
+    # by Axel Koolhaas, and Tjeerd Slokker (https://indico.dns-oarc.net/event/36/contributions/776/)
+    # in collaboration with NLnet Labs explored DNS using real world data from the
+    # the RIPE Atlas probes and the researchers suggested different values for
+    # IPv4 and IPv6 and in different scenarios. They advise that servers should
+    # be configured to limit DNS messages sent over UDP to a size that will not
+    # trigger fragmentation on typical network links. DNS servers can switch
+    # from UDP to TCP when a DNS response is too big to fit in this limited
+    # buffer size. This value has also been suggested in DNS Flag Day 2020.
+    edns-buffer-size: 1232
+
+    # Perform prefetching of close to expired message cache entries
+    # This only applies to domains that have been frequently queried
+    prefetch: yes
+
+    # One thread should be sufficient, can be increased on beefy machines. In reality for most users running on small networks or on a single machine, it should be unnecessary to seek performance enhancement by increasing num-threads above 1.
+    num-threads: 1
+
+    # Ensure kernel buffer is large enough to not lose messages in traffic spikes
+    so-rcvbuf: 1m
+
+    # Ensure privacy of local IP ranges
+    private-address: 192.168.0.0/16
+    private-address: 169.254.0.0/16
+    private-address: 172.16.0.0/12
+    private-address: 10.0.0.0/8
+    private-address: fd00::/8
+    private-address: fe80::/10
+
+    # Ensure no reverse queries to non-public IP ranges (RFC6303 4.2)
+    private-address: 192.0.2.0/24
+    private-address: 198.51.100.0/24
+    private-address: 203.0.113.0/24
+    private-address: 255.255.255.255/32
+    private-address: 2001:db8::/32
+</code></pre>
+<h3>Restart and Test</h3>
+<pre><code>sudo systemctl restart unbound
+dig agochar.online @127.0.0.1 -p 5335
+</code></pre>
+<p>You can test DNSSEC validation using :</p>
+<pre><code>dig fail01.dnssec.works @127.0.0.1 -p 5335
+dig dnssec.works @127.0.0.1 -p 5335
+</code></pre>
+<p>The first command should give a status report of <strong>SERVFAIL</strong> and no IP address. The second should give <strong>NOERROR</strong> plus an IP address.</p>
+<h3>Add to pi-hole</h3>
+<p>You gonna have to go at <strong>Settings -&gt; DNS</strong> and uncheck all the upstream DNS services, and add custom one as such :</p>
+<pre><code>127.0.0.1#5335
+</code></pre>
+<p><img src="/pics/local-dns-pi-hole.png" alt="local-dns-pi-hole.png"></p>
+<p>Save and Apply.</p>
+<h2>9 : DoH and DoT are Making life Harder</h2>
+<p>As DNS are being hijacked, the browsers and different kind of application are using <a href="https://en.wikipedia.org/wiki/DNS_over_HTTPS">DNS over HTTPS</a> to query for dns using standary port 443 which makes life of attacker harder to sit in the middle to get information about the sites you are visiting. Another concept is to use <a href="https://en.wikipedia.org/wiki/DNS_over_TLS">DNS over TLS</a>which works on port 853.</p>
+<p>While this is a one part of coin, the another part, as long as you this solution, you should rely on upstream provider which supports these transaction. Which means, there is no purpose of running your own server as long as you can not control what to block and what to allow. </p>
+<p>I will give you a scnerio, say you block the site <em>facebook.com</em>, which itself is a hassle as these companies uses tons of domain to make the users use their application. But after that you know, using using Brave browser built in secure DNS, and all the clients can easily use facebook. You as an administrator is ashamed.</p>
+<p>Port 853, is not much of obstacle here as port 443, as content filtering related to DNS should only be applied. You can easily block 853 in your router firewall. But there is a catchup, as DoH and DoT are supported by quite few (few in a sense that there are millions of DNS provider who does not support) upstream providers, we can set up a blocklist in pi-hole to block those dns servers as we have already set up unbound dns server locally runing.</p>
+<p>You should obviously <a href="https://www.reddit.com/r/homelab/comments/114ty54/doh_and_dot_is_pihole_effective_anymore/">check this reddit discussion</a> on this problem, and <a href="https://insights.sei.cmu.edu/blog/dns-over-https-3-strategies-for-enterprise-security-monitoring/">solution presented</a> as remedy. But still, the list has to be subtly maintained, and no list can be perfect as application are growing to use this encrypted DNS or no DNS functionallity, espacially in case of malwares. Security was and never will be perfect, so, instead of being idle, you as an administrator apply these changes :</p>
+<ul>
+<li>Go to router, and add firewall rules (login as root in your router ONT or command line using ssh ) to block at <strong>853</strong>, mine uses <em>iptables</em> :</li>
+</ul>
+<pre><code>iptables -A INPUT -p tcp -m tcp --dport 853 -j DROP
+iptables -A INPUT -p udp -m udp --dport 853 -j DROP
+</code></pre>
+<ul>
+<li>Add <a href="https://raw.githubusercontent.com/Bryantdl7/pihole-blocklists/main/dns-https-block.txt">this list</a> in blacklist of pi-hole and update changes as suggested earlier in this article.</li>
+</ul>
+<h1>Further Reading</h1>
+<p>If you are somewhat to coding, you should look at <a href="https://docs.pi-hole.net/api/">Pi-hole API</a>. Let's helps you customize or use pi-hole with other things.</p>
+<p>You are the one wanna see logs (real time) in command line, you gotta try :</p>
+<pre><code>sudo pihole tail
+</code></pre>
+<p>You should really <a href="https://docs.pi-hole.net/main/pihole-command/">use pihole command</a>.</p>
+<p>Pi-hole supports whole other bunch of functionality like <a href="https://docs.pi-hole.net/guides/vpn/wireguard/">embedding vpn</a>. Bro, you should seriously <a href="https://docs.pi-hole.net/">read documentation</a>.</p></div>

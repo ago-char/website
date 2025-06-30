@@ -1,0 +1,571 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>LDAP Core Schema</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>LDAP Core Schema at <i>/etc/ldap/schema/cosine.schema</i></h1>
+<h3>🔑 <strong>Key Terminology Explained</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>objectClass</strong></td>
+<td>A template defining a set of attributes for an LDAP entry. It categorizes entries (e.g., person, organization).</td>
+</tr>
+<tr>
+<td><strong>attributeType</strong></td>
+<td>Defines an individual data field that an LDAP entry can store (e.g., email, common name).</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>A brief explanation of the purpose of the object class or attribute.</td>
+</tr>
+<tr>
+<td><strong>SUP</strong></td>
+<td>"Superior": Indicates inheritance from another objectClass or attributeType.</td>
+</tr>
+<tr>
+<td><strong>Type</strong></td>
+<td>Indicates the nature of the object class (STRUCTURAL, AUXILIARY, or ABSTRACT).</td>
+</tr>
+<tr>
+<td><strong>MUST</strong></td>
+<td>Lists attributes that are <strong>required</strong> for entries of that object class.</td>
+</tr>
+<tr>
+<td><strong>MAY</strong></td>
+<td>Lists attributes that are <strong>optional</strong>.</td>
+</tr>
+<tr>
+<td><strong>Aliases</strong></td>
+<td>Alternative names for an attribute.</td>
+</tr>
+<tr>
+<td><strong>EQUALITY</strong></td>
+<td>Specifies how attribute values are compared for equality.</td>
+</tr>
+<tr>
+<td><strong>SUBSTR</strong></td>
+<td>Defines how substring matching should be handled for attribute values.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>📘 ObjectClasses Overview</h3>
+<table>
+<thead>
+<tr>
+<th><strong>objectClass</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>SUP</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>MUST</strong></th>
+<th><strong>MAY</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>country</td>
+<td>a country</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>c</td>
+<td>searchGuide, description</td>
+</tr>
+<tr>
+<td>locality</td>
+<td>a locality</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>—</td>
+<td>street, seeAlso, searchGuide, st, l, description</td>
+</tr>
+<tr>
+<td>organization</td>
+<td>an organization</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>o</td>
+<td>many (e.g. userPassword, searchGuide, seeAlso, postalCode, etc.)</td>
+</tr>
+<tr>
+<td>organizationalUnit</td>
+<td>an organizational unit</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>ou</td>
+<td>same as organization</td>
+</tr>
+<tr>
+<td>person</td>
+<td>a person</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>sn, cn</td>
+<td>userPassword, telephoneNumber, seeAlso, description</td>
+</tr>
+<tr>
+<td>organizationalPerson</td>
+<td>an organizational person</td>
+<td>person</td>
+<td>STRUCTURAL</td>
+<td>(inherited: sn, cn)</td>
+<td>many (e.g. title, ou, l, telephoneNumber, etc.)</td>
+</tr>
+<tr>
+<td>organizationalRole</td>
+<td>an organizational role</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>cn</td>
+<td>many (similar to organizationalPerson)</td>
+</tr>
+<tr>
+<td>groupOfNames</td>
+<td>a group of names (DNs)</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>member, cn</td>
+<td>businessCategory, seeAlso, owner, ou, o, description</td>
+</tr>
+<tr>
+<td>residentialPerson</td>
+<td>a residential person</td>
+<td>person</td>
+<td>STRUCTURAL</td>
+<td>l</td>
+<td>various (postal &amp; contact details)</td>
+</tr>
+<tr>
+<td>applicationProcess</td>
+<td>an application process</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>cn</td>
+<td>seeAlso, ou, l, description</td>
+</tr>
+<tr>
+<td>applicationEntity</td>
+<td>an application entity</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>presentationAddress, cn</td>
+<td>supportedApplicationContext, seeAlso, ou, o, l, description</td>
+</tr>
+<tr>
+<td>dSA</td>
+<td>a directory system agent</td>
+<td>applicationEntity</td>
+<td>STRUCTURAL</td>
+<td>(inherited)</td>
+<td>knowledgeInformation</td>
+</tr>
+<tr>
+<td>device</td>
+<td>a device</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>cn</td>
+<td>serialNumber, seeAlso, owner, ou, o, l, description</td>
+</tr>
+<tr>
+<td>strongAuthenticationUser</td>
+<td>a strong authentication user</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>userCertificate</td>
+<td>—</td>
+</tr>
+<tr>
+<td>certificationAuthority</td>
+<td>a certificate authority</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>authorityRevocationList, certificateRevocationList, cACertificate</td>
+<td>crossCertificatePair</td>
+</tr>
+<tr>
+<td>groupOfUniqueNames</td>
+<td>a group of unique names</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>uniqueMember, cn</td>
+<td>similar to groupOfNames</td>
+</tr>
+<tr>
+<td>userSecurityInformation</td>
+<td>a user security information</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>—</td>
+<td>supportedAlgorithms</td>
+</tr>
+<tr>
+<td>certificationAuthority-V2</td>
+<td>updated certificate authority</td>
+<td>certificationAuthority</td>
+<td>AUXILIARY</td>
+<td>(inherited)</td>
+<td>deltaRevocationList</td>
+</tr>
+<tr>
+<td>cRLDistributionPoint</td>
+<td>a CRL distribution point</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>cn</td>
+<td>certificateRevocationList, authorityRevocationList, deltaRevocationList</td>
+</tr>
+<tr>
+<td>dmd</td>
+<td>Directory Management Domain</td>
+<td>top</td>
+<td>STRUCTURAL</td>
+<td>dmdName</td>
+<td>same MAYs as organization</td>
+</tr>
+<tr>
+<td>pkiUser</td>
+<td>a PKI user</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>—</td>
+<td>userCertificate</td>
+</tr>
+<tr>
+<td>pkiCA</td>
+<td>a PKI certificate authority</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>—</td>
+<td>various certificate-related attributes</td>
+</tr>
+<tr>
+<td>deltaCRL</td>
+<td>X.509 delta CRL</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>—</td>
+<td>deltaRevocationList</td>
+</tr>
+<tr>
+<td>labeledURIObject</td>
+<td>object that contains URI attribute</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>—</td>
+<td>labeledURI</td>
+</tr>
+<tr>
+<td>dcObject</td>
+<td>domain component object</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>dc</td>
+<td>—</td>
+</tr>
+<tr>
+<td>uidObject</td>
+<td>uid object</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>uid</td>
+<td>—</td>
+</tr>
+<tr>
+<td>simpleSecurityObject</td>
+<td>simple security object</td>
+<td>top</td>
+<td>AUXILIARY</td>
+<td>userPassword</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>📘 AttributeTypes Overview</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Attribute</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Syntax</strong></th>
+<th><strong>Single-Valued?</strong></th>
+<th><strong>Usage/Notes</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>Country name</td>
+<td>1.3.6.1.4.1.1466.115.121.1.26 (Printable String)</td>
+<td>✅</td>
+<td>2-letter ISO country code</td>
+</tr>
+<tr>
+<td>cn</td>
+<td>Common name</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Used in person, group, role, etc.</td>
+</tr>
+<tr>
+<td>sn</td>
+<td>Surname</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Mandatory for person</td>
+</tr>
+<tr>
+<td>serialNumber</td>
+<td>Device or certificate serial number</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Device or certificate tracking</td>
+</tr>
+<tr>
+<td>l</td>
+<td>Locality (e.g. city)</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Synonym: localityName</td>
+</tr>
+<tr>
+<td>st</td>
+<td>State or province name</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>—</td>
+</tr>
+<tr>
+<td>street</td>
+<td>Street address</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>—</td>
+</tr>
+<tr>
+<td>o</td>
+<td>Organization name</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Required for organization</td>
+</tr>
+<tr>
+<td>ou</td>
+<td>Organizational unit name</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Required for organizationalUnit</td>
+</tr>
+<tr>
+<td>title</td>
+<td>Job title or position</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Common in organizationalPerson</td>
+</tr>
+<tr>
+<td>description</td>
+<td>Description or comment</td>
+<td>Directory String</td>
+<td>❌</td>
+<td>Generic descriptive field</td>
+</tr>
+<tr>
+<td>searchGuide</td>
+<td>Search guide</td>
+<td>Directory String</td>
+<td>❌</td>
+<td>Obsolete; rarely used</td>
+</tr>
+<tr>
+<td>businessCategory</td>
+<td>Business category</td>
+<td>Directory String</td>
+<td>❌</td>
+<td>—</td>
+</tr>
+<tr>
+<td>postalAddress</td>
+<td>Postal address</td>
+<td>Directory String</td>
+<td>❌</td>
+<td>Multi-line address format</td>
+</tr>
+<tr>
+<td>postalCode</td>
+<td>Postal (ZIP) code</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>—</td>
+</tr>
+<tr>
+<td>postOfficeBox</td>
+<td>PO Box number</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>—</td>
+</tr>
+<tr>
+<td>physicalDeliveryOfficeName</td>
+<td>Office location</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>—</td>
+</tr>
+<tr>
+<td>telephoneNumber</td>
+<td>Telephone number</td>
+<td>Telephone Number (syntax)</td>
+<td>❌</td>
+<td>E.123 format</td>
+</tr>
+<tr>
+<td>seeAlso</td>
+<td>Related entry (DN)</td>
+<td>Distinguished Name</td>
+<td>❌</td>
+<td>Points to other directory entries</td>
+</tr>
+<tr>
+<td>userPassword</td>
+<td>User password</td>
+<td>Octet String</td>
+<td>❌</td>
+<td>Stored hashed or encrypted</td>
+</tr>
+<tr>
+<td>userCertificate</td>
+<td>X.509 user certificate</td>
+<td>Certificate Syntax</td>
+<td>❌</td>
+<td>DER-encoded</td>
+</tr>
+<tr>
+<td>cACertificate</td>
+<td>CA certificate</td>
+<td>Certificate Syntax</td>
+<td>❌</td>
+<td>DER-encoded</td>
+</tr>
+<tr>
+<td>authorityRevocationList</td>
+<td>CA authority revocation list</td>
+<td>Revocation List Syntax</td>
+<td>❌</td>
+<td>DER-encoded</td>
+</tr>
+<tr>
+<td>certificateRevocationList</td>
+<td>CA certificate revocation list</td>
+<td>Revocation List Syntax</td>
+<td>❌</td>
+<td>DER-encoded</td>
+</tr>
+<tr>
+<td>crossCertificatePair</td>
+<td>X.509 cross certificate pair</td>
+<td>Certificate Pair</td>
+<td>❌</td>
+<td>DER-encoded</td>
+</tr>
+<tr>
+<td>deltaRevocationList</td>
+<td>Delta CRL</td>
+<td>Revocation List Syntax</td>
+<td>❌</td>
+<td>DER-encoded</td>
+</tr>
+<tr>
+<td>dmdName</td>
+<td>Directory Management Domain name</td>
+<td>Printable String</td>
+<td>❌</td>
+<td>Required by dmd objectClass</td>
+</tr>
+<tr>
+<td>presentationAddress</td>
+<td>OSI presentation address</td>
+<td>Presentation Address Syntax</td>
+<td>❌</td>
+<td>Required by applicationEntity</td>
+</tr>
+<tr>
+<td>supportedApplicationContext</td>
+<td>App context OID</td>
+<td>OID</td>
+<td>❌</td>
+<td>For OSI apps</td>
+</tr>
+<tr>
+<td>knowledgeInformation</td>
+<td>Knowledge info for DSA</td>
+<td>Directory String</td>
+<td>❌</td>
+<td>Obsolete</td>
+</tr>
+<tr>
+<td>owner</td>
+<td>Owner DN</td>
+<td>Distinguished Name</td>
+<td>❌</td>
+<td>DN of entry owner</td>
+</tr>
+<tr>
+<td>member</td>
+<td>Group member DN</td>
+<td>Distinguished Name</td>
+<td>❌</td>
+<td>Used in groupOfNames</td>
+</tr>
+<tr>
+<td>uniqueMember</td>
+<td>Unique member DN</td>
+<td>Name and Optional UID</td>
+<td>❌</td>
+<td>Used in groupOfUniqueNames</td>
+</tr>
+<tr>
+<td>labeledURI</td>
+<td>URI with optional label</td>
+<td>IA5 String</td>
+<td>❌</td>
+<td>Used in labeledURIObject</td>
+</tr>
+<tr>
+<td>dc</td>
+<td>Domain component</td>
+<td>IA5 String</td>
+<td>❌</td>
+<td>Required for dcObject</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>User ID</td>
+<td>Directory String</td>
+<td>❌</td>
+<td>Required for uidObject</td>
+</tr>
+<tr>
+<td>supportedAlgorithms</td>
+<td>Supported security algorithms</td>
+<td>OID</td>
+<td>❌</td>
+<td>Used in userSecurityInformation</td>
+</tr>
+</tbody>
+</table></div>

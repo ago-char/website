@@ -1,0 +1,231 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>LDAP Introductory Setup</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>LDAP Introductory Setup</h1>
+<p><a href="https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol">LDAP</a> is simply a directory related protocol that stores information on name:value basis mapping name to value just like DNS. Say,  you wanna know : <em>what is the address of the manager of the company 'Hello' located on California who report to CEO1 'Rakesh' ?</em>. You may use <a href="https://linux.die.net/man/1/ldapsearch">ldapsearch</a> and get that in matter of seconds, even milisecond.
+I will request you to <a href="file:///home/maharaja/study/Free-DevOps-Books-1/LDAP.html#What%20is%20LDAP">read official documentation.</a> for more detailing on LDAP.</p>
+<h1>Client Side Programs</h1>
+<p>Before configuring server side, let's look at some client side programs that will help to browse, search and modify the server files/recoreds/directory.</p>
+<h2>ldapadd</h2>
+<p>It is nothing but <code>ldapmodify -a</code>. See next.</p>
+<h2>ldapmodify</h2>
+<p><strong>ldapmodify</strong> opens a connection to an LDAP server, binds, and modifies or adds entries. The entry information is read from standard input or from <em>file</em> through the use of the <strong>-f</strong> option.</p>
+<h3>Useful opts</h3>
+<pre><code>-n shows what will be done, but won't actually do
+-v verbose mode, useful with -n
+-a add entries, default for ldapmodify
+-c continuios operation mode, don't stop modifying even if error
+-f &lt;file&gt; read entry from file
+-S &lt;file&gt; add or change records which where skipped due to an error are written to _file_ and the error message returned by the server is added as a comment. Most useful in conjunction with -c. 
+-D &lt;binddn&gt; bind with particular Distunguished Name, this will override BINDDN directive in /etc/ldap/ldap.conf
+-x use simple auth, default is to use SASL
+-W prompt for auth/password
+</code></pre>
+<h2>ldapsearch</h2>
+<ul>
+<li>open conn to ldap server, binds, auth and search</li>
+<li>search depends on filters/options/parameters</li>
+<li>default filter is (objectClass=*)</li>
+<li>if more than one entry is found, entry specified by filters will be returned</li>
+<li>if * is used, all user attributes are returned</li>
+<li>if + is used, all operational attributes are returned </li>
+<li>if none , all user attributes are returned</li>
+</ul>
+<h3>Useful opts</h3>
+<pre><code>-n shows what will be done, but won't actually do
+-v verbose mode, useful with -n
+-u include user friendly domain for eg : dn=example,dn=com to example.com
+-t\[t] single -t write retrived non-printable vals to files, this helps getting audio/pics,etc. Another -t writes retrived printable vals to files
+-T &lt;path&gt; wirte temp files to specified path by -T &lt;path&gt;, useful with -t
+-A if you are interested only on attributes but not the value, then use -A
+-S &lt;attrib&gt; sorts results based on attrib
+-z &lt;num&gt; search results limited to &lt;num&gt; number of entries
+-D &lt;binddn&gt; bind with particular Distunguished Name, this will override BINDDN directive in /etc/ldap/ldap.conf
+</code></pre>
+<h2>ldapdelete</h2>
+<p><strong>ldapdelete</strong> opens a connection to an LDAP server, binds, and deletes one or more entries. If one or more <em>DN</em> arguments are provided, entries with those Distinguished Names are deleted.</p>
+<h3>Useful Opts</h3>
+<pre><code>-n shows what will be done, but won't actually do
+-v verbose mode, useful with -n
+-f &lt;file&gt; read a series of DNs from _file_, one per line, performing an LDAP delete for each
+-r do a recursive delete. If the DN specified isn't a leaf, its children, and all their children are deleted down the tree. No verification is done, so if you add this switch, ldapdelete will happily delete large portions of your tree. Use with care
+-z &lt;sizelimit&gt; Use _sizelimit_ when searching for children DN to delete, to circumvent any server-side size limit. Only useful in conjunction with -r.
+-x use simple auth instead of SASL
+</code></pre>
+<h1>Setup</h1>
+<p>Install and follow the instructions, basically you will be prompted to choose admin password. If you ever need GUI help, <a href="https://www.linuxbabe.com/ubuntu/install-configure-openldap-server-ubuntu-16-04">chek at linuxbabe</a>.</p>
+<pre><code>sudo apt install slapd
+# Choose admin password here
+</code></pre>
+<p>Main server config dir : <code>/etc/ldap/slapd.d</code> includes :</p>
+<pre><code>├── cn=config
+│   ├── cn=module{0}.ldif
+│   ├── cn=schema
+│   │   ├── cn={0}core.ldif
+│   │   ├── cn={1}cosine.ldif
+│   │   ├── cn={2}nis.ldif
+│   │   └── cn={3}inetorgperson.ldif
+│   ├── cn=schema.ldif
+│   ├── olcDatabase={0}config.ldif
+│   ├── olcDatabase={-1}frontend.ldif
+│   └── olcDatabase={1}mdb.ldif
+└── cn=config.ldif
+</code></pre>
+<p>Global configs are on <code>cn=config.ldif</code>, the <code>olc*</code> are databases.</p>
+<p>You can change some basic settings (if you are only prompted for password while installation) like domain name, pw, org name etc. :</p>
+<pre><code>sudo dpkg-reconfigure slapd
+</code></pre>
+<p>I have set :
+domain name =&gt; example.com
+pw=&gt; ................
+org=&gt; surror</p>
+<p>You may wanna know that data entries (that you have done) are also stored under <code>/var/lib/ldap</code>.</p>
+<p>Now start and check status :</p>
+<pre><code>sudo systemctl start slapd
+systemctl status slapd
+ss -tl sport 389
+</code></pre>
+<p>You may want to know that <code>ldap</code> daemon itself is not activated, to make service persistence through reboot, you should enable via <code>systemctl</code> :</p>
+<pre><code>sudo systemctl enable slapd
+</code></pre>
+<h1>Clients</h1>
+<p>On client side, to save some typing while using client side programs (because this file will save defaults) you may wanna add at <code>/etc/ldap/ldap.conf</code>:</p>
+<pre><code>BASE dc=example,dc=com # the same when you ran dpkg-reconfigure slapd
+URI ldap://ldap.example.com # this  can be anything i.e. the server host/ip where you install slapd
+</code></pre>
+<p>IF you search by now (as no entries are explicitly made to ldad) :</p>
+<pre><code># as we have applied defaults in /etc/ldap/ldap.conf, the following search is expanded to : ldapsearch -x -LLL -H ldap://kali.pastcast.com -b &quot;dc=example, dc=com&quot;
+$ ldapsearch -x -LLL
+dn: dc=example,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: surror
+dc: example
+</code></pre>
+<p>You realised, your organization is <strong>surror</strong> beb.</p>
+<p>Add "<strong>PARTNERS</strong>" as Organizational Unit. But this is not necessary if you are not willing to create child of this item. Anyway this is just an example.</p>
+<pre><code>ldapadd -xW -D &quot;cn=admin,dc=example,dc=com&quot; -f PARTNERS.ldif 
+Enter LDAP Password: 
+adding new entry &quot;ou=Partners, dc=example, dc=com&quot;
+</code></pre>
+<p>The content of PARTNERS.ldif :</p>
+<pre><code>dn: ou=Partners, dc=example, dc=com
+objectClass: organizationalUnit
+ou: Partners
+description: Business Partners
+</code></pre>
+<p>While adding, you may have noticed you need <strong>BINDDN</strong> as by <code>-D</code> as <em>-D "cn=admin,dc=example,dc=com"</em>, to save typing you can add in <code>~/.ldaprc</code> :</p>
+<pre><code>BINDDN  cn=admin,dc=example,dc=com
+</code></pre>
+<p>From next time, you can skip <code>-D "cn=admin,dc=example,dc=com"</code> unless you are binding to different user DN.</p>
+<p>You may question why not in <code>/etc/ldap/ldap.conf</code> ? -&gt; As man page says <em>user-only option</em>, this can be set to specific user only, not systemwide :</p>
+<blockquote>
+<p><strong>BINDDN</strong> \<dn> : Specifies the default bind DN to use when performing ldap operations. The bind DN must be specified as a Distinguished Name in LDAP format. This is a user-only option. </p>
+</blockquote>
+<p>Now if you search for organizationalUnit partners; as you have guessed :</p>
+<pre><code>$ ldapsearch -x -LLL ou=partners
+dn: ou=Partners,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Partners
+description: Business Partners
+</code></pre>
+<p>Or you want only description :</p>
+<pre><code>$ ldapsearch -x -LLL ou=partners description
+dn: ou=Partners,dc=example,dc=com
+description: Business Partners
+</code></pre>
+<p>You may think it as mistaken entry and can delete using DN :</p>
+<pre><code>$ ldapdelete &quot;ou=Partners,dc=example,dc=com&quot;
+</code></pre>
+<h1>Example</h1>
+<p>Think of :
+- partners of example.com
+- namely : deeya smarika
+- partners' info should be : title, phone, email, address, photo, description</p>
+<p>But before creating examples or records, it has it's own rule. I request you to read all of these to be familier with LDAP files and recording style.</p>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc2849.txt">RFC 2849 Attributes ex and def</a>, also <a href="https://ftpdocs.broadcom.com/cadocs/0/CA%20Process%20Automation%2004%203%2000-JPN/Bookshelf_Files/HTML/Content%20Designer%20Reference/1187917.html">attributes list</a></li>
+<li><a href="https://www.openldap.org/software//man.cgi?query=LDIF&amp;sektion=5&amp;utm_source=chatgpt.com">LDIF format</a></li>
+<li>Check <a href="https://linux.die.net/man/5/ldap.conf">ldap conf</a> man page also</li>
+<li>MORE IMPORTANTLY <a href="/tutorials/linux-networking/ldap/ldap-core-schema/">LDAP Core Schema</a> and <a href="/tutorials/linux-networking/ldap/ldap-cosine-schema/">LDAP Cosine Schema</a></li>
+</ul>
+<h2>Till now no record as Searched</h2>
+<p>Remember on fresh installation, just <em>surror</em> as Organization was choosed.</p>
+<pre><code>$ ldapsearch -x -LLL
+dn: dc=example,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: surror
+dc: example
+</code></pre>
+<h2>Partners as Organizational Unit <code>PARTNERS.ldif</code></h2>
+<pre><code>dn: ou=Partners, dc=example, dc=com
+objectClass: organizationalUnit
+ou: Partners
+description: Business Partners
+</code></pre>
+<p>Add :</p>
+<pre><code>$ ldapadd -xW -f PARTNERS.ldif 
+Enter LDAP Password: 
+adding new entry &quot;ou=Partners, dc=example, dc=com&quot;
+</code></pre>
+<h2>Deeya (<code>deeya.ldif</code>) and Smarika(<code>smarika.ldif</code>) are PARTNERS</h2>
+<p>Deeya:</p>
+<pre><code># deeya.ldif
+dn: cn=Deeya,dc=example,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+title: Investment Based Partner
+givenName: Dimpi
+cn: Deeya
+sn: Pokheral
+registeredAddress: Ramailo, Morang
+mobile: 9842142144
+mail: dimpi@deeya.com
+jpegPhoto: &lt; file:///home/maharaja/Pictures/deeya.jpg
+description: Black Dress, still remember, ilv
+</code></pre>
+<p>Smarika:</p>
+<pre><code>dn: cn=Smarika,dc=example,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+title: Idea Based Partner
+givenName: TiktokQueen
+cn: Smarika
+sn: Nepal
+registeredAddress: Sukrabare, Morang
+mobile: 9811911921
+mail: tiktokqueen@smarika.com
+jpegPhoto: &lt; file:///home/maharaja/Pictures/smarika.jpg
+description: First Day Yellow Shirt, Green Skirt, specially 'kazra lagae aai kesh me hai kesh me', still remember that hair uff ilv
+</code></pre>
+<p>Add both :</p>
+<pre><code>$ for partner in {smarika,deeya}.ldif; do ldapadd -xW -f &quot;$partner&quot;; done
+Enter LDAP Password: 
+adding new entry &quot;cn=Smarika,dc=example,dc=com&quot;
+
+Enter LDAP Password: 
+adding new entry &quot;cn=Deeya,dc=example,dc=com&quot;
+</code></pre>
+<h2>Search for Pic of Smarika</h2>
+<p>You have place record in server, let's search now.</p>
+<pre><code>ldapsearch -x -LLL cn=deeya jpegphoto -t -T /path/to/dir
+</code></pre>
+<p>You will get org location of the photo in some temp file inside <code>/path/to/dir</code>,  browse to view.</p>
+<h1 style="color: #c80f0f;">Words of CAUTION</h1>
+<p>You should plan before putting records on LDAP. I mean always be sure what is the kind of records you are placing on LDAP. You may not want your trade secrets there.</p>
+<p>I don't think it is necessary to keep the file <code>someRecord.ldif</code> at client side, after placing it at the server db, because these are usually unsafe place to store such data and may expose. Well, you can just create one in <code>/tmp</code> and delete after operation is somlete, because it can be retrieved from server which needed.</p></div>

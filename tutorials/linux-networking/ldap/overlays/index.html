@@ -1,0 +1,33 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>Introduction to Overlays in LDAP</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/linux-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<h1>OVERLAYS</h1>
+<p>Overlays are software components that provide hooks to functions analogous to those provided by backends, which can be stacked on top of the backend calls and as callbacks on top of backend responses to alter their behavior.</p>
+<p>Overlays may be compiled statically into <em>slapd</em>, or when module support is enabled, they may be dynamically loaded. Most of the overlays are only allowed to be configured on individual databases.</p>
+<p>Essentially, overlays represent a means to:</p>
+<ul>
+<li>customize the behavior of existing backends without changing the backend code and without requiring one to write a new custom backend with complete functionality</li>
+<li>write functionality of general usefulness that can be applied to different backend types</li>
+</ul>
+<p>Think of this as extention in browsers. Say, you want to log every read and write activity done in certain database. One way to achieve this is to write backend, that will do read, write, and also log in special database. This is tedious, because LDAP already and perform read, write, etc. To log is put <strong>overlay</strong> somewhere in between frontend and backend component, so the overlay software can log the activity even before reaching to the backend. This is flexible because as user POV, he is doing what he has been doing, but you as an admin now have the overview somewhere dumped which later can be analysed.
+Pictorically :</p>
+<p><img src="/pics/LDAPOVERLAY.png" alt="LDAPOVERLAY.png"></p>
+<p>Overlays are usually documented by separate specific man pages in section 5; the naming convention is : <code>slapo-&lt;overlay name&gt;</code></p>
+<p>If you are interested in what overlays are available, you can <a href="https://linux.die.net/man/5/slapd.overlays">check man page</a>. Typically, following are the steps to make an overlay into work :</p>
+<ol>
+<li>Overlays are used as modules, these are available in your library, say in Debian <code>/var/lib/ldap</code>. So, <strong>import any overlay you wanna use as module</strong>.</li>
+<li>Create Database or Branch in the DIT (Directory Information Tree) for the module to work its internal functionalities.</li>
+<li>Add Overlay to required database usually under <code>cn=config</code>.</li>
+</ol>
+<p>Don't worry much on this. On subsequents chapters, we will reveal how to make them in work environment.
+Never Mind Reading <a href="https://www.openldap.org/doc/admin26/guide.html#Overlays">Official Documentation on Overlays</a>.</p></div>
