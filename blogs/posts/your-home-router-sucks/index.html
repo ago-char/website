@@ -1,0 +1,105 @@
+<link rel="icon" type="image/png" href="/pics/icos/happy_9760313.png"/>
+<link rel="stylesheet" href="/css/main-style.css">
+<link rel="stylesheet" href="/css/tut-styl.css">
+<link rel="stylesheet" href="/css/md-style.css">
+<title>Home Router Just Sucks</title>
+<script src="/javascript/load.js"></script>
+<script>
+    includeHTML('/includes/navbar.html', 'navbar');
+    includeHTML('/includes/others-sidebar.html', 'sidebar');
+</script>
+<div class="navbar" id="navbar"></div>
+<div class="sidebar" id="sidebar"></div>
+<div class="content">
+<p>I was thinking of managing my home router and <a href="https://fcc.report/FCC-ID/2ADZRG2425GA/4968412.pdf">get the official documentation</a> of my <strong>G-2425G-A</strong> router. Well this is an ONT device which can act as switch, router, AP and even mini firewall. But the thing is, services are limited and stay tuned, after the research and practice, I found, some of the service included like as important as : <em>port forwarding</em> does not even work.</p>
+<h2>Can't Even Access WEB portal</h2>
+<p>Well, Don't think this router as ordinary ones (Although it is).  <strong>I did the same mistake</strong>. The mistake was trying to access web portal which most of the routers run at port 80. <strong>I was brutally denied</strong> of all hops of complete management of my router.</p>
+<h2>But I do have a Method</h2>
+<p>I was not in mood of losing, I did some nmap scan :</p>
+<pre><code>sudo nmap 192.168.1.154
+# snipped output
+Not shown: 997 closed tcp ports (reset)
+PORT    STATE    SERVICE
+22/tcp  open     ssh
+23/tcp  open     telnet
+80/tcp  filtered http
+</code></pre>
+<p>This give me hope as port could be open but filtered for external use. I even call my ISP, and they said : <strong>Due to security reasons, normal customers are not given access to web portal</strong>.  Well, this is good, but let me be Abnormal now.</p>
+<h2>SSH is a way through</h2>
+<p>The scan clearly shows I could get into the router using ssh. <strong>But this will give me command line access but you had said web portal ?</strong> This might me your question. As I said, go along with me. <a href="https://www.digitalocean.com/community/tutorials/ssh-port-forwarding#dynamic-port-forwarding-ssh-d">Ever Heard of Dynamic SSH Forwarding</a>. Teaching ssh forwarding is out of scope of this blog, But think of this :</p>
+<blockquote>
+<p>If you need to access any server that is only locally running on any machine and if the machine allow you ssh, they you can access any server running locally with just one command.</p>
+</blockquote>
+<p>Let's run the magic command : </p>
+<pre><code>ssh -D 9999 user@192.168.1.254
+</code></pre>
+<p>This will open socks5 proxy (at port 9999) at your localhost, that will serve you as middleman to get anything from <code>192.168.1.254</code>.</p>
+<h2>Get into the broswer now :</h2>
+<p>Now you go into the browser and type whatever you had previous, typically :</p>
+<pre><code>http://192.168.1.254
+</code></pre>
+<p>I know you are frusted and saying <strong>What the f#k bro ?</strong>, Not yet, we have forget just a minor thing. The firefox should work as our proxy socks server at port 9999, Set it up like this and see the magic happening in your eyes.</p>
+<p>The settings will be at <code>about:preferences</code> of firefox, you can search for <code>proxy</code> :</p>
+<p><img src="/pics/setting-sockes-proxy.png" alt="setting-sockes-proxy.png"></p>
+<p>This is the last time, you search, I promise :</p>
+<pre><code>http://192.168.1.254
+</code></pre>
+<p>Now tell me, you did not get this page. </p>
+<p><img src="/pics/router-login-page.png" alt="router-login-page.png"></p>
+<p>At least, you should thank me. Kidding....</p>
+<h2>Change Your Password Dude</h2>
+<p>Many folks are using <a href="https://setuprouter.com/router/nokia/g-2425g-a/login.htm">this website</a> to get the default password of your router, Change it right now. Got to <strong>Maintenance-&gt;Password</strong> as such :</p>
+<p><img src="/pics/router-pw-change.png" alt="router-pw-change.png"></p>
+<p>I should not say keep your password strong.</p>
+<h2>Enable HTTP</h2>
+<p>All of this hassle was due to Denial by Access Control Policy of your router. Go to <strong>Security&gt;Access Control</strong> to change it as <em>Deny/Deny</em> for SSH, <em>Allow/Allow</em> for HTTP and save it. YOU MAY BE KICKED OUT but you can now login without SSH setup and proxy setup. Make sure to disable proxy before accessing router row.</p>
+<p>The following should be the setup before you save :</p>
+<p><img src="/pics/acl-in-router.png" alt="acl-in-router.png"></p>
+<h4><span style="color:red">WARNING HERE</span></h4>
+<p>Don't ever <em>Deny/Deny</em> both SSH and HTTP, else you will have no way to get in unless you got into resetting your router and following the same tutorial from the very beginning. Trust me, you don't wanna do so.</p>
+<h3>Why am I even telling to deny SSH ?</h3>
+<p>This question should be popping on your mind, I will answer :</p>
+<blockquote>
+<p>I have not yet found a way to write changes to router, unless the change is made from router web itself, so even if you login to SSH and change some settings, it will last till just a reboot of router, and So, your default password of SSH (this is different than login even though they were same at the beginning) can never be changed as persistence solution. This means another scope of attack, even for a neighbor who wanna see you. Let you be first to spy. Bro ! It is a CRIME.</p>
+</blockquote>
+<h2>Set Security Level to Low</h2>
+<p>You may be asking - Why, in this god green earth I would set security to <em>low</em>, it should be <strong><em>HIGH</em></strong>, bold, italic and uppercase. Let me walk through a scenerio. Currently your security posture at <strong>Security&gt;Firewall</strong> is :</p>
+<p><img src="/pics/high-security.png" alt="high-security.png"></p>
+<p>Say you have a web server running at non-standard port 8080. Try to access that server : </p>
+<pre><code>curl -v 192.168.1.80:8080
+*   Trying 192.168.1.80:8080...
+
+
+
+</code></pre>
+<p><code>curl</code> will only keep trying, it does not know <strong>your security was high.</strong></p>
+<p>As asked, Make security LOW.</p>
+<p><img src="/pics/low-security.png" alt="low-security.png"></p>
+<p><code>curl</code> has not been smarter, you have been.</p>
+<pre><code>curl -v 192.168.1.80:8080 -o index.html
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 192.168.1.80:8080...
+* Connected to 192.168.1.80 (192.168.1.80) port 8080 (#0)
+&gt; GET / HTTP/1.1
+&gt; Host: 192.168.1.80:8080
+&gt; User-Agent: curl/7.88.1
+&gt; Accept: */*
+&gt; 
+&lt; HTTP/1.1 200 OK
+&lt; Server: nginx/1.24.0 (Ubuntu)
+&lt; Date: Wed, 02 Jul 2025 13:44:40 GMT
+&lt; Content-Type: text/html
+&lt; Content-Length: 914
+&lt; Last-Modified: Tue, 01 Jul 2025 16:55:00 GMT
+&lt; Connection: keep-alive
+&lt; ETag: &quot;686412e4-392&quot;
+&lt; Accept-Ranges: bytes
+&lt; 
+{ [914 bytes data]
+100   914  100   914    0     0  61777      0 --:--:-- --:--:-- --:--:-- 65285
+* Connection #0 to host 192.168.1.80 left intact
+</code></pre>
+<h1>Further Reading</h1>
+<p>Read the <a href="https://fcc.report/FCC-ID/2ADZRG2425GA/4968412.pdf">official doc on pdf</a>and get going with more and more unexplored features.</p>
+<p>But you should probaby REPLACE YOUR ROUTER, <a href="https://www.cvedetails.com/cve/CVE-2022-30903/">this is vulnerable</a> to <a href="https://owasp.org/www-community/attacks/xss/">Cross Site Scripting (XSS)</a>.</p></div>
